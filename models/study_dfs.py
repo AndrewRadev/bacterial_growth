@@ -131,8 +131,11 @@ def get_general_info(studyId, conn):
     result['techniques'] = list(conn.execute(sql.text(query), params).scalars())
 
     query = """
-        SELECT DISTINCT metabo_name, chebi_id
+        SELECT DISTINCT
+            Metabolites.metabo_name as metabo_name,
+            Metabolites.chebi_id
         FROM MetabolitePerExperiment
+          INNER JOIN Metabolites on MetabolitePerExperiment.chebi_id = Metabolites.chebi_id
         WHERE studyId = :studyId
         ORDER BY metabo_name ASC
     """
@@ -277,5 +280,5 @@ def get_fc_counts(studyId, conn):
 def get_metabolites_per_replicate(studyId, conn):
     query = "SELECT * FROM MetabolitePerExperiment WHERE studyId = %(studyId)s;"
     df_metabolites = pd.read_sql(query, conn, params={'studyId': studyId})
-    columns_to_exclude = ['experimentUniqueId', 'experimentId', 'bioreplicateUniqueId']
+    columns_to_exclude = ['experimentUniqueId', 'bioreplicateUniqueId']
     return df_metabolites.drop(columns=columns_to_exclude)
