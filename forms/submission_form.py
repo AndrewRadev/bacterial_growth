@@ -1,5 +1,6 @@
-from uuid import uuid4
 import copy
+import itertools
+from uuid import uuid4
 from typing import List, Tuple
 
 import sqlalchemy as sql
@@ -18,35 +19,39 @@ class SubmissionForm:
     def __init__(self, submission_id=None, step=0, db_session=None, user_uuid=None):
         self.step       = step
         self.db_session = db_session
+        self.errors     = []
+
+        defaultStudyDesign = {
+            'project': {'name': None, 'description': None},
+            'study':   {'name': None, 'description': None},
+
+            'vessel_type':     None,
+            'bottle_count':    None,
+            'plate_count':     None,
+            'vessel_count':    None,
+            'column_count':    None,
+            'row_count':       None,
+            'timepoint_count': None,
+            'strains':         [],
+            'new_strains':     [],
+            'techniques':      [],
+        }
 
         # Load submission object
         self.submission = None
         if submission_id is not None:
             self.submission = self.db_session.get(Submission, submission_id)
+            self.submission.studyDesign = {
+                **defaultStudyDesign,
+                **self.submission.studyDesign,
+            }
 
         if self.submission is None:
             self.submission = Submission(
                 projectUniqueID=None,
                 studyUniqueID=None,
                 userUniqueID=user_uuid,
-                studyDesign={
-                    'project': {
-                        'name':        None,
-                        'description': None,
-                    },
-                    'vessel_type':     None,
-                    'bottle_count':    None,
-                    'plate_count':     None,
-                    'vessel_count':    None,
-                    'column_count':    None,
-                    'row_count':       None,
-                    'timepoint_count': None,
-                    'technique_types': [],
-                    'strains':         [],
-                    'new_strains':     [],
-                    'metabolites':     [],
-                }
-
+                studyDesign=defaultStudyDesign,
             )
 
         # Check for an existing project/study and set the submission "type" accordingly:
@@ -55,29 +60,40 @@ class SubmissionForm:
         self.type       = self._determine_project_type()
 
     def update_project(self, data):
-        self.type = data['submission_type']
+        # Update IDs:
+        if data['project_uuid'] == '_new':
+            self.submission.projectUniqueID = str(uuid4())
+        else:
+            self.submission.projectUniqueID = data['project_uuid']
+
+        if data['study_uuid'] == '_new':
+            self.submission.studyUniqueID = str(uuid4())
+        else:
+            self.submission.studyUniqueID = data['study_uuid']
+
+        # Update text fields:
         self.submission.studyDesign['project'] = {
             'name':        data['project_name'],
-            'description': data['project_description'],
+            'description': data.get('project_description', ''),
+        }
+        self.submission.studyDesign['study'] = {
+            'name':        data['study_name'],
+            'description': data.get('study_description', ''),
         }
         flag_modified(self.submission, 'studyDesign')
 
-        if self.type == 'new_project':
-            self.submission.projectUniqueID = str(uuid4())
-            self.submission.studyUniqueID   = str(uuid4())
-        elif self.type == 'new_study':
-            self.submission.projectUniqueID = data['project_uuid']
-            self.submission.studyUniqueID   = str(uuid4())
-        elif self.type == 'update_study':
-            self.submission.projectUniqueID = data['project_uuid']
-            self.submission.studyUniqueID   = data['study_uuid']
+        # Validate uniqueness:
+        self._validate_unique_project_names()
 
+        # Check whether projects exist:
         self.project_id = self._find_project_id()
         self.study_id   = self._find_study_id()
+        self.type       = self._determine_project_type()
 
     def update_strains(self, data):
         self.submission.studyDesign['strains']     = data['strains']
         self.submission.studyDesign['new_strains'] = data['new_strains']
+
         flag_modified(self.submission, 'studyDesign')
 
     def update_study_design(self, data):
@@ -96,8 +112,7 @@ class SubmissionForm:
             study_design['vessel_count'] = data['plate_count']
 
         study_design['timepoint_count'] = data['timepoint_count']
-        study_design['technique_types'] = data['technique_types']
-        study_design['metabolites']     = data['metabolites']
+        study_design['techniques'] = data['techniques']
 
         self.submission.studyDesign = study_design
         flag_modified(self.submission, 'studyDesign')
@@ -127,8 +142,13 @@ class SubmissionForm:
 
         return new_strains
 
-    def fetch_metabolites(self):
-        metabolites = self.submission.studyDesign['metabolites']
+    def fetch_metabolites(self, technique_index=None):
+        if technique_index is None:
+            # In a new form, we don't have any metabolites to list
+            return []
+
+        techniques = self.submission.studyDesign['techniques']
+        metabolites = techniques[technique_index]['metabolites']
 
         return self.db_session.scalars(
             sql.select(Metabolite)
@@ -140,6 +160,21 @@ class SubmissionForm:
         self.db_session.commit()
 
         return self.submission.id
+
+    def has_error(self, key):
+        return key in self.errors
+
+    def error_messages(self):
+        # Flatten messages per property:
+        return list(itertools.chain.from_iterable(self.errors.values()))
+
+    def html_step_classes(self, target_step):
+        if self.step < target_step:
+            return 'disabled'
+        elif self.step == target_step:
+            return 'active'
+        else:
+            return ''
 
     def _find_project_id(self):
         if self.submission.projectUniqueID is None:
@@ -166,3 +201,37 @@ class SubmissionForm:
             return 'new_study'
         else:
             return 'new_project'
+
+    def _validate_unique_project_names(self):
+        self.errors = {}
+
+        project_name = self.submission.studyDesign['project']['name']
+        # study_name   = self.submission.studyDesign['study']['name']
+
+        if len(project_name) > 0:
+            project_exists = self.db_session.query(
+                sql.exists()
+                .where(
+                    Project.projectName == project_name,
+                    Project.projectUniqueID != self.submission.projectUniqueID
+                )
+            ).scalar()
+
+            if project_exists:
+                self.errors['project_name'] = ["Project name is taken"]
+
+        # TODO (2025-03-24) Discuss whether study names should be unique
+        #
+        # if len(study_name) > 0:
+        #     study_exists = self.db_session.query(
+        #         sql.exists()
+        #         .where(
+        #             Study.studyName == study_name,
+        #             Study.studyUniqueID != self.submission.studyUniqueID
+        #         )
+        #     ).scalar()
+        #
+        #     if study_exists:
+        #         self.errors['study_name'] = ["Study name is taken"]
+
+        return len(self.errors) == 0
