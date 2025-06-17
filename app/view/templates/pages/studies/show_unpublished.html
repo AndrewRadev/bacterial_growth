@@ -2,17 +2,17 @@
 
 {% extends '_layout.html' %}
 
-{% block title %}: Study {{ study.studyId }}{% endblock %}
+{% block title %}: Study {{ study.publicId }}{% endblock %}
 
 {% block content %}
   <div class="container study-page">
     {% include 'pages/studies/_header.html' %}
 
     <article>
-      <h1>{{ study.studyName }}</h1>
+      <h1>{{ study.name }}</h1>
 
-      {% if study.studyDescription: %}
-        <p>{{ study.studyDescription }}</p>
+      {% if study.description: %}
+        <p>{{ study.description }}</p>
       {% endif %}
 
       <p>

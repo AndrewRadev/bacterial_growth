@@ -50,8 +50,8 @@
 
             {% if user_submission.project: %}
               [<a
-                   href="{{ url_for('project_show_page', projectId=user_submission.project.projectId) }}"
-                   data-tooltip="{{ project_name }}">{{ user_submission.project.projectId }}</a>]
+                   href="{{ url_for('project_show_page', publicId=user_submission.project.publicId) }}"
+                   data-tooltip="{{ project_name }}">{{ user_submission.project.publicId }}</a>]
             {% else: %}
               <span data-tooltip="{{ project_name }}">
                 [New] {{ project_name|truncate(20) if project_name is not none }}
@@ -63,8 +63,8 @@
 
             {% if user_submission.study: %}
               [<a
-                   href="{{ url_for('study_show_page', studyId=user_submission.study.studyId) }}"
-                   data-tooltip="{{ study_name }}">{{ user_submission.study.studyId }}</a>]
+                   href="{{ url_for('study_show_page', publicId=user_submission.study.publicId) }}"
+                   data-tooltip="{{ study_name }}">{{ user_submission.study.publicId }}</a>]
             {% else: %}
               <span data-tooltip="{{ study_name }}">
                 [New] {{ study_name|truncate(20) if study_name is not none }}

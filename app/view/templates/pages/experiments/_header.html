@@ -1,18 +1,18 @@
 <nav>
   {% set study = experiment.study %}
 
-  {% set projectUrl = url_for('project_show_page', projectId=study.project.projectId) %}
-  {% set studyUrl   = url_for('study_show_page',   studyId=study.studyId) %}
+  {% set projectUrl = url_for('project_show_page', publicId=study.project.publicId) %}
+  {% set studyUrl   = url_for('study_show_page',   publicId=study.publicId) %}
 
   <ul>
     <li class="small">
       Project
-      <a href="{{ projectUrl }}">{{ study.project.projectId }}</a>:
-      {{ study.project.projectName }}
+      <a href="{{ projectUrl }}">{{ study.project.publicId }}</a>:
+      {{ study.project.name }}
     </li>
     <li class="small">
       Study
-      <a href="{{ studyUrl }}">{{ study.studyId }}</a>:
+      <a href="{{ studyUrl }}">{{ study.publicId }}</a>:
       {{ study.name }}
     </li>
     <li class="small">
