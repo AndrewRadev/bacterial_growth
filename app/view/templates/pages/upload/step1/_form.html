@@ -43,12 +43,12 @@
 
             {% for project in g.current_user.managedProjects: %}
               <option
-                  value="{{ project.projectUniqueID }}"
-                  {{ "selected" if project.projectUniqueID == submission.projectUniqueID }}
-                  data-name="{{ project.projectName }}"
-                  data-description="{{ project.projectDescription }}"
+                  value="{{ project.uuid }}"
+                  {{ "selected" if project.uuid == submission.projectUniqueID }}
+                  data-name="{{ project.name }}"
+                  data-description="{{ project.description }}"
                   data-study-uuids='{{ project.studyUuids|tojson }}'>
-                [{{ project.projectId }}] {{ project.projectName }}
+                [{{ project.publicId }}] {{ project.name }}
               </option>
             {% endfor %}
           </select>
@@ -61,6 +61,7 @@
                 type="text"
                 name="project_name"
                 required
+                maxlength=250
                 value="{{ submission.studyDesign['project']['name'] or '' }}"
                 class="form-input-full form-input-blue {{ "error" if submission_form.has_error('project_name') }}"
                 placeholder="Example: A flexible Pipeline for Environmental DNA Metabarcoding Analysis..." />
@@ -95,12 +96,12 @@
 
             {% for study in g.current_user.managedStudies: %}
               <option
-                  value="{{ study.studyUniqueID }}"
-                  {{ "selected" if study.studyUniqueID == submission.studyUniqueID }}
-                  data-name="{{ study.studyName }}"
-                  data-description="{{ study.studyDescription }}"
-                  data-project-uuid="{{ study.projectUniqueID }}">
-                [{{ study.studyId }}] {{ study.studyName }}
+                  value="{{ study.uuid }}"
+                  {{ "selected" if study.uuid == submission.studyUniqueID }}
+                  data-name="{{ study.name }}"
+                  data-description="{{ study.description }}"
+                  data-project-uuid="{{ study.projectUuid }}">
+                [{{ study.publicId }}] {{ study.name }}
               </option>
             {% endfor %}
           </select>
@@ -113,6 +114,7 @@
                 type="text"
                 name="study_name"
                 required
+                maxlength=250
                 value="{{ submission.studyDesign['study']['name'] or '' }}"
                 class="form-input-full form-input-blue {{ "error" if submission_form.has_error('study_name') }}"
                 placeholder="Example: Cultivation of Bacterial Strains A, B and C" />
@@ -151,8 +153,8 @@
           <option value="">
           </option>
           {% for study in g.current_user.managedStudies: %}
-            <option value="{{ study.studyUniqueID }}">
-              [{{ study.studyId }}] {{ study.studyName }}
+            <option value="{{ study.uuid }}">
+              [{{ study.publicId }}] {{ study.name }}
             </option>
           {% endfor %}
         </select>

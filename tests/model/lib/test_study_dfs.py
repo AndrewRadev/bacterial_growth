@@ -21,9 +21,9 @@ class TestStudyDsf(unittest.TestCase):
             {'option': 'Study Name', 'value': 'Example'}
         ])
         self.assertSqlQuery(query, """
-            SELECT DISTINCT studyId
+            SELECT DISTINCT publicId
             FROM Studies
-            WHERE LOWER(studyName) LIKE :value_0
+            WHERE LOWER(name) LIKE :value_0
         """)
         self.assertEqual(values, ['%example%'])
 
@@ -31,7 +31,7 @@ class TestStudyDsf(unittest.TestCase):
             {'option': 'Microbial Strain', 'value': 'Rhodospirillum'}
         ])
         self.assertSqlQuery(query, """
-            SELECT DISTINCT studyId
+            SELECT DISTINCT publicId
             FROM Strains
             WHERE LOWER(name) LIKE :value_0
         """)
@@ -43,11 +43,11 @@ class TestStudyDsf(unittest.TestCase):
             {'option': 'Metabolites', 'value': 'acetyl', 'logic_operator': 'AND'}
         ])
         self.assertSqlQuery(query, """
-            SELECT DISTINCT studyId
+            SELECT DISTINCT publicId
             FROM Studies
-            WHERE LOWER(studyName) LIKE :value_0
+            WHERE LOWER(name) LIKE :value_0
             AND studyId IN (
-                SELECT DISTINCT studyId
+                SELECT DISTINCT publicId
                 FROM StudyMetabolites
                 INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
                 WHERE LOWER(Metabolites.name) LIKE :value_1

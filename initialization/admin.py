@@ -160,8 +160,8 @@ def init_admin(app):
     db_session = FLASK_DB.session
 
     class StudyView(AppView):
-        column_searchable_list = ['studyName']
-        column_exclude_list = ['studyDescription']
+        column_searchable_list = ['name']
+        column_exclude_list = ['description']
         form_excluded_columns = ['measurements', 'measurementContexts', 'measurementTechniques']
 
     class SubmissionView(AppView):

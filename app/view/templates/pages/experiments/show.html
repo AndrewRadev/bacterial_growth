@@ -15,8 +15,8 @@
       <h1>Experiment: {{ experiment.name }}</h1>
 
       <p class="small">
-        {% if study.studyURL: %}
-          <strong>Publication URL</strong>: {{ experiment.study.studyURL|external_link }}
+        {% if study.url: %}
+          <strong>Publication URL</strong>: {{ experiment.study.url|external_link }}
           <br>
         {% endif %}
       </p>
@@ -82,7 +82,7 @@
                   </span>
 
                   <a
-                      href="{{ url_for('study_visualize_page', studyId=study.publicId, l=measurement_context_ids|join(',')) }}"
+                      href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context_ids|join(',')) }}"
                       class="white-button no-border small-button"
                       data-tooltip="Visualize">
                     📈
@@ -112,7 +112,7 @@
                           </span>
 
                           <a
-                              href="{{ url_for('study_visualize_page', studyId=study.publicId, l=measurement_context.id) }}"
+                              href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context.id) }}"
                               class="white-button no-border small-button"
                               data-tooltip="Visualize">
                             📈

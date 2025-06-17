@@ -21,7 +21,7 @@
       </p>
 
       <p>
-        <a href="{{ url_for('study_show_page', studyId=submission_form.study_id) }}">
+        <a href="{{ url_for('study_show_page', publicId=submission_form.study_id) }}">
           [{{ submission_form.study_id }}] {{ submission.studyDesign['study']['name'] }}
         </a>
       </p>
@@ -55,7 +55,7 @@
       {% endif %}
 
       <p>
-        <a href="{{ url_for('study_show_page', studyId=submission_form.study_id) }}">
+        <a href="{{ url_for('study_show_page', publicId=submission_form.study_id) }}">
           [{{ submission_form.study_id }}] {{ submission.studyDesign['study']['name'] }}
         </a>
       </p>

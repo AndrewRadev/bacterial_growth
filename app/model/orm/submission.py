@@ -24,11 +24,11 @@ class Submission(OrmBase):
 
     project: Mapped[Optional['Project']] = relationship(
         foreign_keys=[projectUniqueID],
-        primaryjoin="Submission.projectUniqueID == Project.projectUniqueID",
+        primaryjoin="Submission.projectUniqueID == Project.uuid",
     )
     study: Mapped[Optional['Study']] = relationship(
         foreign_keys=[studyUniqueID],
-        primaryjoin="Submission.studyUniqueID == Study.studyUniqueID",
+        primaryjoin="Submission.studyUniqueID == Study.uuid",
     )
 
     userUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Users.uuid'), nullable=False)

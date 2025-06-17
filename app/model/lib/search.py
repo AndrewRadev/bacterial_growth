@@ -6,7 +6,7 @@ is less complicated.
 
 
 def dynamical_query(all_advance_query):
-    base_query = "SELECT DISTINCT studyId"
+    base_query = "SELECT DISTINCT publicId"
     search_final_query = ""
     values = []
 
@@ -24,7 +24,7 @@ def dynamical_query(all_advance_query):
                 WHERE projectUniqueID IN (
                     SELECT projectUniqueID
                     FROM Projects
-                    WHERE LOWER(projectName) LIKE :value_{len(values)}
+                    WHERE LOWER(name) LIKE :value_{len(values)}
                 )
                 """
                 values.append(f'%{project_name}%')
@@ -35,7 +35,7 @@ def dynamical_query(all_advance_query):
             WHERE projectUniqueID IN (
                 SELECT projectUniqueID
                 FROM Projects
-                WHERE projectId = :value_{len(values)}
+                WHERE publicId = :value_{len(values)}
             )
             """
             values.append(project_id)
@@ -43,7 +43,7 @@ def dynamical_query(all_advance_query):
             study_name = query_dict['value'].strip().lower()
             where_clause = f"""
                 FROM Studies
-                WHERE LOWER(studyName) LIKE :value_{len(values)}
+                WHERE LOWER(name) LIKE :value_{len(values)}
             """
             values.append(f"%{study_name}%")
         elif query_dict['option'] == 'Study ID':
