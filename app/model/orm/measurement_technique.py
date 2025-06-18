@@ -71,6 +71,14 @@ class MeasurementTechnique(OrmBase):
         return TECHNIQUE_SHORT_NAMES[self.type]
 
     @property
+    def short_name_with_units(self):
+        if self.units:
+            units = f" ({self.units})"
+        else:
+            units = ""
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
+
+    @property
     def long_name(self):
         return TECHNIQUE_LONG_NAMES[self.type]
 

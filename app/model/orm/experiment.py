@@ -21,7 +21,7 @@ class Experiment(OrmBase):
     description: Mapped[str] = mapped_column(sql.String)
 
     bioreplicates: Mapped[List['Bioreplicate']] = relationship(
-        order_by="Bioreplicate.id",
+        order_by='Bioreplicate.calculationType.is_(None), Bioreplicate.id',
         back_populates='experiment',
         cascade="all, delete-orphan"
     )
