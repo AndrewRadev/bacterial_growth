@@ -221,7 +221,12 @@ def init_admin(app):
     admin.add_view(TaxonView(Taxon,           db_session, category="External data"))
 
     class UserView(AppView):
-        form_excluded_columns = ['createdAt', 'updatedAt', 'lastLoginAt']
+        form_excluded_columns = [
+            'createdAt', 'lastLoginAt', 'updatedAt', 'submissions',
+            'managedProjects', 'managedStudies',
+            'ownedProjects', 'ownedStudies',
+            'projectUsers', 'studyUsers',
+        ]
 
     admin.add_view(UserView(User,       db_session, category="Users"))
     admin.add_view(AppView(StudyUser,   db_session, category="Users"))
