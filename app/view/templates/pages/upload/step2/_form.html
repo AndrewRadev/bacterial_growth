@@ -64,14 +64,14 @@
         </li>
       </template>
 
-      <template class="new-strain-parent-preview">
+      <template class="custom-strain-parent-preview">
         <div>
           Parent strain: <strong>${name}</strong>
           ({{ "https://www.ncbi.nlm.nih.gov/datasets/taxonomy/${id}/"|external_link("NCBI:${id}") }})
         </div>
       </template>
 
-      <template class="new-strain-form">
+      <template class="custom-strain-form">
         {% set subform = upload_form.get_template('NewStrainForm') %}
         {{ render_custom_strain_form(form=subform, submission_form=submission_form, index=None) }}
       </template>
