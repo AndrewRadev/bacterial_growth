@@ -11,12 +11,14 @@ Page('.upload-page .step-content.step-1.active', function($step1) {
     let $select = $form.find('.js-project-select');
     let $option = $select.find('option:selected');
 
-    let $name = $form.find('input[name=project_name]');
-    if ($option.data('name') != '') {
-      $name.val($option.data('name'));
-    }
+    let $name        = $form.find('input[name=project_name]');
     let $description = $form.find('textarea[name=project_description]');
-    if ($option.data('description') != '') {
+
+    if ($option.val() == '_new') {
+      $name.val('');
+      $description.val('');
+    } else {
+      $name.val($option.data('name'));
       $description.val($option.data('description'));
     }
 
@@ -35,8 +37,16 @@ Page('.upload-page .step-content.step-1.active', function($step1) {
     let $select = $form.find('.js-study-select');
     let $option = $select.find('option:selected');
 
-    $form.find('input[name=study_name]').val($option.data('name'));
-    $form.find('textarea[name=study_description]').val($option.data('description'));
+    let $name        = $form.find('input[name=study_name]');
+    let $description = $form.find('textarea[name=study_description]');
+
+    if ($option.val() == '_new') {
+      $name.val('');
+      $description.val('');
+    } else {
+      $name.val($option.data('name'));
+      $description.val($option.data('description'));
+    }
 
     // If the selected project is not the parent of this study, find it in the project form
     if ($option.val() != '_new') {

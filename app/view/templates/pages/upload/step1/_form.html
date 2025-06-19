@@ -48,7 +48,7 @@
                   data-name="{{ project.name }}"
                   data-description="{{ project.description }}"
                   data-study-uuids='{{ project.studyUuids|tojson }}'>
-                [{{ project.publicId }}] {{ project.name }}
+                [{{ project.publicId }}] {{ project.name|truncate(50) }}
               </option>
             {% endfor %}
           </select>
@@ -101,7 +101,7 @@
                   data-name="{{ study.name }}"
                   data-description="{{ study.description }}"
                   data-project-uuid="{{ study.projectUuid }}">
-                [{{ study.publicId }}] {{ study.name }}
+                [{{ study.publicId }}] {{ study.name|truncate(50) }}
               </option>
             {% endfor %}
           </select>
@@ -154,7 +154,7 @@
           </option>
           {% for study in g.current_user.managedStudies: %}
             <option value="{{ study.uuid }}">
-              [{{ study.publicId }}] {{ study.name }}
+              [{{ study.publicId }}] {{ study.name|truncate(50) }}
             </option>
           {% endfor %}
         </select>
