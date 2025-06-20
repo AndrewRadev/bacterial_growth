@@ -88,6 +88,7 @@
                 <div class="js-modeling-result-state flex-right">
                   {% for modeling_result in measurement_context.modelingResults: %}
                     <div
+                        data-modeling-result-id="{{ modeling_result.id }}"
                         data-modeling-type="{{ modeling_result.type }}"
                         class="hidden">
                       {% if modeling_result.state == 'ready': %}

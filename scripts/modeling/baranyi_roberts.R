@@ -26,8 +26,15 @@ h0_est = 0.05
 
 max_value = max(data$value)
 
-p     <- c(y0 = y0_est, mumax = mumax_est, K = max_value, h0 = h0_est)
-lower <- c(y0 = 1e-9,   mumax = 1e-9,      K = 1e-9,      h0 = 1e-9)
+p <- c(y0    = max(y0_est, 1e-9),
+       mumax = max(mumax_est, 1e-9),
+       K     = max(max_value, 1e-9),
+       h0    = max(h0_est, 1e-9))
+
+lower <- c(y0    = 1e-9,
+           mumax = 1e-9,
+           K     = 1e-9,
+           h0    = 1e-9)
 
 # Fitting methods:
 # “Marq”, “Port”, “Newton”, “Nelder-Mead”, “BFGS”, “CG”, “L-BFGS-B”, “SANN”, “Pseudo”, “bobyqa”

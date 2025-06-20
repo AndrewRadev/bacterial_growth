@@ -46,14 +46,7 @@ def _process_modeling_request(db_session, modeling_request_id, measurement_conte
                     ModelingResult.requestId == modeling_request.id,
                     ModelingResult.measurementContextId == measurement_context.id,
                 )
-            ).one_or_none()
-
-            if not modeling_result:
-                modeling_result = ModelingResult(
-                    type=modeling_request.type,
-                    request=modeling_request,
-                    measurementContext=measurement_context,
-                )
+            ).one()
 
             if modeling_request.type == 'easy_linear':
                 modeling_result.inputs = {'pointCount': point_count}
@@ -106,6 +99,7 @@ def _process_modeling_request(db_session, modeling_request_id, measurement_conte
             except Exception as e:
                 modeling_result.state = 'error'
                 modeling_result.error = 'RScript error'
+                has_error = True
                 LOGGER.error(e)
 
     if has_error:

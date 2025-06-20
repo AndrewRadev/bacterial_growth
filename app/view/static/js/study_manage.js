@@ -51,10 +51,8 @@ Page('.study-manage-page', function($page) {
     e.preventDefault();
     let $form = $(e.currentTarget);
 
-    let modelingType    = $form.find('select[name=modelingType]').val();
-    let $activeRow      = $('.js-technique-row.highlight:visible');
-    let $stateContainer = $activeRow.find('.js-modeling-result-state');
-    let $state          = $stateContainer.find(`[data-modeling-type=${modelingType}]`);
+    let modelingType = $form.find('select[name=modelingType]').val();
+    let $activeRow   = $('.js-technique-row.highlight:visible');
 
     $.ajax({
       url: $form.attr('action'),
@@ -63,46 +61,42 @@ Page('.study-manage-page', function($page) {
       data: $form.serializeArray(),
       success: function(response) {
         let modelingRequestId = response.modelingRequestId;
-        let $result = $page.find('.js-calculation-result');
+        let $formResult       = $page.find('.js-calculation-result');
+
+        if ($activeRow.find('[data-modeling-result-id]').length == 0) {
+          $activeRow.append(`<div data-modeling-result-id="${modelingResultId}">⏳</div>`);
+        }
 
         function check() {
           $.ajax({
             url: `/study/${studyId}/modeling/check.json`,
             dataType: 'json',
             success: function(response) {
-              let $state = $stateContainer.find(`[data-modeling-type=${modelingType}]`);
+              let allReady = true;
 
-              if (!response.ready) {
-                $result.html('⏳ Calculating...');
-                if ($state.length > 0) {
-                  $state.text('⏳');
+              for (const [resultId, resultState] of Object.entries(response)) {
+                let $indicator = $page.find(`[data-modeling-result-id=${resultId}]`);
+
+                if (!resultState.ready) {
+                  allReady = false;
+                  $indicator.text('⏳');
+                } else if (!resultState.successful) {
+                  $indicator.text('❌');
                 } else {
-                  $stateContainer.append(`<div data-modeling-type="${modelingType}">⏳</div>`);
+                  $indicator.text('✅');
                 }
-                setTimeout(check, 1000);
-                return;
-              }
-
-              if (!response.successful) {
-                $result.html("<span class=\"error\">❌ Calculation failed: Couldn't fit the model</span>");
-                if ($state.length > 0) {
-                  $state.text('❌');
-                } else {
-                  $stateContainer.append(`<div data-modeling-type="${modelingType}">❌</div>`);
-                }
-                return;
-              }
-
-              $result.html("✅ Calculation was successful");
-              if ($state.length > 0) {
-                $state.text('✅');
-              } else {
-                $stateContainer.append(`<div data-modeling-type="${modelingType}">✅</div>`);
               }
 
               let $activeRadio = $activeRow.find('input[type=radio]:checked');
               if ($activeRadio.length > 0) {
                 updateChart($activeRadio.first());
+              }
+
+              if (!allReady) {
+                $formResult.html('⏳ Calculating...');
+                setTimeout(check, 1000);
+              } else {
+                $formResult.html("Calculations finished. Submit the form to perform another calculation");
               }
             }
           });

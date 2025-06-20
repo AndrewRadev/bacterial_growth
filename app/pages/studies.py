@@ -133,8 +133,8 @@ def study_download_models_csv(publicId):
 def study_visualize_page(publicId):
     study = _fetch_study(publicId)
 
-    left_axis_ids  = [int(s) for s in request.args.get('l', '').split(',') if s != '']
-    right_axis_ids = [int(s) for s in request.args.get('r', '').split(',') if s != '']
+    left_axis_ids  = _parse_comma_separated_request_ids('l')
+    right_axis_ids = _parse_comma_separated_request_ids('r')
 
     chart_form = ComparativeChartForm(
         g.db_session,
@@ -187,8 +187,9 @@ def study_modeling_submit_action(publicId):
             type=modeling_type,
             study=study,
         )
-        g.db_session.add(modeling_request)
-        g.db_session.commit()
+
+    modeling_request.create_results(g.db_session, [measurement_context_id])
+    g.db_session.add(modeling_request)
 
     result = process_modeling_request.delay(modeling_request.id, [measurement_context_id], args)
     modeling_request.jobUuid = result.task_id
@@ -200,15 +201,19 @@ def study_modeling_submit_action(publicId):
 def study_modeling_check_json(publicId):
     study = _fetch_study(publicId)
 
-    # TODO (2025-05-20) Return counts of pending requests?
+    modeling_requests = [r for r in study.modelingRequests]
+    result_states = {}
 
-    ready      = all([mr.state in ('ready', 'error') for mr in study.modelingRequests])
-    successful = all([mr.state != 'error' for mr in study.modelingRequests])
+    for modeling_request in study.modelingRequests:
+        for modeling_result in modeling_request.results:
+            print(repr(modeling_result))
 
-    return {
-        "ready":      ready,
-        "successful": successful,
-    }
+            result_states[modeling_result.id] = {
+                'ready':      modeling_result.state in ('ready', 'error'),
+                'successful': modeling_result.state != 'error',
+            }
+
+    return result_states
 
 
 def study_modeling_chart_fragment(publicId, measurementContextId):
@@ -300,3 +305,7 @@ def _fetch_study(publicId, check_user_visibility=True, sql_options=None):
         raise Forbidden()
 
     return study
+
+
+def _parse_comma_separated_request_ids(key):
+    return [int(s) for s in request.args.get(key, '').split(',') if s != '']
