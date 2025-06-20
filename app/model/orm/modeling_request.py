@@ -54,6 +54,29 @@ class ModelingRequest(OrmBase):
         cascade='all, delete-orphan'
     )
 
+    def create_results(self, db_session, measurement_context_ids):
+        from app.model.orm import ModelingResult
+
+        for measurement_context_id in measurement_context_ids:
+            modeling_result = db_session.scalars(
+                sql.select(ModelingResult)
+                .where(
+                    ModelingResult.requestId == self.id,
+                    ModelingResult.measurementContextId == measurement_context_id,
+                )
+            ).one_or_none()
+
+            if not modeling_result:
+                modeling_result = ModelingResult(
+                    type=modeling_request.type,
+                    request=modeling_request,
+                    measurementContextId=measurement_context_id,
+                )
+                modeling_request.results.append(modeling_result)
+
+            modeling_result.state = 'pending'
+
+
     @validates('type')
     def _validate_type(self, key, value):
         return self._validate_inclusion(key, value, VALID_TYPES)
