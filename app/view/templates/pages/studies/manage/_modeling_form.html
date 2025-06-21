@@ -90,13 +90,14 @@
                     <div
                         data-modeling-result-id="{{ modeling_result.id }}"
                         data-modeling-type="{{ modeling_result.type }}"
+                        data-modeling-state="{{ modeling_result.state }}"
                         class="hidden">
                       {% if modeling_result.state == 'ready': %}
-                        ✅
+                        <span data-tooltip="Ready">✅</span>
                       {% elif modeling_result.state == 'error': %}
-                        ❌
-                      {% elif modeling_result.state == 'in_progress': %}
-                        ⏳
+                        <span data-tooltip="Error">❌</span>
+                      {% elif modeling_result.state == 'pending': %}
+                        <span data-tooltip="Pending">⏳</span>
                       {% endif %}
                     </div>
                   {% endfor %}

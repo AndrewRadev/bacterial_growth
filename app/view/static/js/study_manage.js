@@ -8,6 +8,11 @@ Page('.study-manage-page', function($page) {
     updateChart($activeRadio.first());
   }
 
+  let $pendingIndicators = $page.find('[data-modeling-state=pending]');
+  if ($pendingIndicators.length > 0) {
+    checkForUpdates();
+  }
+
   $page.find('.js-experiment-container').each(function(e) {
     let $container = $(this);
 
@@ -21,7 +26,7 @@ Page('.study-manage-page', function($page) {
     let $form = $(e.currentTarget);
     updateFormVisibility($form);
 
-    let $activeRadio = $('.js-technique-row:visible input[type=radio]:checked');
+    let $activeRadio = $page.find('.js-technique-row:visible input[type=radio]:checked');
     if ($activeRadio.length > 0) {
       updateChart($activeRadio.first());
     }
@@ -51,8 +56,7 @@ Page('.study-manage-page', function($page) {
     e.preventDefault();
     let $form = $(e.currentTarget);
 
-    let modelingType = $form.find('select[name=modelingType]').val();
-    let $activeRow   = $('.js-technique-row.highlight:visible');
+    let $activeRow = $('.js-technique-row.highlight:visible');
 
     $.ajax({
       url: $form.attr('action'),
@@ -61,48 +65,12 @@ Page('.study-manage-page', function($page) {
       data: $form.serializeArray(),
       success: function(response) {
         let modelingRequestId = response.modelingRequestId;
-        let $formResult       = $page.find('.js-calculation-result');
 
         if ($activeRow.find('[data-modeling-result-id]').length == 0) {
           $activeRow.append(`<div data-modeling-result-id="${modelingResultId}">⏳</div>`);
         }
 
-        function check() {
-          $.ajax({
-            url: `/study/${studyId}/modeling/check.json`,
-            dataType: 'json',
-            success: function(response) {
-              let allReady = true;
-
-              for (const [resultId, resultState] of Object.entries(response)) {
-                let $indicator = $page.find(`[data-modeling-result-id=${resultId}]`);
-
-                if (!resultState.ready) {
-                  allReady = false;
-                  $indicator.text('⏳');
-                } else if (!resultState.successful) {
-                  $indicator.text('❌');
-                } else {
-                  $indicator.text('✅');
-                }
-              }
-
-              let $activeRadio = $activeRow.find('input[type=radio]:checked');
-              if ($activeRadio.length > 0) {
-                updateChart($activeRadio.first());
-              }
-
-              if (!allReady) {
-                $formResult.html('⏳ Calculating...');
-                setTimeout(check, 1000);
-              } else {
-                $formResult.html("Calculations finished. Submit the form to perform another calculation");
-              }
-            }
-          });
-        }
-
-        check();
+        checkForUpdates();
       }
     })
   });
@@ -167,6 +135,42 @@ Page('.study-manage-page', function($page) {
         $chart.html(response)
         initTooltips();
       },
+    });
+  }
+
+  function checkForUpdates() {
+    $.ajax({
+      url: `/study/${studyId}/modeling/check.json`,
+      dataType: 'json',
+      success: function(response) {
+        let $calculationResult = $page.find('.js-calculation-result');
+        let allReady = true;
+
+        for (const [resultId, resultState] of Object.entries(response)) {
+          let $indicator = $page.find(`[data-modeling-result-id=${resultId}]`);
+
+          if (resultState == 'ready') {
+            $indicator.text('✅');
+          } else if (resultState == 'error') {
+            $indicator.text('❌');
+          } else if (resultState == 'pending') {
+            allReady = false;
+            $indicator.text('⏳');
+          }
+        }
+
+        if (allReady) {
+          $calculationResult.html("Calculations finished. Submit the form to perform another calculation");
+
+          let $activeRadio = $page.find('.js-technique-row:visible input[type=radio]:checked');
+          if ($activeRadio.length > 0) {
+            updateChart($activeRadio.first());
+          }
+        } else {
+          $calculationResult.html('⏳ Calculating...');
+          setTimeout(checkForUpdates, 1000);
+        }
+      }
     });
   }
 });
