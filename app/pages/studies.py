@@ -189,7 +189,9 @@ def study_modeling_submit_action(publicId):
         )
 
     modeling_request.create_results(g.db_session, [measurement_context_id])
+    modeling_request.state = 'pending'
     g.db_session.add(modeling_request)
+    g.db_session.commit()
 
     result = process_modeling_request.delay(modeling_request.id, [measurement_context_id], args)
     modeling_request.jobUuid = result.task_id
@@ -206,10 +208,7 @@ def study_modeling_check_json(publicId):
 
     for modeling_request in study.modelingRequests:
         for modeling_result in modeling_request.results:
-            result_states[modeling_result.id] = {
-                'ready':      modeling_result.state in ('ready', 'error'),
-                'successful': modeling_result.state != 'error',
-            }
+            result_states[modeling_result.id] = modeling_result.state
 
     return result_states
 
