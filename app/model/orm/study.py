@@ -24,18 +24,18 @@ class Study(OrmBase):
         cascade='all, delete-orphan',
     )
 
-    studyUniqueID: Mapped[str] = mapped_column(sql.String(100), primary_key=True)
-    ownerUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Users.uuid'))
+    uuid: Mapped[str] = mapped_column(sql.String(100), primary_key=True)
+    ownerUuid: Mapped[str] = mapped_column(sql.ForeignKey('Users.uuid'))
 
     owner: Mapped['User'] = relationship(back_populates='ownedStudies')
 
-    studyId:          Mapped[str] = mapped_column(sql.String(100))
-    studyName:        Mapped[str] = mapped_column(sql.String(100))
-    studyDescription: Mapped[str] = mapped_column(sql.String, nullable=True)
-    studyURL:         Mapped[str] = mapped_column(sql.String, nullable=True)
-    timeUnits:        Mapped[str] = mapped_column(sql.String(100))
+    publicId:    Mapped[str] = mapped_column(sql.String(100))
+    name:        Mapped[str] = mapped_column(sql.String(100))
+    description: Mapped[str] = mapped_column(sql.String, nullable=True)
+    url:         Mapped[str] = mapped_column(sql.String, nullable=True)
+    timeUnits:   Mapped[str] = mapped_column(sql.String(100))
 
-    projectUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Projects.projectUniqueID'))
+    projectUuid: Mapped[str] = mapped_column(sql.ForeignKey('Projects.uuid'))
     project: Mapped['Project'] = relationship(back_populates="studies")
 
     createdAt:        Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
@@ -74,22 +74,6 @@ class Study(OrmBase):
         secondary='StudyMetabolites',
         viewonly=True,
     )
-
-    @hybrid_property
-    def uuid(self):
-        return self.studyUniqueID
-
-    @hybrid_property
-    def publicId(self):
-        return self.studyId
-
-    @hybrid_property
-    def name(self):
-        return self.studyName
-
-    @hybrid_property
-    def description(self):
-        return self.studyDescription
 
     @hybrid_property
     def isPublished(self):

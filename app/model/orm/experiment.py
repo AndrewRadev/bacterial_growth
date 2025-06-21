@@ -21,7 +21,7 @@ class Experiment(OrmBase):
     description: Mapped[str] = mapped_column(sql.String)
 
     bioreplicates: Mapped[List['Bioreplicate']] = relationship(
-        order_by="Bioreplicate.id",
+        order_by='Bioreplicate.calculationType.is_(None), Bioreplicate.id',
         back_populates='experiment',
         cascade="all, delete-orphan"
     )
@@ -29,7 +29,7 @@ class Experiment(OrmBase):
     communityId: Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'))
     community: Mapped['Community'] = relationship(back_populates='experiments')
 
-    studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.studyId'), nullable=False)
+    studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates='experiments')
 
     cultivationMode: Mapped[str] = mapped_column(sql.String(50))

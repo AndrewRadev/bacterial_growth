@@ -13,7 +13,7 @@ A study uploaded to μGrowthDB provides multiple different views of its data. Yo
 - **Export data**:      Provides an interface to download the raw measurements in CSV format
 - **Manage**:           Allows the owners of the study to make changes to it and fit models to the data
 
-This particular example is taken from the study <a target="_blank" href="{{ url_for("study_show_page", studyId="SMGDB00000002") }}">SMGDB00000002</a>.
+This particular example is taken from the study <a target="_blank" href="{{ url_for("study_show_page", publicId="SMGDB00000002") }}">SMGDB00000002</a>.
 
 ## Study homepage
 
@@ -26,7 +26,7 @@ This particular example is taken from the study <a target="_blank" href="{{ url_
         title="Biological replicates" />
 </div>
 
-The central place that acts as a hub for all the different ways to interact with a study is the study homepage. The study has a permanent unique ID, in these examples "<a target="_blank" href="{{ url_for("study_show_page", studyId="SMGDB00000002") }}">SMGDB00000002</a>", which can be shared in publications. Projects have identifiers starting with "PMGDB" and experiment IDs are prefixed with "EMGDB".
+The central place that acts as a hub for all the different ways to interact with a study is the study homepage. The study has a permanent unique ID, in these examples "<a target="_blank" href="{{ url_for("study_show_page", publicId="SMGDB00000002") }}">SMGDB00000002</a>", which can be shared in publications. Projects have identifiers starting with "PMGDB" and experiment IDs are prefixed with "EMGDB".
 
 The basic information shown right below the title includes the name of the uploader, and timestamps to indicate when the data was uploaded or updated. Ideally, a study would not be changed after uploading, but it is possible that mistakes are made and corrections are necessary. A study owner is allowed to go back to the submission process and upload new data or change the experimental design. However, every separate submission is stored as a data package that can be accessed and potentially restored by the μGrowthDB administrators if necessary.
 
@@ -45,7 +45,7 @@ The double-arrows icon adds the measurements represented by the line to the "Com
         title="Left/right axis controls" />
 </div>
 
-On the visualize page (<a target="_blank" href="{{ url_for("study_show_page", studyId="SMGDB00000002") }}">Example: SMGDB00000002</a>), you can see the form interface shown on the right figure. You can select an experiment from the top-most dropdown and a measurement technique from the one below. As you change these filters, the visible checkboxes show the available measurement subjects.
+On the visualize page (<a target="_blank" href="{{ url_for("study_show_page", publicId="SMGDB00000002") }}">Example: SMGDB00000002</a>), you can see the form interface shown on the right figure. You can select an experiment from the top-most dropdown and a measurement technique from the one below. As you change these filters, the visible checkboxes show the available measurement subjects.
 
 This example shows the BT\_MUCIN experiment, in which mucin beads were added to a bottle with Wilkins-Chalgrens (WC) medium. Because the WC broth and the mucin beads are in the same biological system, they are considered part of the same **biological replicate** of the experiment. Because they represent different physical locations that the researchers measure separately, they are described by separate **compartments**.
 
@@ -59,7 +59,7 @@ From this page, you can copy the "Permalink to this page" hyperlink and send it 
 
 After investigating data in a particular study using the "Visualize" interface, you can add the selected traces and copy them to the "Compare" view by pressing the "Compare across studies" button. It is also possible to click on any of the buttons with a left-right icon (↔️) in the study homepage. Once either of these types of buttons are clicked, you can visit the "Compare" page from the navigation sidebar. The number of data traces currently loaded in the compare view is shown in that same sidebar link.
 
-After picking data from different studies, you can click the sidebar menu button to go to the "Compare" page. In the example below, we see a comparison between the growth curves of _R. intestinalis_ and _B. thetaiotaomicron_ in two studies, <a target="_blank" href="{{ url_for("study_show_page", studyId="SMGDB00000001") }}">SMGDB00000001</a> and <a target="_blank" href="{{ url_for("study_show_page", studyId="SMGDB00000003") }}">SMGDB00000003</a>. Both of these experiments grow the cultures in a chemostat and we can see a correspondence in the shapes of the curves in both cases.
+After picking data from different studies, you can click the sidebar menu button to go to the "Compare" page. In the example below, we see a comparison between the growth curves of _R. intestinalis_ and _B. thetaiotaomicron_ in two studies, <a target="_blank" href="{{ url_for("study_show_page", publicId="SMGDB00000001") }}">SMGDB00000001</a> and <a target="_blank" href="{{ url_for("study_show_page", publicId="SMGDB00000003") }}">SMGDB00000003</a>. Both of these experiments grow the cultures in a chemostat and we can see a correspondence in the shapes of the curves in both cases.
 
 <p>
     <div style="width: 100%; text-align: center">

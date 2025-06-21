@@ -32,16 +32,13 @@ class TestMeasurement(DatabaseTest):
     def test_import_bioreplicate_csv(self):
         study = self.create_study(timeUnits='h')
 
-        study_id = study.studyId
-        study_uuid = study.studyUniqueID
+        b1 = self.create_bioreplicate(studyId=study.publicId, name='b1')
+        b2 = self.create_bioreplicate(studyId=study.publicId, name='b2')
+        self.create_compartment(studyId=study.publicId, name='c1')
 
-        b1 = self.create_bioreplicate(studyId=study_id, name='b1')
-        b2 = self.create_bioreplicate(studyId=study_id, name='b2')
-        self.create_compartment(studyId=study_id, name='c1')
-
-        t_fc = self.create_measurement_technique(studyUniqueID=study_uuid, subjectType='bioreplicate', type='fc')
-        t_od = self.create_measurement_technique(studyUniqueID=study_uuid, subjectType='bioreplicate', type='od')
-        t_ph = self.create_measurement_technique(studyUniqueID=study_uuid, subjectType='bioreplicate', type='ph')
+        t_fc = self.create_measurement_technique(studyUniqueID=study.uuid, subjectType='bioreplicate', type='fc')
+        t_od = self.create_measurement_technique(studyUniqueID=study.uuid, subjectType='bioreplicate', type='od')
+        t_ph = self.create_measurement_technique(studyUniqueID=study.uuid, subjectType='bioreplicate', type='ph')
 
         growth_data = util.trim_lines("""
             Biological Replicate,Compartment,Time,Community FC,Community OD,Community pH
@@ -89,23 +86,20 @@ class TestMeasurement(DatabaseTest):
     def test_import_metabolite_csv(self):
         study = self.create_study(timeUnits='m')
 
-        study_id = study.studyId
-        study_uuid = study.studyUniqueID
-
-        self.create_bioreplicate(studyId=study_id, name='b1')
-        self.create_compartment(studyId=study_id, name='c1')
+        self.create_bioreplicate(studyId=study.publicId, name='b1')
+        self.create_compartment(studyId=study.publicId, name='c1')
 
         glucose_id = self.create_study_metabolite(
-            studyId=study_id,
+            studyId=study.publicId,
             metabolite={'name': 'glucose'},
         ).chebi_id
         trehalose_id = self.create_study_metabolite(
-            studyId=study_id,
+            studyId=study.publicId,
             metabolite={'name': 'trehalose'},
         ).chebi_id
 
         self.create_measurement_technique(
-            studyUniqueID=study_uuid,
+            studyUniqueID=study.uuid,
             subjectType='metabolite',
             type='Metabolite',
             metaboliteIds=[glucose_id, trehalose_id],
@@ -140,25 +134,22 @@ class TestMeasurement(DatabaseTest):
     def test_import_strain_csv(self):
         study = self.create_study()
 
-        study_id = study.studyId
-        study_uuid = study.studyUniqueID
+        self.create_bioreplicate(studyId=study.publicId, name='b1')
+        self.create_compartment(studyId=study.publicId, name='c1')
 
-        self.create_bioreplicate(studyId=study_id, name='b1')
-        self.create_compartment(studyId=study_id, name='c1')
-
-        s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study_id)
-        s2 = self.create_strain(name='R. intestinalis', studyId=study_id)
+        s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study.publicId)
+        s2 = self.create_strain(name='R. intestinalis', studyId=study.publicId)
         strain_ids = [s1.id, s2.id]
 
         t_fc = self.create_measurement_technique(
-            studyUniqueID=study_uuid,
+            studyUniqueID=study.uuid,
             subjectType='strain',
             type='fc',
             units='Cells/mL',
             strainIds=strain_ids,
         )
         t_16s = self.create_measurement_technique(
-            studyUniqueID=study_uuid,
+            studyUniqueID=study.uuid,
             subjectType='strain',
             type='16s',
             units='reads',

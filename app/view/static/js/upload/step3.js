@@ -93,16 +93,27 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
     }
 
     columnName = [subject, columnName].filter(Boolean).join(' ');
-    let previewLines = ["Column name(s) in spreadsheet:", "<ul>"]
-    previewLines.push(`<li><strong>${columnName}</strong></li>`);
+
+    let previewTableHeader = [];
+    let previewTableBody   = [];
+
+    previewTableHeader.push('<th>...</th>');
+    previewTableHeader.push(`<th>${columnName}</th>`);
+
+    previewTableBody.push('<td>...</td>');
+    previewTableBody.push('<td align="center">...</td>');
 
     if (includeStd) {
       let stdColumnName = [columnName, 'STD'].filter(Boolean).join(' ');
-      previewLines.push(`<li><strong>${stdColumnName}</strong></li>`)
+
+      previewTableHeader.push(`<th>${stdColumnName}</th>`);
+      previewTableBody.push('<td align="center">...</td>');
     }
 
-    previewLines.push("</ul>");
+    previewTableHeader.push('<th>...</th>');
+    previewTableBody.push('<td>...</td>');
 
-    $container.find('.js-preview').html(previewLines.join("\n"));
+    $container.find('.js-preview-header').html(previewTableHeader.join("\n"));
+    $container.find('.js-preview-body').html(previewTableBody.join("\n"));
   }
 });

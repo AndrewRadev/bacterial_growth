@@ -54,7 +54,7 @@ def search_index_page():
 
         # TODO (2025-04-15) Extract, test with multiple users
         studyIds = g.db_session.scalars(
-            sql.select(Study.studyId)
+            sql.select(Study.publicId)
             .join(StudyUser, isouter=True)
             .where(publish_clause)
             .order_by(Study.updatedAt.desc())

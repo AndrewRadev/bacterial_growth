@@ -16,7 +16,7 @@
             <span class="icon"></span>
             <span>{{ techniques|length }} {{ type }} measurements:</span>
             <span class="truncate">
-              {{ techniques|map(attribute="short_name")|join_tag('strong') }}
+              {{ techniques|map(attribute="short_name_with_units")|join_tag('strong') }}
             </span>
           </li>
         {% endif %}

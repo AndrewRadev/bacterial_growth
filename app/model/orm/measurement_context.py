@@ -22,7 +22,7 @@ class MeasurementContext(OrmBase):
     compartmentId: Mapped[int] = mapped_column(sql.ForeignKey('Compartments.id'))
     compartment: Mapped['Compartment'] = relationship(back_populates='measurementContexts')
 
-    studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.studyId'), nullable=False)
+    studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates='measurementContexts')
 
     techniqueId: Mapped[int] = mapped_column(sql.ForeignKey("MeasurementTechniques.id"))

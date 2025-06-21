@@ -267,7 +267,7 @@ def upload_step7_page():
             g.db_session.add(study)
             g.db_session.commit()
 
-            return redirect(url_for('study_show_page', studyId=study.publicId))
+            return redirect(url_for('study_show_page', publicId=study.publicId))
 
     return render_template(
         "pages/upload/index.html",

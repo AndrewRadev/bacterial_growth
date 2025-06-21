@@ -177,19 +177,19 @@ def _save_study(db_session, submission_form):
     submission = submission_form.submission
 
     params = {
-        'studyId':          submission_form.study_id,
-        'studyName':        submission.studyDesign['study']['name'],
-        'studyDescription': submission.studyDesign['study'].get('description', ''),
-        'studyURL':         submission.studyDesign['study'].get('url', ''),
-        'studyUniqueID':    submission.studyUniqueID,
-        'projectUniqueID':  submission.projectUniqueID,
-        'timeUnits':        submission.studyDesign['timeUnits'],
+        'publicId':    submission_form.study_id,
+        'name':        submission.studyDesign['study']['name'].strip(),
+        'description': submission.studyDesign['study'].get('description', '').strip(),
+        'url':         submission.studyDesign['study'].get('url', '').strip(),
+        'uuid':        submission.studyUniqueID,
+        'projectUuid': submission.projectUniqueID,
+        'timeUnits':   submission.studyDesign['timeUnits'],
     }
 
     if submission_form.type != 'update_study':
         study = Study(**Study.filter_keys(params))
 
-        study.studyId = Study.generate_public_id(db_session)
+        study.publicId = Study.generate_public_id(db_session)
         study.publishableAt = datetime.now(UTC) + timedelta(hours=24)
 
         db_session.add(StudyUser(
@@ -209,15 +209,15 @@ def _save_project(db_session, submission_form):
     submission = submission_form.submission
 
     params = {
-        'projectId':          submission_form.project_id,
-        'projectName':        submission.studyDesign['project']['name'],
-        'projectDescription': submission.studyDesign['project'].get('description', ''),
-        'projectUniqueID':    submission.projectUniqueID,
+        'publicId':    submission_form.project_id,
+        'name':        submission.studyDesign['project']['name'].strip(),
+        'description': submission.studyDesign['project'].get('description', '').strip(),
+        'uuid':        submission.projectUniqueID,
     }
 
     if submission_form.type == 'new_project':
         project = Project(**Project.filter_keys(params))
-        project.projectId = Project.generate_public_id(db_session)
+        project.publicId = Project.generate_public_id(db_session)
         db_session.add(ProjectUser(
             projectUniqueID=submission.projectUniqueID,
             userUniqueID=submission.userUniqueID,

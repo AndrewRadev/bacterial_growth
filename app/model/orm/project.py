@@ -15,33 +15,21 @@ from app.model.orm.orm_base import OrmBase
 class Project(OrmBase):
     __tablename__ = 'Projects'
 
-    projectUniqueID: Mapped[str] = mapped_column(sql.String(100), primary_key=True)
-    ownerUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Users.uuid'))
+    uuid:      Mapped[str] = mapped_column(sql.String(100), primary_key=True)
+    ownerUuid: Mapped[str] = mapped_column(sql.ForeignKey('Users.uuid'))
 
     owner: Mapped['User'] = relationship(back_populates='ownedProjects')
 
-    projectId:          Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    projectName:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    projectDescription: Mapped[str] = mapped_column(sql.String,      nullable=False)
+    publicId:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    name:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    description: Mapped[str] = mapped_column(sql.String,      nullable=False)
 
     projectUsers: Mapped[List['ProjectUser']] = relationship(back_populates="project")
     studies:      Mapped[List['Study']]       = relationship(back_populates="project")
 
-    @hybrid_property
-    def publicId(self):
-        return self.projectId
-
-    @hybrid_property
-    def uuid(self):
-        return self.projectUniqueID
-
-    @hybrid_property
-    def name(self):
-        return self.projectName
-
     @property
     def studyUuids(self):
-        return [s.studyUniqueID for s in self.studies]
+        return [s.uuid for s in self.studies]
 
     @property
     def managerUuids(self):

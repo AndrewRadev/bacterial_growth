@@ -48,7 +48,7 @@ class TestSubmissionProcess(DatabaseTest):
 
         _save_project(self.db_session, submission_form)
         _save_study(self.db_session, submission_form)
-        self.db_session.flush()
+        self.db_session.commit()
 
         project = self.db_session.get(Project, self.submission.projectUniqueID)
         study   = self.db_session.get(Study,   self.submission.studyUniqueID)

@@ -26,7 +26,7 @@
       <ul>
         {% for project in g.current_user.managedProjects: %}
           <li>
-            <a href="{{ url_for('project_show_page', projectId=project.publicId) }}">
+            <a href="{{ url_for('project_show_page', publicId=project.publicId) }}">
               [{{ project.publicId }}] {{ project.name }}
             </a>
           </li>
@@ -51,7 +51,7 @@
       <ul>
         {% for study in g.current_user.managedStudies: %}
           <li>
-            <a href="{{ url_for('study_show_page', studyId=study.publicId) }}">
+            <a href="{{ url_for('study_show_page', publicId=study.publicId) }}">
               [{{ study.publicId }}] {{ study.name }}
             </a>
           </li>

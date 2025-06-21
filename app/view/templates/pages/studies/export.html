@@ -7,17 +7,17 @@
     {% include 'pages/studies/_header.html' %}
 
     <article>
-      <h1>{{ study.studyName }}</h1>
+      <h1>{{ study.name }}</h1>
 
       {% include 'pages/studies/_navigation_buttons.html' %}
 
       <p>
-        {{ study.studyDescription }}
+        {{ study.description }}
       </p>
 
       <form
           class="simple-form"
-          action="{{ url_for('study_download_data_zip', studyId=studyId) }}"
+          action="{{ url_for('study_download_data_zip', publicId=studyId) }}"
           method="GET">
         <div class="flex-row columns">
           <div class="column column-left">

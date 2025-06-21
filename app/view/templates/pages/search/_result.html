@@ -4,7 +4,7 @@
 {% macro render_result(result) %}
   <div class="search-result">
     <h3>
-      <a href="{{ url_for('study_show_page', studyId=result.publicId) }}">
+      <a href="{{ url_for('study_show_page', publicId=result.publicId) }}">
         [{{ result.publicId }}] {{ result.name }}
       </a>
     </h3>
@@ -15,7 +15,7 @@
 
     <p>
       <strong>Project ID</strong>:
-      <a href="{{ url_for('project_show_page', projectId=result.project.publicId) }}">
+      <a href="{{ url_for('project_show_page', publicId=result.project.publicId) }}">
         {{ result.project.publicId }}
       </a>
     </p>

@@ -1,11 +1,11 @@
 {% extends '_layout.html' %}
 
-{% block title %}: Project {{ project.projectId }}{% endblock %}
+{% block title %}: Project {{ project.publicId }}{% endblock %}
 
 {% block content %}
   <div class="container">
     <article>
-      <h2>{{ project.projectName }}</h2>
+      <h2>{{ project.name }}</h2>
 
       {% if g.current_user and g.current_user.uuid in project.managerUuids: %}
         <br>
@@ -21,7 +21,7 @@
       {% endif %}
 
       <p>
-        {{ project.projectDescription }}
+        {{ project.description }}
       </p>
 
       <h3>List of studies</h3>
@@ -29,12 +29,12 @@
       <ul>
         {% for study in project.studies: %}
           <li>
-            <a href="{{ url_for('study_show_page', studyId=study.studyId) }}">
-              [{{ study.studyId }}] {{ study.studyName }}
+            <a href="{{ url_for('study_show_page', publicId=study.publicId) }}">
+              [{{ study.publicId }}] {{ study.name }}
             </a>
 
             <p>
-              {{ study.studyDescription }}
+              {{ study.description }}
             </p>
           </li>
         {% endfor %}

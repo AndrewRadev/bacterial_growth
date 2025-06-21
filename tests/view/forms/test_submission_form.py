@@ -8,9 +8,9 @@ from app.view.forms.submission_form import SubmissionForm
 
 class TestSubmissionForm(DatabaseTest):
     def test_project_and_studies(self):
-        p1 = self.create_project(projectName="Project 1")
-        p2 = self.create_project(projectName="Project 2")
-        s2 = self.create_study(projectUniqueID=p2.projectUniqueID)
+        p1 = self.create_project(name="Project 1")
+        p2 = self.create_project(name="Project 2")
+        s2 = self.create_study(projectUuid=p2.uuid)
 
         submission_form = SubmissionForm(db_session=self.db_session)
         self.assertEqual(submission_form.project_id, None)
@@ -18,18 +18,18 @@ class TestSubmissionForm(DatabaseTest):
         self.assertEqual(submission_form.type, 'new_project')
 
         submission_form.update_project({
-            'project_uuid': p1.projectUniqueID,
+            'project_uuid': p1.uuid,
             'project_name': 'Project 1 (updated)',
             'study_uuid':   '_new',
             'study_name':   'Study 1',
         })
 
-        self.assertEqual(submission_form.project_id, p1.projectId)
+        self.assertEqual(submission_form.project_id, p1.publicId)
         self.assertEqual(submission_form.type, 'new_study')
         self.assertEqual(submission_form.submission.studyDesign['project']['name'], 'Project 1 (updated)')
 
         submission_form.update_project({
-            'project_uuid':        p2.projectUniqueID,
+            'project_uuid':        p2.uuid,
             'study_uuid':          s2.uuid,
             'project_name':        'Project 2 (updated)',
             'study_name':          'Study 2 (updated)',
@@ -37,8 +37,8 @@ class TestSubmissionForm(DatabaseTest):
             'study_description':   'Test',
         })
 
-        self.assertEqual(submission_form.project_id, p2.projectId)
-        self.assertEqual(submission_form.study_id, s2.studyId)
+        self.assertEqual(submission_form.project_id, p2.publicId)
+        self.assertEqual(submission_form.study_id, s2.publicId)
         self.assertEqual(submission_form.type, 'update_study')
         self.assertEqual(submission_form.submission.studyDesign['project']['name'], 'Project 2 (updated)')
         self.assertEqual(submission_form.submission.studyDesign['study']['name'], 'Study 2 (updated)')
@@ -46,8 +46,8 @@ class TestSubmissionForm(DatabaseTest):
         self.assertEqual(submission_form.submission.studyDesign['study']['description'], 'Test')
 
     def test_project_and_study_uniqueness_validation(self):
-        p1 = self.create_project(projectName="Project 1")
-        self.create_study(studyName="Study 1", projectUniqueID=p1.projectUniqueID)
+        p1 = self.create_project(name="Project 1")
+        self.create_study(name="Study 1", projectUuid=p1.uuid)
 
         submission_form = SubmissionForm(db_session=self.db_session)
         valid_params = {

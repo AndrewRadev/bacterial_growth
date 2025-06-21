@@ -48,7 +48,7 @@ class MeasurementTechnique(OrmBase):
     metaboliteIds: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
     strainIds:     Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
-    studyUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Studies.studyUniqueID'), nullable=False)
+    studyUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Studies.uuid'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="measurementTechniques")
 
     createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
@@ -69,6 +69,14 @@ class MeasurementTechnique(OrmBase):
     @property
     def short_name(self):
         return TECHNIQUE_SHORT_NAMES[self.type]
+
+    @property
+    def short_name_with_units(self):
+        if self.units:
+            units = f" ({self.units})"
+        else:
+            units = ""
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
 
     @property
     def long_name(self):

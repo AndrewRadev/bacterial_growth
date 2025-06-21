@@ -220,8 +220,8 @@ class SubmissionForm:
             return None
 
         return self.db_session.scalars(
-            sql.select(Project.projectId)
-            .where(Project.projectUniqueID == self.submission.projectUniqueID)
+            sql.select(Project.publicId)
+            .where(Project.uuid == self.submission.projectUniqueID)
         ).one_or_none()
 
     def _find_study_id(self):
@@ -229,8 +229,8 @@ class SubmissionForm:
             return None
 
         return self.db_session.scalars(
-            sql.select(Study.studyId)
-            .where(Study.studyUniqueID == self.submission.studyUniqueID)
+            sql.select(Study.publicId)
+            .where(Study.uuid == self.submission.studyUniqueID)
         ).one_or_none()
 
     def _determine_project_type(self):
@@ -250,8 +250,8 @@ class SubmissionForm:
             project_exists = self.db_session.query(
                 sql.exists()
                 .where(
-                    Project.projectName == project_name,
-                    Project.projectUniqueID != self.submission.projectUniqueID
+                    Project.name == project_name,
+                    Project.uuid != self.submission.projectUniqueID
                 )
             ).scalar()
 

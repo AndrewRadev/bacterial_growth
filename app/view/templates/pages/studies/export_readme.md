@@ -9,8 +9,8 @@
 {% for experiment in study.experiments: -%}
 - {{ experiment.name }}: {{ experiment.description }}
 {% endfor %}
-{% if study.studyURL: %}
+{% if study.url: %}
 ## More information
 
-URL: <{{ study.studyURL }}>
+URL: <{{ study.url }}>
 {% endif %}

@@ -151,12 +151,12 @@ class ExperimentExportForm:
         delimiter = args.get('delimiter', 'comma')
 
         if delimiter == 'comma':
-            self.sep = ','
+            self.csv_separator = ','
         elif delimiter == 'tab':
-            self.sep = '\t'
+            self.csv_separator = '\t'
         elif delimiter == 'custom':
-            self.sep = args.get('custom_delimiter', '|')
-            if self.sep == '':
-                self.sep = ' '
+            self.csv_separator = args.get('custom_delimiter', '|')
+            if self.csv_separator == '':
+                self.csv_separator = ' '
         else:
             raise Exception(f"Unknown delimiter requested: {delimiter}")
