@@ -68,11 +68,12 @@ class ModelingRequest(OrmBase):
 
             if not modeling_result:
                 modeling_result = ModelingResult(
-                    type=modeling_request.type,
-                    request=modeling_request,
+                    type=self.type,
+                    request=self,
                     measurementContextId=measurement_context_id,
                 )
-                modeling_request.results.append(modeling_result)
+                db_session.add(modeling_result)
+                self.results.append(modeling_result)
 
             modeling_result.state = 'pending'
 

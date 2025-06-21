@@ -18,6 +18,8 @@ class TestModelingTasks(DatabaseTest):
         measurement_context = self.create_measurement_context(subjectId=strain.id, subjectType='strain')
         modeling_request    = self.create_modeling_request()
 
+        modeling_request.create_results(self.db_session, [measurement_context.id])
+
         data = [
             (0.0,   2146.0),
             (4.0,   23640.0),

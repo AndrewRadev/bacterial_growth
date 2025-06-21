@@ -206,8 +206,6 @@ def study_modeling_check_json(publicId):
 
     for modeling_request in study.modelingRequests:
         for modeling_result in modeling_request.results:
-            print(repr(modeling_result))
-
             result_states[modeling_result.id] = {
                 'ready':      modeling_result.state in ('ready', 'error'),
                 'successful': modeling_result.state != 'error',
