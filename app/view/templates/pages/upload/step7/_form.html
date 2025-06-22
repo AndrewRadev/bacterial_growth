@@ -26,12 +26,6 @@
         </a>
       </p>
 
-      <p>
-        You can click the "Update" button to apply your current submission to
-        it, for example if you have discovered issues you need to fix. The
-        study will show a timestamp of the last update that was applied to it.
-      </p>
-
     {% else: %}
 
       <p>
@@ -76,16 +70,18 @@
 
     <br>
 
-    <button
-        type="submit"
-        class="form-input-full"
-        {{ "disabled" if submission.study is none or not submission.study.isPublishable }}>
-      {% if submission.study and submission.study.isPublished: %}
-        Update
-      {% elif submission.study.publishableAt is not none: %}
-        Publish
-      {% endif %}
-    </button>
+    {% if submission.study is none or not submission.study.isPublished: %}
+      <button
+          type="submit"
+          class="form-input-full"
+          {{ "disabled" if submission.study is none or not submission.study.isPublishable }}>
+        {% if submission.study and submission.study.isPublished: %}
+          Update
+        {% elif not submission.study or submission.study.publishableAt is not none: %}
+          Publish
+        {% endif %}
+      </button>
+    {% endif %}
   </form>
 
 {% endmacro %}
