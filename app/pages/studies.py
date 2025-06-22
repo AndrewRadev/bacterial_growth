@@ -1,10 +1,12 @@
 import io
+import uuid
 
 from flask import (
     g,
     render_template,
     send_file,
     request,
+    redirect,
 )
 from werkzeug.exceptions import Forbidden
 import sqlalchemy as sql
@@ -16,6 +18,8 @@ from app.model.orm import (
     ModelingRequest,
     ModelingResult,
     Study,
+    StudyUser,
+    Submission,
 )
 from app.view.forms.experiment_export_form import ExperimentExportForm
 from app.view.forms.comparative_chart_form import ComparativeChartForm
@@ -128,6 +132,32 @@ def study_download_models_csv(publicId):
         as_attachment=True,
         download_name=f"{publicId}_models.csv",
     )
+
+def study_reset_action(publicId):
+    study = _fetch_study(publicId, check_user_visibility=False)
+    if study.ownerUuid != g.current_user.uuid:
+        raise Forbidden()
+
+    study_submissions = g.db_session.scalars(
+        sql.select(Submission)
+        .where(Submission.studyUniqueID == study.uuid)
+    ).all()
+
+    study.uuid = str(uuid.uuid4())
+
+    g.db_session.add(study)
+    g.db_session.add(StudyUser(
+        user=g.current_user,
+        study=study,
+    ))
+
+    for submission in study_submissions:
+        submission.studyUniqueID = study.uuid
+        g.db_session.add(submission)
+
+    g.db_session.commit()
+
+    return redirect(request.referrer)
 
 
 def study_visualize_page(publicId):
