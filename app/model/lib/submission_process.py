@@ -41,9 +41,8 @@ def persist_submission_to_database(submission_form):
     with get_transaction() as db_transaction:
         db_trans_session = get_session(db_transaction)
 
-        _save_project(db_trans_session, submission_form)
-
-        study = _save_study(db_trans_session, submission_form)
+        project = _save_project(db_trans_session, submission_form)
+        study   = _save_study(db_trans_session, submission_form)
 
         # First, clear out existing relationships
         study.measurements           = []
@@ -70,7 +69,7 @@ def persist_submission_to_database(submission_form):
             _create_average_measurements(db_trans_session, study, experiment)
 
         submission_form.save()
-        submission_form.save_backup()
+        submission_form.save_backup(study_id=study.publicId, project_id=project.publicId)
 
         db_trans_session.commit()
 
