@@ -18,5 +18,6 @@ from .study import Study
 from .study_metabolite import StudyMetabolite
 from .study_user import StudyUser
 from .submission import Submission
+from .submission_backup import SubmissionBackup
 from .taxon import Taxon
 from .user import User

@@ -41,6 +41,7 @@ from app.model.orm import (
     StudyMetabolite,
     StudyUser,
     Submission,
+    SubmissionBackup,
     Taxon,
     User,
 )
@@ -190,12 +191,13 @@ def init_admin(app):
                 download_name=file.filename
             )
 
-    admin.add_view(AppView(Project,           db_session, category="Studies"))
-    admin.add_view(StudyView(Study,           db_session, category="Studies"))
-    admin.add_view(SubmissionView(Submission, db_session, category="Studies"))
-    admin.add_view(AppView(Strain,            db_session, category="Studies"))
-    admin.add_view(AppView(StudyMetabolite,   db_session, category="Studies"))
-    admin.add_view(ExcelFileView(ExcelFile,   db_session, category="Studies"))
+    admin.add_view(AppView(Project,                 db_session, category="Studies"))
+    admin.add_view(StudyView(Study,                 db_session, category="Studies"))
+    admin.add_view(SubmissionView(Submission,       db_session, category="Studies"))
+    admin.add_view(SubmissionView(SubmissionBackup, db_session, category="Studies"))
+    admin.add_view(AppView(Strain,                  db_session, category="Studies"))
+    admin.add_view(AppView(StudyMetabolite,         db_session, category="Studies"))
+    admin.add_view(ExcelFileView(ExcelFile,         db_session, category="Studies"))
 
     admin.add_view(AppView(Experiment,            db_session, category="Experiments"))
     admin.add_view(AppView(ExperimentCompartment, db_session, category="Experiments"))
