@@ -64,6 +64,7 @@ def init_routes(app):
     app.add_url_rule("/study/<string:publicId>/export/preview",    view_func=study_pages.study_export_preview_fragment)
     app.add_url_rule("/study/<string:publicId>/manage/",           view_func=study_pages.study_manage_page)
     app.add_url_rule("/study/<string:publicId>/manage/models.csv", view_func=study_pages.study_download_models_csv, methods=["POST"])
+    app.add_url_rule("/study/<string:publicId>/manage/reset",      view_func=study_pages.study_reset_action, methods=["POST"])
     app.add_url_rule("/study/<string:publicId>/visualize/",        view_func=study_pages.study_visualize_page)
     app.add_url_rule("/study/<string:publicId>/visualize/chart",   view_func=study_pages.study_chart_fragment, methods=["POST"])
 
@@ -80,6 +81,7 @@ def init_routes(app):
         "/study/<string:publicId>/modeling/<int:measurementContextId>/chart",
         view_func=study_pages.study_modeling_chart_fragment,
     )
+
 
     app.add_url_rule("/experiment/<string:publicId>/", view_func=experiment_pages.experiment_show_page)
     app.add_url_rule("/project/<string:publicId>", view_func=project_pages.project_show_page)

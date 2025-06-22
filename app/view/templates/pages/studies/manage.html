@@ -35,6 +35,23 @@
         </div>
       </p>
 
+      {% if study.ownerUuid == g.current_user.uuid: %}
+        <div class="flex-row">
+          <p>
+            You can reset the unique ID to a new value, which will lock out
+            everyone else other than you. Only resort to this in case of a
+            security issue:
+          </p>
+
+          {{ post_button(
+            "Reset study access",
+            url_for('study_reset_action', publicId=study.publicId),
+            class="flex-right",
+            confirm="Are you sure? This will remove other people's access to the study."
+          ) }}
+        </div>
+      {% endif %}
+
       <h2>Edit study</h2>
 
       <p>
