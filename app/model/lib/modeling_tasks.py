@@ -49,10 +49,12 @@ def _process_modeling_request(db_session, modeling_request_id, measurement_conte
                 )
             ).one()
 
+            inputs = {}
+
             if modeling_request.type == 'easy_linear':
-                modeling_result.inputs = {'pointCount': point_count}
+                inputs = {'pointCount': point_count}
             elif modeling_request.type in ('logistic', 'baranyi_roberts'):
-                modeling_result.inputs = {'endTime': end_time}
+                inputs = {'endTime': end_time}
 
             db_session.add(modeling_result)
             modeling_request.results.append(modeling_result)
@@ -91,17 +93,19 @@ def _process_modeling_request(db_session, modeling_request_id, measurement_conte
                     has_error = True
                 else:
                     modeling_result.update(
-                        coefficients=coefficients,
                         rSummary=_extract_r_summary(output),
-                        fit=fit,
+                        params={
+                            'inputs':              inputs,
+                            'coefficients':        coefficients,
+                            'fit':                 fit,
+                            'r_version':           rscript.get_r_version(),
+                            'growthrates_version': rscript.get_growthrates_version(),
+                        },
                         state='ready',
                         error=None,
                         calculatedAt=datetime.now(UTC),
                     )
-
-                    flag_modified(modeling_result, 'coefficients')
-                    flag_modified(modeling_result, 'fit')
-                    flag_modified(modeling_result, 'rSummary')
+                    flag_modified(modeling_result, 'params')
 
                     modeling_request.error = None
             except Exception as e:

@@ -57,6 +57,8 @@ class ModelingRequest(OrmBase):
     def create_results(self, db_session, measurement_context_ids):
         from app.model.orm import ModelingResult
 
+        results = []
+
         for measurement_context_id in measurement_context_ids:
             modeling_result = db_session.scalars(
                 sql.select(ModelingResult)
@@ -76,7 +78,9 @@ class ModelingRequest(OrmBase):
                 self.results.append(modeling_result)
 
             modeling_result.state = 'pending'
+            results.append(modeling_result)
 
+        return results
 
     @validates('type')
     def _validate_type(self, key, value):

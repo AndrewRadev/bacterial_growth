@@ -64,7 +64,7 @@ Page('.study-manage-page', function($page) {
       method: 'POST',
       data: $form.serializeArray(),
       success: function(response) {
-        let modelingRequestId = response.modelingRequestId;
+        let modelingResultId = response.modelingResultId;
 
         if ($activeRow.find('[data-modeling-result-id]').length == 0) {
           $activeRow.append(`<div data-modeling-result-id="${modelingResultId}">⏳</div>`);

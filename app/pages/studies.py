@@ -188,7 +188,7 @@ def study_modeling_submit_action(publicId):
             study=study,
         )
 
-    modeling_request.create_results(g.db_session, [measurement_context_id])
+    results = modeling_request.create_results(g.db_session, [measurement_context_id])
     modeling_request.state = 'pending'
     g.db_session.add(modeling_request)
     g.db_session.commit()
@@ -197,7 +197,7 @@ def study_modeling_submit_action(publicId):
     modeling_request.jobUuid = result.task_id
     g.db_session.commit()
 
-    return {'modelingRequestId': modeling_request.id}
+    return {'modelingResultId': results[0].id}
 
 
 def study_modeling_check_json(publicId):
@@ -264,24 +264,18 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         label = modeling_result.model_name
         chart.add_model_df(df, units=units, label=label)
 
-        model_inputs       = modeling_result.inputs
-        model_coefficients = modeling_result.coefficients
-        model_fit          = modeling_result.fit
-        r_summary          = modeling_result.rSummary
+        model_params = modeling_result.params
+        r_summary    = modeling_result.rSummary
     else:
-        model_inputs       = ModelingResult.empty_inputs(modeling_type)
-        model_coefficients = ModelingResult.empty_coefficients(modeling_type)
-        model_fit          = ModelingResult.empty_fit()
-        r_summary          = None
+        model_params = ModelingResult.empty_params(modeling_type)
+        r_summary    = None
 
     return render_template(
         'pages/studies/manage/_modeling_chart.html',
         chart=chart,
         form_data=request.form,
         model_type=modeling_type,
-        model_inputs=model_inputs,
-        model_coefficients=model_coefficients,
-        model_fit=model_fit,
+        model_params=model_params,
         r_summary=r_summary,
         measurement_context=measurement_context,
         log_transform=log_transform,

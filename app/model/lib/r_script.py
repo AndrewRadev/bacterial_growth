@@ -1,3 +1,5 @@
+import re
+
 import simplejson as json
 import subprocess
 import shutil
@@ -32,14 +34,7 @@ class RScript:
         )
 
         if result.returncode != 0:
-            LOGGER.error("STDOUT:")
-            for line in result.stdout.decode('utf-8').split("\n"):
-                LOGGER.error(line)
-
-            LOGGER.error("STDERR:")
-            for line in result.stderr.decode('utf-8').split("\n"):
-                LOGGER.error(line)
-
+            self._log_failure(result)
             raise ValueError(f"Failed RScript call: {script_path}")
 
         for line in result.stderr.decode('utf-8').split("\n"):
@@ -72,6 +67,34 @@ class RScript:
         else:
             return {k: v for k, v in raw_data[0].items() if k not in discard_keys}
 
+    def get_r_version(self):
+        result = subprocess.run(
+            [self.rscript_exe, '--version'],
+            cwd=self.root_path,
+            capture_output=True,
+        )
+
+        if result.returncode == 0:
+            output = result.stdout.decode('utf-8').strip()
+            return re.sub(r'^.*version ', '', output)
+        else:
+            self._log_failure(result)
+            return None
+
+    def get_growthrates_version(self):
+        result = subprocess.run(
+            [self.rscript_exe, '-e', 'library(growthrates); getNamespaceVersion("growthrates")'],
+            cwd=self.root_path,
+            capture_output=True,
+        )
+
+        if result.returncode == 0:
+            output = result.stdout.decode('utf-8').split()[-1]
+            return re.sub('"', '', output).strip()
+        else:
+            self._log_failure(result)
+            return None
+
     def _read_raw_json(self, filename):
         path = self.root_path / filename
 
@@ -82,3 +105,13 @@ class RScript:
         LOGGER.info(f"{filename}: {text}")
 
         return json.loads(text, use_decimal=True)
+
+    def _log_failure(self, result):
+        LOGGER.error("STDOUT:")
+        for line in result.stdout.decode('utf-8').split("\n"):
+            LOGGER.error(line)
+
+        LOGGER.error("STDERR:")
+        for line in result.stderr.decode('utf-8').split("\n"):
+            LOGGER.error(line)
+

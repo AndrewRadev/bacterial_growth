@@ -292,16 +292,14 @@ CREATE TABLE ModelingResults (
   id int NOT NULL AUTO_INCREMENT,
   `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   requestId int NOT NULL,
-  coefficients json DEFAULT (json_object()),
   state varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `error` text,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   calculatedAt datetime DEFAULT NULL,
-  fit json DEFAULT (json_object()),
   measurementContextId int NOT NULL,
-  inputs json NOT NULL DEFAULT (json_object()),
   rSummary text,
+  params json DEFAULT (json_object()),
   PRIMARY KEY (id),
   KEY Calculations_calculationTechniqueId (requestId),
   CONSTRAINT Calculations_calculationTechniqueId FOREIGN KEY (requestId) REFERENCES ModelingRequests (id) ON DELETE CASCADE ON UPDATE CASCADE
@@ -360,8 +358,8 @@ DROP TABLE IF EXISTS Projects;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE Projects (
   publicId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
-  `description` text COLLATE utf8mb4_bin,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   uuid varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -404,9 +402,9 @@ DROP TABLE IF EXISTS Studies;
 CREATE TABLE Studies (
   publicId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   projectUuid varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
-  `description` text COLLATE utf8mb4_bin,
-  `url` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   uuid varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   timeUnits varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -578,5 +576,6 @@ INSERT INTO MigrationVersions VALUES
 (146,'2025_06_05_145355_add_owner_to_studies_and_projects','2025-06-05 12:55:11'),
 (148,'2025_06_05_150110_rename_study_and_project','2025-06-05 13:01:50'),
 (153,'2025_06_17_202034_fix_project_columns','2025-06-17 18:25:56'),
-(156,'2025_06_17_203802_fix_study_columns','2025-06-17 18:43:56');
+(156,'2025_06_17_203802_fix_study_columns','2025-06-17 18:43:56'),
+(158,'2025_06_22_152747_combine_modeling_params','2025-06-22 13:29:56');
 

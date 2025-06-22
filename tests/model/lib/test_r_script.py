@@ -40,6 +40,15 @@ class TestRScriptRunner(unittest.TestCase):
 
         self.assertEqual(output.strip(), "[1] 1 2 3\n[1] 10 20 30")
 
+    def test_package_versions(self):
+        script = RScript(self.root_path)
+
+        # Example: 4.4.3 (2025-02-28)
+        self.assertRegex(script.get_r_version(), r'^\d+\.\d+\.\d+ \(\d+-\d+-\d+\)$')
+
+        # Example: 0.8.4
+        self.assertRegex(script.get_growthrates_version(), r'^\d+\.\d+\.\d+$')
+
     def _create_script(self, name, contents):
         script_path = self.root_path / name
 
