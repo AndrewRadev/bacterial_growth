@@ -51,8 +51,8 @@ class TestModelingTasks(DatabaseTest):
         self.assertEqual(len(modeling_request.results), 1)
 
         modeling_result = modeling_request.results[0]
-        self.assertEqual(len(modeling_result.coefficients), 4)
-        self.assertEqual(set(modeling_result.coefficients.keys()), {'y0', 'h0', 'K', 'mumax'})
+        self.assertEqual(len(modeling_result.params['coefficients']), 4)
+        self.assertEqual(set(modeling_result.params['coefficients'].keys()), {'y0', 'h0', 'K', 'mumax'})
 
 
 if __name__ == '__main__':
