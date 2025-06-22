@@ -70,6 +70,8 @@ def persist_submission_to_database(submission_form):
             _create_average_measurements(db_trans_session, study, experiment)
 
         submission_form.save()
+        submission_form.save_backup()
+
         db_trans_session.commit()
 
         return []

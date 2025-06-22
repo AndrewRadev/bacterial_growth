@@ -456,6 +456,25 @@ CREATE TABLE StudyUsers (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `SubmissionBackups`
+--
+
+DROP TABLE IF EXISTS SubmissionBackups;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE SubmissionBackups (
+  id int NOT NULL AUTO_INCREMENT,
+  projectId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  userUuid varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  studyDesign json DEFAULT (json_object()),
+  dataFileId int DEFAULT NULL,
+  createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `Submissions`
 --
 
@@ -577,5 +596,6 @@ INSERT INTO MigrationVersions VALUES
 (148,'2025_06_05_150110_rename_study_and_project','2025-06-05 13:01:50'),
 (153,'2025_06_17_202034_fix_project_columns','2025-06-17 18:25:56'),
 (156,'2025_06_17_203802_fix_study_columns','2025-06-17 18:43:56'),
-(158,'2025_06_22_152747_combine_modeling_params','2025-06-22 13:29:56');
+(158,'2025_06_22_152747_combine_modeling_params','2025-06-22 13:29:56'),
+(160,'2025_06_22_161710_create_submission_backups','2025-06-22 14:21:36');
 

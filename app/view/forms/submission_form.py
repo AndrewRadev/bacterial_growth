@@ -10,6 +10,7 @@ from app.model.orm import (
     Project,
     Study,
     Submission,
+    SubmissionBackup
 )
 
 # The structure of a Submission's `studyDesign` field. Any parameters given to
@@ -62,6 +63,7 @@ class SubmissionForm:
         # Check for an existing project/study and set the submission "type" accordingly:
         self.project_id = self._find_project_id()
         self.study_id   = self._find_study_id()
+        self.user_uuid  = user_uuid
         self.type       = self._determine_project_type()
 
     def update_project(self, data):
@@ -179,6 +181,17 @@ class SubmissionForm:
         self.db_session.commit()
 
         return self.submission.id
+
+    def save_backup(self):
+        self.db_session.add(SubmissionBackup(
+            projectId=self.project_id,
+            studyId=self.study_id,
+            userUuid=self.user_uuid,
+            studyDesign=self.submission.studyDesign,
+            dataFileId=self.submission.dataFileId,
+        ))
+        self.db_session.commit()
+
 
     def has_error(self, key):
         return key in self.errors
