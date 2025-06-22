@@ -182,16 +182,15 @@ class SubmissionForm:
 
         return self.submission.id
 
-    def save_backup(self):
+    def save_backup(self, study_id, project_id):
         self.db_session.add(SubmissionBackup(
-            projectId=self.project_id,
-            studyId=self.study_id,
-            userUuid=self.user_uuid,
+            projectId=project_id,
+            studyId=study_id,
+            userUuid=self.submission.userUniqueID,
             studyDesign=self.submission.studyDesign,
             dataFileId=self.submission.dataFileId,
         ))
         self.db_session.commit()
-
 
     def has_error(self, key):
         return key in self.errors
