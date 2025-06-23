@@ -30,10 +30,13 @@ class TestStudyDsf(unittest.TestCase):
         query, values = dynamical_query([
             {'option': 'Microbial Strain', 'value': 'Rhodospirillum'}
         ])
-        self.assertSqlQuery(query, """
+        self.assertSqlQuery(query, f"""
             SELECT DISTINCT publicId
-            FROM Strains
-            WHERE LOWER(name) LIKE :value_0
+            FROM (
+                SELECT studyId as publicId
+                FROM Strains
+                WHERE LOWER(name) LIKE :value_0
+            ) as Strains_Alias
         """)
         self.assertEqual(values, ['%rhodospirillum%'])
 
@@ -48,9 +51,12 @@ class TestStudyDsf(unittest.TestCase):
             WHERE LOWER(name) LIKE :value_0
             AND studyId IN (
                 SELECT DISTINCT publicId
-                FROM StudyMetabolites
-                INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
-                WHERE LOWER(Metabolites.name) LIKE :value_1
+                FROM (
+                    SELECT studyId as publicId
+                    FROM StudyMetabolites
+                    INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
+                    WHERE LOWER(Metabolites.name) LIKE :value_1
+                ) as StudyMetabolites_Alias
             )
         """)
         self.assertEqual(values, ['%human%', '%acetyl%'])

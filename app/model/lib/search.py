@@ -20,23 +20,23 @@ def dynamical_query(all_advance_query):
             project_name = query_dict['value'].strip().lower()
             if project_name != '':
                 where_clause = f"""
-                FROM Studies
-                WHERE projectUniqueID IN (
-                    SELECT projectUniqueID
-                    FROM Projects
-                    WHERE LOWER(name) LIKE :value_{len(values)}
-                )
+                    FROM Studies
+                    WHERE projectUniqueID IN (
+                        SELECT projectUniqueID
+                        FROM Projects
+                        WHERE LOWER(name) LIKE :value_{len(values)}
+                    )
                 """
                 values.append(f'%{project_name}%')
         elif query_dict['option'] == 'Project ID':
             project_id = query_dict['value']
             where_clause = f"""
-            FROM Studies
-            WHERE projectUniqueID IN (
-                SELECT projectUniqueID
-                FROM Projects
-                WHERE publicId = :value_{len(values)}
-            )
+                FROM Studies
+                WHERE projectUniqueID IN (
+                    SELECT projectUniqueID
+                    FROM Projects
+                    WHERE publicId = :value_{len(values)}
+                )
             """
             values.append(project_id)
         elif query_dict['option'] == 'Study Name':
@@ -49,30 +49,41 @@ def dynamical_query(all_advance_query):
         elif query_dict['option'] == 'Study ID':
             study_id = query_dict['value']
             where_clause = f"""
-            FROM Studies
-            WHERE studyId = :value_{len(values)}
+                FROM Studies
+                WHERE publicId = :value_{len(values)}
             """
             values.append(study_id)
         elif query_dict['option'] == 'Microbial Strain':
             microb_strain = query_dict['value'].strip().lower()
+            # Note: Creating a nested query so that "Strains.studyId" can be
+            # renamed to "publicId"
             where_clause = f"""
-            FROM Strains
-            WHERE LOWER(name) LIKE :value_{len(values)}
+            FROM (
+                SELECT studyId as publicId
+                FROM Strains
+                WHERE LOWER(name) LIKE :value_{len(values)}
+            ) as Strains_Alias
             """
             values.append(f"%{microb_strain}%")
         elif query_dict['option'] == 'NCBI ID':
             microb_ID = query_dict['value']
             where_clause = f"""
-            FROM Strains
-            WHERE NCBId = :value_{len(values)}
+            FROM (
+                SELECT studyId as publicId
+                FROM Strains
+                WHERE NCBId = :value_{len(values)}
+            ) as Strains_Alias
             """
             values.append(microb_ID)
         elif query_dict['option'] == 'Metabolites':
             metabo = query_dict['value'].strip().lower()
             where_clause = f"""
-            FROM StudyMetabolites
-            INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
-            WHERE LOWER(Metabolites.name) LIKE :value_{len(values)}
+                FROM (
+                    SELECT studyId as publicId
+                    FROM StudyMetabolites
+                    INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
+                    WHERE LOWER(Metabolites.name) LIKE :value_{len(values)}
+                ) as StudyMetabolites_Alias
             """
             values.append(f"%{metabo}%")
         elif query_dict['option'] == 'chEBI ID':
@@ -82,8 +93,11 @@ def dynamical_query(all_advance_query):
                 chebi_id = f"CHEBI:{chebi_id}"
 
             where_clause = f"""
-            FROM StudyMetabolites
-            WHERE chebi_id = :value_{len(values)}
+                FROM (
+                    SELECT studyId as publicId
+                    FROM StudyMetabolites
+                    WHERE chebi_id = :value_{len(values)}
+                ) as StudyMetabolites_Alias
             """
             values.append(chebi_id)
         else:
