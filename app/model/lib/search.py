@@ -21,19 +21,19 @@ def dynamical_query(all_advance_query):
             if project_name != '':
                 where_clause = f"""
                     FROM Studies
-                    WHERE projectUniqueID IN (
-                        SELECT projectUniqueID
+                    WHERE projectUuid IN (
+                        SELECT uuid
                         FROM Projects
                         WHERE LOWER(name) LIKE :value_{len(values)}
                     )
                 """
                 values.append(f'%{project_name}%')
         elif query_dict['option'] == 'Project ID':
-            project_id = query_dict['value']
+            project_id = query_dict['value'].strip()
             where_clause = f"""
                 FROM Studies
-                WHERE projectUniqueID IN (
-                    SELECT projectUniqueID
+                WHERE projectUuid IN (
+                    SELECT uuid
                     FROM Projects
                     WHERE publicId = :value_{len(values)}
                 )
@@ -47,7 +47,7 @@ def dynamical_query(all_advance_query):
             """
             values.append(f"%{study_name}%")
         elif query_dict['option'] == 'Study ID':
-            study_id = query_dict['value']
+            study_id = query_dict['value'].strip()
             where_clause = f"""
                 FROM Studies
                 WHERE publicId = :value_{len(values)}
@@ -66,7 +66,7 @@ def dynamical_query(all_advance_query):
             """
             values.append(f"%{microb_strain}%")
         elif query_dict['option'] == 'NCBI ID':
-            microb_ID = query_dict['value']
+            microb_ID = query_dict['value'].strip()
             where_clause = f"""
             FROM (
                 SELECT studyId as publicId
@@ -87,7 +87,7 @@ def dynamical_query(all_advance_query):
             """
             values.append(f"%{metabo}%")
         elif query_dict['option'] == 'chEBI ID':
-            chebi_id = query_dict['value']
+            chebi_id = query_dict['value'].strip()
 
             if not chebi_id.startswith('CHEBI:'):
                 chebi_id = f"CHEBI:{chebi_id}"
