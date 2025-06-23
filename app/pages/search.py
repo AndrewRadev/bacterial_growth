@@ -57,6 +57,7 @@ def search_index_page():
             sql.select(Study.publicId)
             .join(StudyUser, isouter=True)
             .where(publish_clause)
+            .group_by(Study)
             .order_by(Study.updatedAt.desc())
             .limit(5)
         ).all()
