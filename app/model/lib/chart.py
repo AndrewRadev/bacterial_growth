@@ -26,7 +26,10 @@ class Chart:
         legend_position='top',
         clamp_x_data=False,
     ):
+        # TODO (2025-06-25) Unused, should consider conversion, but handle
+        # units during modeling:
         self.time_units       = time_units
+
         self.cell_count_units = cell_count_units
         self.cfu_count_units  = cfu_count_units
         self.metabolite_units = metabolite_units
@@ -121,7 +124,7 @@ class Chart:
                 exponentformat="power",
             ),
             xaxis=dict(
-                title=dict(text=f"Time ({self.time_units})"),
+                title=dict(text=f"Time (h)"),
             )
         )
 
