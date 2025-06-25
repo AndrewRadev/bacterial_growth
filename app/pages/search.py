@@ -11,7 +11,7 @@ from flask import (
 import sqlalchemy as sql
 
 from app.view.forms.search_form import SearchForm, SearchFormClause
-from app.model.lib.search import dynamical_query
+from app.model.lib.search_queries import dynamical_query
 from app.model.orm import (
     Study,
     StudyUser,
