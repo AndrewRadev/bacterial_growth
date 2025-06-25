@@ -10,6 +10,7 @@ from app.model.orm import (
     ModelingRequest,
     Compartment,
     Experiment,
+    ExperimentCompartment,
     Measurement,
     MeasurementContext,
     MeasurementTechnique,
@@ -120,6 +121,9 @@ class DatabaseTest(unittest.TestCase):
         }
 
         return self._create_orm_record(Compartment, params)
+
+    def create_experiment_compartment(self, **params):
+        return self._create_orm_record(ExperimentCompartment, params)
 
     def create_experiment(self, **params):
         self.experiment_sequence = getattr(self, 'experiment_sequence', 0) + 1

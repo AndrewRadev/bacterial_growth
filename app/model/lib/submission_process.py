@@ -390,7 +390,6 @@ def _create_average_measurements(db_session, study, experiment):
     bioreplicate_ids = [b.id for b in experiment.bioreplicates]
 
     # The averaged measurements will be parented by a custom-generated bioreplicate:
-    # Note: This always gets created, unfortunately
     average_bioreplicate = Bioreplicate(
         name=f"Average({experiment.name})",
         calculationType='average',
@@ -398,6 +397,8 @@ def _create_average_measurements(db_session, study, experiment):
         study=study,
     )
     db_session.add(average_bioreplicate)
+
+    has_measurements = False
 
     for technique in study.measurementTechniques:
         for compartment in experiment.compartments:
@@ -417,6 +418,15 @@ def _create_average_measurements(db_session, study, experiment):
 
             # If there is a single context for this cluster of measurements, there is nothing to average:
             if len(measurement_contexts) <= 1:
+                continue
+
+            # If measurement time points don't match, don't average them:
+            time_point_sets = set()
+            for measurement_context in measurement_contexts:
+                time_points = [m.timeInSeconds for m in measurement_context.measurements]
+                time_point_sets.add(frozenset(time_points))
+
+            if len(time_point_sets) > 1:
                 continue
 
             if technique.subjectType == 'bioreplicate':
@@ -442,6 +452,11 @@ def _create_average_measurements(db_session, study, experiment):
                         subject_id=subject_id,
                         subject_type=subject_type
                     )
+
+            has_measurements = True
+
+    if not has_measurements:
+        db_session.delete(average_bioreplicate)
 
 
 def _create_average_measurement_context(
