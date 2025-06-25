@@ -3,10 +3,10 @@ import tests.init  # noqa: F401
 import unittest
 import re
 
-from app.model.lib.search import dynamical_query
+from app.model.lib.search_queries import dynamical_query
 
 
-class TestStudyDsf(unittest.TestCase):
+class TestSearch(unittest.TestCase):
     def assertSqlQuery(self, actual, expected):
         actual   = ' '.join(re.split(r'\s+', actual.strip(), flags=re.MULTILINE))
         expected = ' '.join(re.split(r'\s+', expected.strip(), flags=re.MULTILINE))
@@ -33,10 +33,10 @@ class TestStudyDsf(unittest.TestCase):
         self.assertSqlQuery(query, f"""
             SELECT DISTINCT publicId
             FROM (
-                SELECT studyId as publicId
+                SELECT studyId as publicId, name, NCBId
                 FROM Strains
-                WHERE LOWER(name) LIKE :value_0
             ) as Strains_Alias
+            WHERE LOWER(name) LIKE :value_0
         """)
         self.assertEqual(values, ['%rhodospirillum%'])
 
@@ -49,14 +49,17 @@ class TestStudyDsf(unittest.TestCase):
             SELECT DISTINCT publicId
             FROM Studies
             WHERE LOWER(name) LIKE :value_0
-            AND studyId IN (
+            AND publicId IN (
                 SELECT DISTINCT publicId
                 FROM (
-                    SELECT studyId as publicId
+                    SELECT
+                        studyId as publicId,
+                        Metabolites.name as name,
+                        chebi_id
                     FROM StudyMetabolites
                     INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
-                    WHERE LOWER(Metabolites.name) LIKE :value_1
                 ) as StudyMetabolites_Alias
+                WHERE LOWER(name) LIKE :value_1
             )
         """)
         self.assertEqual(values, ['%human%', '%acetyl%'])
