@@ -304,14 +304,12 @@ class TestSubmissionProcess(DatabaseTest):
         study      = self.create_study()
         experiment = self.create_experiment(name="e1", studyId=study.publicId)
 
-        b1 = self.create_bioreplicate(name="b1", studyId=study.publicId, experimentId=experiment.id)
-        b2 = self.create_bioreplicate(name="b2", studyId=study.publicId, experimentId=experiment.id)
-
         c1 = self.create_compartment(studyId=study.publicId)
-        study.experiments[0].compartments = [c1]
+        self.create_experiment_compartment(compartmentId=c1.id, experimentId=experiment.id)
 
         mt = self.create_measurement_technique(subjectType='bioreplicate', studyUniqueID=study.uuid)
 
+        b1 = self.create_bioreplicate(name="b1", studyId=study.publicId, experimentId=experiment.id)
         mc1 = self.create_measurement_context(
             subjectId=b1.id,
             subjectType='bioreplicate',
@@ -323,10 +321,11 @@ class TestSubmissionProcess(DatabaseTest):
         for i, value in enumerate([10, 20, 30]):
             self.create_measurement(timeInSeconds=i, value=value, contextId=mc1.id)
 
+        b2 = self.create_bioreplicate(name="b2", studyId=study.publicId, experimentId=experiment.id)
         mc2 = self.create_measurement_context(
             subjectId=b2.id,
             subjectType='bioreplicate',
-            bioreplicateId=b1.id,
+            bioreplicateId=b2.id,
             techniqueId=mt.id,
             compartmentId=c1.id,
             studyId=study.publicId,
@@ -334,14 +333,40 @@ class TestSubmissionProcess(DatabaseTest):
         for i, value in enumerate([20, 40, 60]):
             self.create_measurement(timeInSeconds=i, value=value, contextId=mc2.id)
 
+        self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2"})
         _create_average_measurements(self.db_session, study, experiment)
-        self.db_session.flush()
-
+        self.db_session.refresh(study)
         self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2", "Average(e1)"})
 
         average_bioreplicate = next(b for b in study.bioreplicates if b.name == "Average(e1)")
         self.assertEqual(average_bioreplicate.calculationType, 'average')
         self.assertEqual([int(m.value) for m in average_bioreplicate.measurements], [15, 30, 45])
+
+        # Don't create averages if their time points don't match
+        b3 = self.create_bioreplicate(name="b3", studyId=study.publicId, experimentId=experiment.id)
+        mc3 = self.create_measurement_context(
+            subjectId=b3.id,
+            subjectType='bioreplicate',
+            bioreplicateId=b3.id,
+            techniqueId=mt.id,
+            compartmentId=c1.id,
+            studyId=study.publicId,
+        )
+        for i, value in enumerate([30, 50, 70]):
+            # Time points offset by 1:
+            self.create_measurement(timeInSeconds=i + 1, value=value, contextId=mc3.id)
+
+        self.db_session.delete(average_bioreplicate)
+        self.db_session.flush()
+
+        self.db_session.refresh(study)
+        self.db_session.refresh(experiment)
+
+        # Average bioreplicate doesn't get created:
+        self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2", "b3"})
+        _create_average_measurements(self.db_session, study, experiment)
+        self.db_session.refresh(study)
+        self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2", "b3"})
 
 
 if __name__ == '__main__':
