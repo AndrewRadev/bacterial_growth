@@ -14,8 +14,10 @@ docs/api/
 
 # Ignore var/ directory where the running process can store things
 var/backups/*
+var/external_data/*
 var/mysql/*
 !var/backups/.keep
+!var/external_data/.keep
 !var/mysql/.keep
 
 # Configuration contains passwords, copy config/database.toml.example:
