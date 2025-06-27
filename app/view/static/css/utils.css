@@ -64,6 +64,10 @@
   margin-top: 10px;
 }
 
+.small {
+  font-size: 14px;
+}
+
 code.inline {
   font-family: monospace;
   font-size: 16px;
