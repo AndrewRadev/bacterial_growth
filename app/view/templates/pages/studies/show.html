@@ -41,6 +41,28 @@
         <p>{{ study.description }}</p>
       {% endif %}
 
+      <h2>Measurement techniques</h2>
+
+      <p>
+        <ol>
+          {% for technique in study.measurementTechniques: %}
+            <li>
+              <strong>
+                {{ technique.long_name_with_subject_type }}
+                {% if technique.units != '' %}
+                  ({{ technique.units }})
+                {% endif %}
+              </strong>
+              {% if technique.description != '': %}
+                <div class="small">
+                  {{ technique.description }}
+                </div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ol>
+      </p>
+
       <div class="flex-row">
         <div class="experiments">
           {% for experiment in study.experiments: %}
