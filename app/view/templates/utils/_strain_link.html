@@ -1,12 +1,13 @@
 {% macro render_strain_link(strain) %}
   {% if strain.defined: %}
-    {{ strain.NCBId|ncbi_url|external_link(strain.name) }}
+    <strong>{{ strain.NCBId|ncbi_url|external_link(strain.name) }}</strong>
   {% else: %}
-    {{ strain.name }}
+    <strong>{{ strain.name }}</strong>
     (from {{ strain.NCBId|ncbi_url|external_link("NCBI:{}".format(strain.NCBId)) }})
     {%- if strain.description: -%}
-      <br>
-      {{ strain.description }}
+      <div class="small">
+        {{ strain.description|urlize(target="_blank") }}
+      </div>
     {% endif %}
   {% endif %}
 {% endmacro %}
