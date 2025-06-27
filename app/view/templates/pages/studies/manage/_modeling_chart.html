@@ -42,26 +42,26 @@
   <div class="column" style="width: 50%;">
     <h3 style="margin-top: 10px">Coefficients:</h3>
 
-    {{ render_param_input(model_coefficients, "y0",    "y₀: initial value of abundance", show_units=True) }}
-    {{ render_param_input(model_coefficients, "y0_lm", "y₀ calculated as the intersection of the fit with the abscissa, the initial abundance if there was no lag", show_units=True) }}
-    {{ render_param_input(model_coefficients, "mumax", "μ: maximum growth rate (1/time)") }}
-    {{ render_param_input(model_coefficients, "K",     "K: carrying capacity (max. abundance)", show_units=True) }}
-    {{ render_param_input(model_coefficients, "lag",   "time duration of lag phase") }}
-    {{ render_param_input(model_coefficients, "h0",    "h₀: parameter specifying the initial physiological state of organisms (e.g. cells) and in consequence the lag phase (h0 = max growth rate * lag phase)") }}
+    {{ render_param_input(model_params['coefficients'], "y0",    "y₀: initial value of abundance", show_units=True) }}
+    {{ render_param_input(model_params['coefficients'], "y0_lm", "y₀ calculated as the intersection of the fit with the abscissa, the initial abundance if there was no lag", show_units=True) }}
+    {{ render_param_input(model_params['coefficients'], "mumax", "μ: maximum growth rate (1/time)") }}
+    {{ render_param_input(model_params['coefficients'], "K",     "K: carrying capacity (max. abundance)", show_units=True) }}
+    {{ render_param_input(model_params['coefficients'], "lag",   "time duration of lag phase") }}
+    {{ render_param_input(model_params['coefficients'], "h0",    "h₀: parameter specifying the initial physiological state of organisms (e.g. cells) and in consequence the lag phase (h0 = max growth rate * lag phase)") }}
   </div>
 
   <div class="column" style="width: 50%;">
-    {% if model_inputs|length > 0: %}
+    {% if model_params['inputs']|length > 0: %}
       <h3 style="margin-top: 10px">Input parameters:</h3>
 
-      {{ render_param_input(model_inputs, "pointCount", "Number of points used to determine the greatest upward slope") }}
-      {{ render_param_input(model_inputs, "endTime",    "Time threshold to avoid fitting a death phase") }}
+      {{ render_param_input(model_params['inputs'], "pointCount", "Number of points used to determine the greatest upward slope") }}
+      {{ render_param_input(model_params['inputs'], "endTime",    "Time threshold to avoid fitting a death phase") }}
     {% endif %}
 
     <h3 style="margin-top: 10px">Quality of fit:</h3>
 
-    {{ render_param_input(model_fit, "r2",  "R²: coefficient of determination") }}
-    {{ render_param_input(model_fit, "rss", "RSS: residual sum of squares") }}
+    {{ render_param_input(model_params['fit'], "r2",  "R²: coefficient of determination") }}
+    {{ render_param_input(model_params['fit'], "rss", "RSS: residual sum of squares") }}
   </div>
 </div>
 
@@ -74,4 +74,9 @@
 
   <pre>{{ r_summary }}</pre>
 </div>
+
+<ul>
+  <li>R version:           {{ model_params['r_version'] }}</li>
+  <li>growthrates version: {{ model_params['growthrates_version'] }}</li>
+</ul>
 {% endif %}

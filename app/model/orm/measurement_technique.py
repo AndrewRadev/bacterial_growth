@@ -19,6 +19,7 @@ TECHNIQUE_SHORT_NAMES = {
     'od':         'OD',
     'plates':     'PC',
     '16s':        '16S-rRNA reads',
+    'qpcr':       'qPCR',
     'metabolite': 'Metabolite',
 }
 
@@ -28,6 +29,7 @@ TECHNIQUE_LONG_NAMES = {
     'od':         'Optical Density',
     'plates':     'Plate Counts',
     '16s':        '16S-rRNA reads',
+    'qpcr':       'qPCR',
     'metabolite': 'Metabolites',
 }
 
@@ -48,7 +50,7 @@ class MeasurementTechnique(OrmBase):
     metaboliteIds: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
     strainIds:     Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
-    studyUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Studies.studyUniqueID'), nullable=False)
+    studyUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Studies.uuid'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="measurementTechniques")
 
     createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
@@ -69,6 +71,14 @@ class MeasurementTechnique(OrmBase):
     @property
     def short_name(self):
         return TECHNIQUE_SHORT_NAMES[self.type]
+
+    @property
+    def short_name_with_units(self):
+        if self.units:
+            units = f" ({self.units})"
+        else:
+            units = ""
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
 
     @property
     def long_name(self):
@@ -142,6 +152,8 @@ class MeasurementTechnique(OrmBase):
         elif self.subjectType == 'strain':
             if self.type == '16s':
                 suffix = 'rRNA reads'
+            elif self.type == 'qpcr':
+                suffix = 'qPCR counts'
             elif self.type == 'fc':
                 suffix = 'FC counts'
             elif self.type == 'plates':

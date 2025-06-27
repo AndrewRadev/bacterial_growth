@@ -41,9 +41,8 @@ def persist_submission_to_database(submission_form):
     with get_transaction() as db_transaction:
         db_trans_session = get_session(db_transaction)
 
-        _save_project(db_trans_session, submission_form)
-
-        study = _save_study(db_trans_session, submission_form)
+        project = _save_project(db_trans_session, submission_form)
+        study   = _save_study(db_trans_session, submission_form)
 
         # First, clear out existing relationships
         study.measurements           = []
@@ -70,6 +69,8 @@ def persist_submission_to_database(submission_form):
             _create_average_measurements(db_trans_session, study, experiment)
 
         submission_form.save()
+        submission_form.save_backup(study_id=study.publicId, project_id=project.publicId)
+
         db_trans_session.commit()
 
         return []
@@ -177,19 +178,19 @@ def _save_study(db_session, submission_form):
     submission = submission_form.submission
 
     params = {
-        'studyId':          submission_form.study_id,
-        'studyName':        submission.studyDesign['study']['name'],
-        'studyDescription': submission.studyDesign['study'].get('description', ''),
-        'studyURL':         submission.studyDesign['study'].get('url', ''),
-        'studyUniqueID':    submission.studyUniqueID,
-        'projectUniqueID':  submission.projectUniqueID,
-        'timeUnits':        submission.studyDesign['timeUnits'],
+        'publicId':    submission_form.study_id,
+        'name':        submission.studyDesign['study']['name'].strip(),
+        'description': submission.studyDesign['study'].get('description', '').strip(),
+        'url':         submission.studyDesign['study'].get('url', '').strip(),
+        'uuid':        submission.studyUniqueID,
+        'projectUuid': submission.projectUniqueID,
+        'timeUnits':   submission.studyDesign['timeUnits'],
     }
 
     if submission_form.type != 'update_study':
         study = Study(**Study.filter_keys(params))
 
-        study.studyId = Study.generate_public_id(db_session)
+        study.publicId = Study.generate_public_id(db_session)
         study.publishableAt = datetime.now(UTC) + timedelta(hours=24)
 
         db_session.add(StudyUser(
@@ -209,15 +210,15 @@ def _save_project(db_session, submission_form):
     submission = submission_form.submission
 
     params = {
-        'projectId':          submission_form.project_id,
-        'projectName':        submission.studyDesign['project']['name'],
-        'projectDescription': submission.studyDesign['project'].get('description', ''),
-        'projectUniqueID':    submission.projectUniqueID,
+        'publicId':    submission_form.project_id,
+        'name':        submission.studyDesign['project']['name'].strip(),
+        'description': submission.studyDesign['project'].get('description', '').strip(),
+        'uuid':        submission.projectUniqueID,
     }
 
     if submission_form.type == 'new_project':
         project = Project(**Project.filter_keys(params))
-        project.projectId = Project.generate_public_id(db_session)
+        project.publicId = Project.generate_public_id(db_session)
         db_session.add(ProjectUser(
             projectUniqueID=submission.projectUniqueID,
             userUniqueID=submission.userUniqueID,
@@ -389,7 +390,6 @@ def _create_average_measurements(db_session, study, experiment):
     bioreplicate_ids = [b.id for b in experiment.bioreplicates]
 
     # The averaged measurements will be parented by a custom-generated bioreplicate:
-    # Note: This always gets created, unfortunately
     average_bioreplicate = Bioreplicate(
         name=f"Average({experiment.name})",
         calculationType='average',
@@ -397,6 +397,8 @@ def _create_average_measurements(db_session, study, experiment):
         study=study,
     )
     db_session.add(average_bioreplicate)
+
+    has_measurements = False
 
     for technique in study.measurementTechniques:
         for compartment in experiment.compartments:
@@ -416,6 +418,15 @@ def _create_average_measurements(db_session, study, experiment):
 
             # If there is a single context for this cluster of measurements, there is nothing to average:
             if len(measurement_contexts) <= 1:
+                continue
+
+            # If measurement time points don't match, don't average them:
+            time_point_sets = set()
+            for measurement_context in measurement_contexts:
+                time_points = [m.timeInSeconds for m in measurement_context.measurements]
+                time_point_sets.add(frozenset(time_points))
+
+            if len(time_point_sets) > 1:
                 continue
 
             if technique.subjectType == 'bioreplicate':
@@ -441,6 +452,11 @@ def _create_average_measurements(db_session, study, experiment):
                         subject_id=subject_id,
                         subject_type=subject_type
                     )
+
+            has_measurements = True
+
+    if not has_measurements:
+        db_session.delete(average_bioreplicate)
 
 
 def _create_average_measurement_context(

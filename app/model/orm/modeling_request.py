@@ -39,7 +39,7 @@ class ModelingRequest(OrmBase):
     id:   Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
-    studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.studyId'), nullable=False)
+    studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates='modelingRequests')
 
     jobUuid: Mapped[str] = mapped_column(sql.String(100))
@@ -53,6 +53,34 @@ class ModelingRequest(OrmBase):
         back_populates='request',
         cascade='all, delete-orphan'
     )
+
+    def create_results(self, db_session, measurement_context_ids):
+        from app.model.orm import ModelingResult
+
+        results = []
+
+        for measurement_context_id in measurement_context_ids:
+            modeling_result = db_session.scalars(
+                sql.select(ModelingResult)
+                .where(
+                    ModelingResult.requestId == self.id,
+                    ModelingResult.measurementContextId == measurement_context_id,
+                )
+            ).one_or_none()
+
+            if not modeling_result:
+                modeling_result = ModelingResult(
+                    type=self.type,
+                    request=self,
+                    measurementContextId=measurement_context_id,
+                )
+                db_session.add(modeling_result)
+                self.results.append(modeling_result)
+
+            modeling_result.state = 'pending'
+            results.append(modeling_result)
+
+        return results
 
     @validates('type')
     def _validate_type(self, key, value):

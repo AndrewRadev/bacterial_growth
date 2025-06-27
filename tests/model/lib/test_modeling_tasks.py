@@ -18,6 +18,8 @@ class TestModelingTasks(DatabaseTest):
         measurement_context = self.create_measurement_context(subjectId=strain.id, subjectType='strain')
         modeling_request    = self.create_modeling_request()
 
+        modeling_request.create_results(self.db_session, [measurement_context.id])
+
         data = [
             (0.0,   2146.0),
             (4.0,   23640.0),
@@ -49,8 +51,8 @@ class TestModelingTasks(DatabaseTest):
         self.assertEqual(len(modeling_request.results), 1)
 
         modeling_result = modeling_request.results[0]
-        self.assertEqual(len(modeling_result.coefficients), 4)
-        self.assertEqual(set(modeling_result.coefficients.keys()), {'y0', 'h0', 'K', 'mumax'})
+        self.assertEqual(len(modeling_result.params['coefficients']), 4)
+        self.assertEqual(set(modeling_result.params['coefficients'].keys()), {'y0', 'h0', 'K', 'mumax'})
 
 
 if __name__ == '__main__':

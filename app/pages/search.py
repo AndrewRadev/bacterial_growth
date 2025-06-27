@@ -11,7 +11,7 @@ from flask import (
 import sqlalchemy as sql
 
 from app.view.forms.search_form import SearchForm, SearchFormClause
-from app.model.lib.search import dynamical_query
+from app.model.lib.search_queries import dynamical_query
 from app.model.orm import (
     Study,
     StudyUser,
@@ -54,9 +54,10 @@ def search_index_page():
 
         # TODO (2025-04-15) Extract, test with multiple users
         studyIds = g.db_session.scalars(
-            sql.select(Study.studyId)
+            sql.select(Study.publicId)
             .join(StudyUser, isouter=True)
             .where(publish_clause)
+            .group_by(Study)
             .order_by(Study.updatedAt.desc())
             .limit(5)
         ).all()

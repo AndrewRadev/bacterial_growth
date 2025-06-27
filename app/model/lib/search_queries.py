@@ -6,7 +6,7 @@ is less complicated.
 
 
 def dynamical_query(all_advance_query):
-    base_query = "SELECT DISTINCT studyId"
+    base_query = "SELECT DISTINCT publicId"
     search_final_query = ""
     values = []
 
@@ -20,70 +20,91 @@ def dynamical_query(all_advance_query):
             project_name = query_dict['value'].strip().lower()
             if project_name != '':
                 where_clause = f"""
-                FROM Studies
-                WHERE projectUniqueID IN (
-                    SELECT projectUniqueID
-                    FROM Projects
-                    WHERE LOWER(projectName) LIKE :value_{len(values)}
-                )
+                    FROM Studies
+                    WHERE projectUuid IN (
+                        SELECT uuid
+                        FROM Projects
+                        WHERE LOWER(name) LIKE :value_{len(values)}
+                    )
                 """
                 values.append(f'%{project_name}%')
         elif query_dict['option'] == 'Project ID':
-            project_id = query_dict['value']
+            project_id = query_dict['value'].strip()
             where_clause = f"""
-            FROM Studies
-            WHERE projectUniqueID IN (
-                SELECT projectUniqueID
-                FROM Projects
-                WHERE projectId = :value_{len(values)}
-            )
+                FROM Studies
+                WHERE projectUuid IN (
+                    SELECT uuid
+                    FROM Projects
+                    WHERE publicId = :value_{len(values)}
+                )
             """
             values.append(project_id)
         elif query_dict['option'] == 'Study Name':
             study_name = query_dict['value'].strip().lower()
             where_clause = f"""
                 FROM Studies
-                WHERE LOWER(studyName) LIKE :value_{len(values)}
+                WHERE LOWER(name) LIKE :value_{len(values)}
             """
             values.append(f"%{study_name}%")
         elif query_dict['option'] == 'Study ID':
-            study_id = query_dict['value']
+            study_id = query_dict['value'].strip()
             where_clause = f"""
-            FROM Studies
-            WHERE studyId = :value_{len(values)}
+                FROM Studies
+                WHERE publicId = :value_{len(values)}
             """
             values.append(study_id)
         elif query_dict['option'] == 'Microbial Strain':
             microb_strain = query_dict['value'].strip().lower()
+            # Note: Creating a nested query so that "Strains.studyId" can be
+            # renamed to "publicId"
             where_clause = f"""
-            FROM Strains
+            FROM (
+                SELECT studyId as publicId, name, NCBId
+                FROM Strains
+            ) as Strains_Alias
             WHERE LOWER(name) LIKE :value_{len(values)}
             """
             values.append(f"%{microb_strain}%")
         elif query_dict['option'] == 'NCBI ID':
-            microb_ID = query_dict['value']
+            microb_ID = query_dict['value'].strip()
             where_clause = f"""
-            FROM Strains
+            FROM (
+                SELECT studyId as publicId, name, NCBId
+                FROM Strains
+            ) as Strains_Alias
             WHERE NCBId = :value_{len(values)}
             """
             values.append(microb_ID)
         elif query_dict['option'] == 'Metabolites':
             metabo = query_dict['value'].strip().lower()
             where_clause = f"""
-            FROM StudyMetabolites
-            INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
-            WHERE LOWER(Metabolites.name) LIKE :value_{len(values)}
+                FROM (
+                    SELECT
+                        studyId as publicId,
+                        Metabolites.name as name,
+                        chebi_id
+                    FROM StudyMetabolites
+                    INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
+                ) as StudyMetabolites_Alias
+                WHERE LOWER(name) LIKE :value_{len(values)}
             """
             values.append(f"%{metabo}%")
         elif query_dict['option'] == 'chEBI ID':
-            chebi_id = query_dict['value']
+            chebi_id = query_dict['value'].strip()
 
             if not chebi_id.startswith('CHEBI:'):
                 chebi_id = f"CHEBI:{chebi_id}"
 
             where_clause = f"""
-            FROM StudyMetabolites
-            WHERE chebi_id = :value_{len(values)}
+                FROM (
+                    SELECT
+                        studyId as publicId,
+                        Metabolites.name as name,
+                        chebi_id
+                    FROM StudyMetabolites
+                    INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
+                ) as StudyMetabolites_Alias
+                WHERE chebi_id = :value_{len(values)}
             """
             values.append(chebi_id)
         else:
@@ -92,11 +113,11 @@ def dynamical_query(all_advance_query):
         logic_add = ""
         if 'logic_operator' in query_dict:
             if query_dict['logic_operator'] == 'AND':
-                logic_add = " AND studyId IN ("
+                logic_add = " AND publicId IN ("
             if query_dict['logic_operator'] == 'OR':
-                logic_add = " OR studyId IN ("
+                logic_add = " OR publicId IN ("
             if query_dict['logic_operator'] == 'NOT':
-                logic_add = " AND studyId NOT IN ("
+                logic_add = " AND publicId NOT IN ("
 
         if logic_add != "":
             final_query = logic_add + " " + base_query + " " + where_clause + " )"

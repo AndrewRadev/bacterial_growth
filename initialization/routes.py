@@ -58,31 +58,33 @@ def init_routes(app):
         methods=["POST"],
     )
 
-    app.add_url_rule("/study/<string:studyId>/",                  view_func=study_pages.study_show_page)
-    app.add_url_rule("/study/<string:studyId>.zip",               view_func=study_pages.study_download_data_zip)
-    app.add_url_rule("/study/<string:studyId>/export/",           view_func=study_pages.study_export_page)
-    app.add_url_rule("/study/<string:studyId>/export/preview",    view_func=study_pages.study_export_preview_fragment)
-    app.add_url_rule("/study/<string:studyId>/manage/",           view_func=study_pages.study_manage_page)
-    app.add_url_rule("/study/<string:studyId>/manage/models.csv", view_func=study_pages.study_download_models_csv, methods=["POST"])
-    app.add_url_rule("/study/<string:studyId>/visualize/",        view_func=study_pages.study_visualize_page)
-    app.add_url_rule("/study/<string:studyId>/visualize/chart",   view_func=study_pages.study_chart_fragment, methods=["POST"])
+    app.add_url_rule("/study/<string:publicId>/",                  view_func=study_pages.study_show_page)
+    app.add_url_rule("/study/<string:publicId>.zip",               view_func=study_pages.study_download_data_zip)
+    app.add_url_rule("/study/<string:publicId>/export/",           view_func=study_pages.study_export_page)
+    app.add_url_rule("/study/<string:publicId>/export/preview",    view_func=study_pages.study_export_preview_fragment)
+    app.add_url_rule("/study/<string:publicId>/manage/",           view_func=study_pages.study_manage_page)
+    app.add_url_rule("/study/<string:publicId>/manage/models.csv", view_func=study_pages.study_download_models_csv, methods=["POST"])
+    app.add_url_rule("/study/<string:publicId>/manage/reset",      view_func=study_pages.study_reset_action, methods=["POST"])
+    app.add_url_rule("/study/<string:publicId>/visualize/",        view_func=study_pages.study_visualize_page)
+    app.add_url_rule("/study/<string:publicId>/visualize/chart",   view_func=study_pages.study_chart_fragment, methods=["POST"])
 
     app.add_url_rule(
-        "/study/<string:studyId>/modeling/submit",
+        "/study/<string:publicId>/modeling/submit",
         view_func=study_pages.study_modeling_submit_action,
         methods=["POST"],
     )
     app.add_url_rule(
-        "/study/<string:studyId>/modeling/check.json",
+        "/study/<string:publicId>/modeling/check.json",
         view_func=study_pages.study_modeling_check_json,
     )
     app.add_url_rule(
-        "/study/<string:studyId>/modeling/<int:measurementContextId>/chart",
+        "/study/<string:publicId>/modeling/<int:measurementContextId>/chart",
         view_func=study_pages.study_modeling_chart_fragment,
     )
 
+
     app.add_url_rule("/experiment/<string:publicId>/", view_func=experiment_pages.experiment_show_page)
-    app.add_url_rule("/project/<string:projectId>", view_func=project_pages.project_show_page)
+    app.add_url_rule("/project/<string:publicId>", view_func=project_pages.project_show_page)
 
     app.add_url_rule("/strains/completion/",     view_func=strain_pages.taxa_completion_json)
     app.add_url_rule("/metabolites/completion/", view_func=metabolite_pages.metabolites_completion_json)

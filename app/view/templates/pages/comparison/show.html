@@ -26,7 +26,7 @@
       <form class="js-chart-form">
         {% for (study, measurement_contexts) in measurement_contexts_by_study.items(): %}
           <h4>
-            [<a href="{{ url_for('study_show_page', studyId=study.publicId) }}">{{ study.publicId }}</a>]
+            [<a href="{{ url_for('study_show_page', publicId=study.publicId) }}">{{ study.publicId }}</a>]
             {{ study.name }}
           </h4>
 

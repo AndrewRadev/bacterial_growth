@@ -48,9 +48,7 @@ class ModelingResult(OrmBase):
     )
     measurementContext: Mapped['MeasurementContext'] = relationship(back_populates='modelingResults')
 
-    inputs:       Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
-    fit:          Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
-    coefficients: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    params: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
     state:    Mapped[str] = mapped_column(sql.String(100), default='pending')
     error:    Mapped[str] = mapped_column(sql.String)
@@ -60,34 +58,6 @@ class ModelingResult(OrmBase):
     updatedAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
     calculatedAt: Mapped[datetime] = mapped_column(UtcDateTime)
 
-    @classmethod
-    def empty_coefficients(Self, model_type):
-        if model_type == 'easy_linear':
-            return {'y0': None, 'y0_lm': None, 'mumax': None, 'lag': None}
-        elif model_type == 'logistic':
-            return {'y0': None, 'mumax': None, 'K': None}
-        elif model_type == 'baranyi_roberts':
-            return {'y0': None, 'mumax': None, 'K': None, 'h0': None}
-        else:
-            raise ValueError(f"Don't know what the coefficients are for model type: {repr(model_type)}")
-
-    @classmethod
-    def empty_fit(Self):
-        return {'r2': None, 'rss': None}
-
-    @classmethod
-    def empty_inputs(Self, model_type):
-        if model_type == 'easy_linear':
-            return {'pointCount': '5'}
-        elif model_type in ('logistic', 'baranyi_roberts'):
-            return {'endTime': ''}
-        else:
-            return {}
-
-    @property
-    def model_name(self):
-        return MODEL_NAMES[self.type]
-
     @validates('type')
     def _validate_type(self, key, value):
         return self._validate_inclusion(key, value, VALID_TYPES)
@@ -95,6 +65,47 @@ class ModelingResult(OrmBase):
     @validates('state')
     def _validate_state(self, key, value):
         return self._validate_inclusion(key, value, VALID_STATES)
+
+    @classmethod
+    def empty_params(Self, model_type):
+        if model_type == 'easy_linear':
+            inputs = {'pointCount': '5'}
+            coefficients = {
+                'y0':    None,
+                'y0_lm': None,
+                'mumax': None,
+                'lag':   None,
+            }
+        elif model_type == 'logistic':
+            inputs = {'endTime': ''}
+            coefficients = {
+                'y0':    None,
+                'mumax': None,
+                'K':     None,
+            }
+        elif model_type == 'baranyi_roberts':
+            inputs = {'endTime': ''}
+            coefficients = {
+                'y0':    None,
+                'mumax': None,
+                'K':     None,
+                'h0':    None,
+            }
+        else:
+            raise ValueError(f"Don't know what the coefficients are for model type: {repr(model_type)}")
+
+        return {
+            'coefficients': coefficients,
+            'inputs': inputs,
+            'fit': {
+                'r2': None,
+                'rss': None,
+            }
+        }
+
+    @property
+    def model_name(self):
+        return MODEL_NAMES[self.type]
 
     def generate_chart_df(self, measurements_df):
         start_time = measurements_df['time'].min()
@@ -119,10 +130,12 @@ class ModelingResult(OrmBase):
             raise ValueError(f"Don't know how to predict values for model type: {repr(self.type)}")
 
     def _predict_easy_linear(self, time):
-        # y0    = float(self.coefficients['y0'])
-        y0_lm = float(self.coefficients['y0_lm'])
-        mumax = float(self.coefficients['mumax'])
-        # lag   = float(self.coefficients['lag'])
+        coefficients = self.params['coefficients']
+
+        # y0    = float(coefficients['y0'])
+        y0_lm = float(coefficients['y0_lm'])
+        mumax = float(coefficients['mumax'])
+        # lag   = float(coefficients['lag'])
 
         # No lag:
         # return y0 * np.exp(time * mumax)
@@ -131,17 +144,21 @@ class ModelingResult(OrmBase):
         return y0_lm * np.exp(time * mumax)
 
     def _predict_logistic(self, time):
-        y0    = float(self.coefficients['y0'])
-        mumax = float(self.coefficients['mumax'])
-        K     = float(self.coefficients['K'])
+        coefficients = self.params['coefficients']
+
+        y0    = float(coefficients['y0'])
+        mumax = float(coefficients['mumax'])
+        K     = float(coefficients['K'])
 
         return (K * y0)/(y0 + (K - y0) * np.exp(-mumax * time))
 
     def _predict_baranyi_roberts(self, time):
-        y0    = float(self.coefficients['y0'])
-        mumax = float(self.coefficients['mumax'])
-        K     = float(self.coefficients['K'])
-        h0    = float(self.coefficients['h0'])
+        coefficients = self.params['coefficients']
+
+        y0    = float(coefficients['y0'])
+        mumax = float(coefficients['mumax'])
+        K     = float(coefficients['K'])
+        h0    = float(coefficients['h0'])
 
         # Formula taken from the "growthrates" documentation under `grow_baranyi`:
         # https://cran.r-project.org/web/packages/growthrates/growthrates.pdf

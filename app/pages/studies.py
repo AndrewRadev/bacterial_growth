@@ -1,10 +1,12 @@
 import io
+import uuid
 
 from flask import (
     g,
     render_template,
     send_file,
     request,
+    redirect,
 )
 from werkzeug.exceptions import Forbidden
 import sqlalchemy as sql
@@ -16,6 +18,8 @@ from app.model.orm import (
     ModelingRequest,
     ModelingResult,
     Study,
+    StudyUser,
+    Submission,
 )
 from app.view.forms.experiment_export_form import ExperimentExportForm
 from app.view.forms.comparative_chart_form import ComparativeChartForm
@@ -26,9 +30,9 @@ from app.model.lib.log_transform import apply_log_transform
 import app.model.lib.util as util
 
 
-def study_show_page(studyId):
+def study_show_page(publicId):
     study = _fetch_study(
-        studyId,
+        publicId,
         check_user_visibility=False,
         sql_options=(
             sql.orm.selectinload(
@@ -52,27 +56,27 @@ def study_show_page(studyId):
         return render_template("pages/studies/show_unpublished.html", study=study)
 
 
-def study_manage_page(studyId):
-    study = _fetch_study(studyId)
+def study_manage_page(publicId):
+    study = _fetch_study(publicId)
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
     return render_template("pages/studies/manage.html", study=study)
 
 
-def study_export_page(studyId):
-    study = _fetch_study(studyId)
+def study_export_page(publicId):
+    study = _fetch_study(publicId)
 
     return render_template(
         "pages/studies/export.html",
         study=study,
-        studyId=studyId,
+        studyId=publicId,
     )
 
 
-def study_export_preview_fragment(studyId):
+def study_export_preview_fragment(publicId):
     # We only need the id here, but we call it to apply visibility checks:
-    _fetch_study(studyId)
+    _fetch_study(publicId)
 
     csv_previews = []
     export_form = ExperimentExportForm(g.db_session, request.args)
@@ -88,8 +92,8 @@ def study_export_preview_fragment(studyId):
     return '\n'.join(csv_previews)
 
 
-def study_download_data_zip(studyId):
-    study = _fetch_study(studyId)
+def study_download_data_zip(publicId):
+    study = _fetch_study(publicId)
     csv_data = []
 
     export_form = ExperimentExportForm(g.db_session, request.args)
@@ -114,27 +118,53 @@ def study_download_data_zip(studyId):
     return send_file(
         zip_file,
         as_attachment=True,
-        download_name=f"{studyId}.zip",
+        download_name=f"{publicId}.zip",
     )
 
 
-def study_download_models_csv(studyId):
-    study = _fetch_study(studyId)
+def study_download_models_csv(publicId):
+    study = _fetch_study(publicId)
 
     csv_data = export_model_csv(g.db_session, study)
 
     return send_file(
         io.BytesIO(csv_data),
         as_attachment=True,
-        download_name=f"{studyId}_models.csv",
+        download_name=f"{publicId}_models.csv",
     )
 
+def study_reset_action(publicId):
+    study = _fetch_study(publicId, check_user_visibility=False)
+    if study.ownerUuid != g.current_user.uuid:
+        raise Forbidden()
 
-def study_visualize_page(studyId):
-    study = _fetch_study(studyId)
+    study_submissions = g.db_session.scalars(
+        sql.select(Submission)
+        .where(Submission.studyUniqueID == study.uuid)
+    ).all()
 
-    left_axis_ids  = [int(s) for s in request.args.get('l', '').split(',') if s != '']
-    right_axis_ids = [int(s) for s in request.args.get('r', '').split(',') if s != '']
+    study.uuid = str(uuid.uuid4())
+
+    g.db_session.add(study)
+    g.db_session.add(StudyUser(
+        user=g.current_user,
+        study=study,
+    ))
+
+    for submission in study_submissions:
+        submission.studyUniqueID = study.uuid
+        g.db_session.add(submission)
+
+    g.db_session.commit()
+
+    return redirect(request.referrer)
+
+
+def study_visualize_page(publicId):
+    study = _fetch_study(publicId)
+
+    left_axis_ids  = _parse_comma_separated_request_ids('l')
+    right_axis_ids = _parse_comma_separated_request_ids('r')
 
     chart_form = ComparativeChartForm(
         g.db_session,
@@ -150,8 +180,8 @@ def study_visualize_page(studyId):
     )
 
 
-def study_chart_fragment(studyId):
-    study = _fetch_study(studyId)
+def study_chart_fragment(publicId):
+    study = _fetch_study(publicId)
     args = request.form.to_dict()
 
     width = request.args.get('width', None)
@@ -167,8 +197,8 @@ def study_chart_fragment(studyId):
     )
 
 
-def study_modeling_submit_action(studyId):
-    study = _fetch_study(studyId)
+def study_modeling_submit_action(publicId):
+    study = _fetch_study(publicId)
     args = request.form.to_dict()
 
     modeling_type = args.pop('modelingType')
@@ -187,32 +217,34 @@ def study_modeling_submit_action(studyId):
             type=modeling_type,
             study=study,
         )
-        g.db_session.add(modeling_request)
-        g.db_session.commit()
+
+    results = modeling_request.create_results(g.db_session, [measurement_context_id])
+    modeling_request.state = 'pending'
+    g.db_session.add(modeling_request)
+    g.db_session.commit()
 
     result = process_modeling_request.delay(modeling_request.id, [measurement_context_id], args)
     modeling_request.jobUuid = result.task_id
     g.db_session.commit()
 
-    return {'modelingRequestId': modeling_request.id}
+    return {'modelingResultId': results[0].id}
 
 
-def study_modeling_check_json(studyId):
-    study = _fetch_study(studyId)
+def study_modeling_check_json(publicId):
+    study = _fetch_study(publicId)
 
-    # TODO (2025-05-20) Return counts of pending requests?
+    modeling_requests = [r for r in study.modelingRequests]
+    result_states = {}
 
-    ready      = all([mr.state in ('ready', 'error') for mr in study.modelingRequests])
-    successful = all([mr.state != 'error' for mr in study.modelingRequests])
+    for modeling_request in study.modelingRequests:
+        for modeling_result in modeling_request.results:
+            result_states[modeling_result.id] = modeling_result.state
 
-    return {
-        "ready":      ready,
-        "successful": successful,
-    }
+    return result_states
 
 
-def study_modeling_chart_fragment(studyId, measurementContextId):
-    study = _fetch_study(studyId)
+def study_modeling_chart_fragment(publicId, measurementContextId):
+    study = _fetch_study(publicId)
     args = request.args.to_dict()
 
     # TODO (2025-06-12) Unused?
@@ -262,36 +294,30 @@ def study_modeling_chart_fragment(studyId, measurementContextId):
         label = modeling_result.model_name
         chart.add_model_df(df, units=units, label=label)
 
-        model_inputs       = modeling_result.inputs
-        model_coefficients = modeling_result.coefficients
-        model_fit          = modeling_result.fit
-        r_summary          = modeling_result.rSummary
+        model_params = modeling_result.params
+        r_summary    = modeling_result.rSummary
     else:
-        model_inputs       = ModelingResult.empty_inputs(modeling_type)
-        model_coefficients = ModelingResult.empty_coefficients(modeling_type)
-        model_fit          = ModelingResult.empty_fit()
-        r_summary          = None
+        model_params = ModelingResult.empty_params(modeling_type)
+        r_summary    = None
 
     return render_template(
         'pages/studies/manage/_modeling_chart.html',
         chart=chart,
         form_data=request.form,
         model_type=modeling_type,
-        model_inputs=model_inputs,
-        model_coefficients=model_coefficients,
-        model_fit=model_fit,
+        model_params=model_params,
         r_summary=r_summary,
         measurement_context=measurement_context,
         log_transform=log_transform,
     )
 
 
-def _fetch_study(studyId, check_user_visibility=True, sql_options=None):
+def _fetch_study(publicId, check_user_visibility=True, sql_options=None):
     sql_options = sql_options or ()
 
     study = g.db_session.scalars(
         sql.select(Study)
-        .where(Study.studyId == studyId)
+        .where(Study.publicId == publicId)
         .options(*sql_options)
         .limit(1)
     ).one()
@@ -300,3 +326,7 @@ def _fetch_study(studyId, check_user_visibility=True, sql_options=None):
         raise Forbidden()
 
     return study
+
+
+def _parse_comma_separated_request_ids(key):
+    return [int(s) for s in request.args.get(key, '').split(',') if s != '']

@@ -37,13 +37,13 @@ class TestStudy(DatabaseTest):
         public_id = Study.generate_public_id(self.db_session)
         self.assertEqual(public_id, "SMGDB00000001")
 
-        self.create_study(studyId="SMGDB00000001")
+        self.create_study(publicId="SMGDB00000001")
 
         public_id = Study.generate_public_id(self.db_session)
         self.assertEqual(public_id, "SMGDB00000002")
 
-        self.create_study(studyId="SMGDB00000002")
-        self.create_study(studyId="SMGDB00000003")
+        self.create_study(publicId="SMGDB00000002")
+        self.create_study(publicId="SMGDB00000003")
 
         # Deleting a project should not generate duplicate ids:
         self.db_session.execute(

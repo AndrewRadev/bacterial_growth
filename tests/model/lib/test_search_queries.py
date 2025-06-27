@@ -3,10 +3,10 @@ import tests.init  # noqa: F401
 import unittest
 import re
 
-from app.model.lib.search import dynamical_query
+from app.model.lib.search_queries import dynamical_query
 
 
-class TestStudyDsf(unittest.TestCase):
+class TestSearch(unittest.TestCase):
     def assertSqlQuery(self, actual, expected):
         actual   = ' '.join(re.split(r'\s+', actual.strip(), flags=re.MULTILINE))
         expected = ' '.join(re.split(r'\s+', expected.strip(), flags=re.MULTILINE))
@@ -21,18 +21,21 @@ class TestStudyDsf(unittest.TestCase):
             {'option': 'Study Name', 'value': 'Example'}
         ])
         self.assertSqlQuery(query, """
-            SELECT DISTINCT studyId
+            SELECT DISTINCT publicId
             FROM Studies
-            WHERE LOWER(studyName) LIKE :value_0
+            WHERE LOWER(name) LIKE :value_0
         """)
         self.assertEqual(values, ['%example%'])
 
         query, values = dynamical_query([
             {'option': 'Microbial Strain', 'value': 'Rhodospirillum'}
         ])
-        self.assertSqlQuery(query, """
-            SELECT DISTINCT studyId
-            FROM Strains
+        self.assertSqlQuery(query, f"""
+            SELECT DISTINCT publicId
+            FROM (
+                SELECT studyId as publicId, name, NCBId
+                FROM Strains
+            ) as Strains_Alias
             WHERE LOWER(name) LIKE :value_0
         """)
         self.assertEqual(values, ['%rhodospirillum%'])
@@ -43,14 +46,20 @@ class TestStudyDsf(unittest.TestCase):
             {'option': 'Metabolites', 'value': 'acetyl', 'logic_operator': 'AND'}
         ])
         self.assertSqlQuery(query, """
-            SELECT DISTINCT studyId
+            SELECT DISTINCT publicId
             FROM Studies
-            WHERE LOWER(studyName) LIKE :value_0
-            AND studyId IN (
-                SELECT DISTINCT studyId
-                FROM StudyMetabolites
-                INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
-                WHERE LOWER(Metabolites.name) LIKE :value_1
+            WHERE LOWER(name) LIKE :value_0
+            AND publicId IN (
+                SELECT DISTINCT publicId
+                FROM (
+                    SELECT
+                        studyId as publicId,
+                        Metabolites.name as name,
+                        chebi_id
+                    FROM StudyMetabolites
+                    INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
+                ) as StudyMetabolites_Alias
+                WHERE LOWER(name) LIKE :value_1
             )
         """)
         self.assertEqual(values, ['%human%', '%acetyl%'])

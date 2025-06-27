@@ -48,7 +48,7 @@ Page('.upload-page .step-content.step-2.active', function($step2) {
     prefixTemplate: 'custom_strains-{}-',
 
     buildSubform: function(index) {
-      let templateHtml = $('template.new-strain-form').html();
+      let templateHtml = $('template.custom-strain-form').html();
       let $newForm = $(templateHtml);
 
       $newForm.addPrefix(`custom_strains-${index}-`);
@@ -79,15 +79,17 @@ Page('.upload-page .step-content.step-2.active', function($step2) {
         templateResult: select2Highlighter,
       });
 
-      $select.on('change', function() { updateNewStrainParentPreview($select) });
+      $select.on('change', function() {
+        updateCustomStrainParentPreview($select)
+      });
       $select.trigger('change');
     }
   })
 
-  function updateNewStrainParentPreview($select) {
-    let $container     = $select.parents('.js-new-strain-container');
+  function updateCustomStrainParentPreview($select) {
+    let $container     = $select.parents('.js-subform-container');
     let $parentPreview = $container.find('.js-parent-preview');
-    let template       = $('template.new-strain-parent-preview').html();
+    let template       = $('template.custom-strain-parent-preview').html();
     let selectedId     = $select.val();
 
     $parentPreview.html('');

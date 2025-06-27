@@ -10,6 +10,7 @@ from app.model.orm import (
     Project,
     Study,
     Submission,
+    SubmissionBackup
 )
 
 # The structure of a Submission's `studyDesign` field. Any parameters given to
@@ -62,6 +63,7 @@ class SubmissionForm:
         # Check for an existing project/study and set the submission "type" accordingly:
         self.project_id = self._find_project_id()
         self.study_id   = self._find_study_id()
+        self.user_uuid  = user_uuid
         self.type       = self._determine_project_type()
 
     def update_project(self, data):
@@ -180,6 +182,16 @@ class SubmissionForm:
 
         return self.submission.id
 
+    def save_backup(self, study_id, project_id):
+        self.db_session.add(SubmissionBackup(
+            projectId=project_id,
+            studyId=study_id,
+            userUuid=self.submission.userUniqueID,
+            studyDesign=self.submission.studyDesign,
+            dataFileId=self.submission.dataFileId,
+        ))
+        self.db_session.commit()
+
     def has_error(self, key):
         return key in self.errors
 
@@ -220,8 +232,8 @@ class SubmissionForm:
             return None
 
         return self.db_session.scalars(
-            sql.select(Project.projectId)
-            .where(Project.projectUniqueID == self.submission.projectUniqueID)
+            sql.select(Project.publicId)
+            .where(Project.uuid == self.submission.projectUniqueID)
         ).one_or_none()
 
     def _find_study_id(self):
@@ -229,8 +241,8 @@ class SubmissionForm:
             return None
 
         return self.db_session.scalars(
-            sql.select(Study.studyId)
-            .where(Study.studyUniqueID == self.submission.studyUniqueID)
+            sql.select(Study.publicId)
+            .where(Study.uuid == self.submission.studyUniqueID)
         ).one_or_none()
 
     def _determine_project_type(self):
@@ -250,8 +262,8 @@ class SubmissionForm:
             project_exists = self.db_session.query(
                 sql.exists()
                 .where(
-                    Project.projectName == project_name,
-                    Project.projectUniqueID != self.submission.projectUniqueID
+                    Project.name == project_name,
+                    Project.uuid != self.submission.projectUniqueID
                 )
             ).scalar()
 

@@ -41,6 +41,7 @@ from app.model.orm import (
     StudyMetabolite,
     StudyUser,
     Submission,
+    SubmissionBackup,
     Taxon,
     User,
 )
@@ -160,8 +161,8 @@ def init_admin(app):
     db_session = FLASK_DB.session
 
     class StudyView(AppView):
-        column_searchable_list = ['studyName']
-        column_exclude_list = ['studyDescription']
+        column_searchable_list = ['name']
+        column_exclude_list = ['description']
         form_excluded_columns = ['measurements', 'measurementContexts', 'measurementTechniques']
 
     class SubmissionView(AppView):
@@ -190,12 +191,13 @@ def init_admin(app):
                 download_name=file.filename
             )
 
-    admin.add_view(AppView(Project,           db_session, category="Studies"))
-    admin.add_view(StudyView(Study,           db_session, category="Studies"))
-    admin.add_view(SubmissionView(Submission, db_session, category="Studies"))
-    admin.add_view(AppView(Strain,            db_session, category="Studies"))
-    admin.add_view(AppView(StudyMetabolite,   db_session, category="Studies"))
-    admin.add_view(ExcelFileView(ExcelFile,   db_session, category="Studies"))
+    admin.add_view(AppView(Project,                 db_session, category="Studies"))
+    admin.add_view(StudyView(Study,                 db_session, category="Studies"))
+    admin.add_view(SubmissionView(Submission,       db_session, category="Studies"))
+    admin.add_view(SubmissionView(SubmissionBackup, db_session, category="Studies"))
+    admin.add_view(AppView(Strain,                  db_session, category="Studies"))
+    admin.add_view(AppView(StudyMetabolite,         db_session, category="Studies"))
+    admin.add_view(ExcelFileView(ExcelFile,         db_session, category="Studies"))
 
     admin.add_view(AppView(Experiment,            db_session, category="Experiments"))
     admin.add_view(AppView(ExperimentCompartment, db_session, category="Experiments"))
@@ -204,11 +206,14 @@ def init_admin(app):
     admin.add_view(AppView(Community,             db_session, category="Experiments"))
     admin.add_view(AppView(Perturbation,          db_session, category="Experiments"))
 
-    admin.add_view(AppView(MeasurementTechnique, db_session, category="Measurements"))
-    admin.add_view(AppView(MeasurementContext,   db_session, category="Measurements"))
-    admin.add_view(AppView(Measurement,          db_session, category="Measurements"))
-    admin.add_view(AppView(ModelingRequest,      db_session, category="Measurements"))
-    admin.add_view(AppView(ModelingResult,       db_session, category="Measurements"))
+    class ModelingResultView(AppView):
+        column_exclude_list = ['rSummary']
+
+    admin.add_view(AppView(MeasurementTechnique,      db_session, category="Measurements"))
+    admin.add_view(AppView(MeasurementContext,        db_session, category="Measurements"))
+    admin.add_view(AppView(Measurement,               db_session, category="Measurements"))
+    admin.add_view(AppView(ModelingRequest,           db_session, category="Measurements"))
+    admin.add_view(ModelingResultView(ModelingResult, db_session, category="Measurements"))
 
     class MetaboliteView(AppView):
         column_searchable_list = ['name']
@@ -221,7 +226,12 @@ def init_admin(app):
     admin.add_view(TaxonView(Taxon,           db_session, category="External data"))
 
     class UserView(AppView):
-        form_excluded_columns = ['createdAt', 'updatedAt', 'lastLoginAt']
+        form_excluded_columns = [
+            'createdAt', 'lastLoginAt', 'updatedAt', 'submissions',
+            'managedProjects', 'managedStudies',
+            'ownedProjects', 'ownedStudies',
+            'projectUsers', 'studyUsers',
+        ]
 
     admin.add_view(UserView(User,       db_session, category="Users"))
     admin.add_view(AppView(StudyUser,   db_session, category="Users"))

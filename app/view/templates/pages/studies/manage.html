@@ -3,14 +3,14 @@
 
 {% extends '_layout.html' %}
 
-{% block title %}: Manage study {{ study.studyId }}{% endblock %}
+{% block title %}: Manage study {{ study.publicId }}{% endblock %}
 
 {% block content %}
-  <div class="container study-page study-manage-page" data-study-id="{{ study.studyId }}">
+  <div class="container study-page study-manage-page" data-study-id="{{ study.publicId }}">
     {% include 'pages/studies/_header.html' %}
 
     <article>
-      <h1>{{ study.studyName }}</h1>
+      <h1>{{ study.name }}</h1>
 
       {% include 'pages/studies/_navigation_buttons.html' %}
 
@@ -34,6 +34,23 @@
               readonly />
         </div>
       </p>
+
+      {% if study.ownerUuid == g.current_user.uuid: %}
+        <div class="flex-row">
+          <p>
+            You can reset the unique ID to a new value, which will lock out
+            everyone else other than you. Only resort to this in case of a
+            security issue:
+          </p>
+
+          {{ post_button(
+            "Reset study access",
+            url_for('study_reset_action', publicId=study.publicId),
+            class="flex-right",
+            confirm="Are you sure? This will remove other people's access to the study."
+          ) }}
+        </div>
+      {% endif %}
 
       <h2>Edit study</h2>
 
@@ -68,13 +85,13 @@
       <div class="flex-row">
         {{ post_button(
           "Download completed models as CSV",
-          url_for('study_download_models_csv', studyId=study.publicId),
+          url_for('study_download_models_csv', publicId=study.publicId),
           class="flex-right"
         ) }}
       </div>
 
       <form
-          action="{{ url_for('study_modeling_submit_action', studyId=study.publicId) }}"
+          action="{{ url_for('study_modeling_submit_action', publicId=study.publicId) }}"
           class="simple-form modeling-form js-modeling-form">
         <div class="columns">
           <div class="controls-column">
