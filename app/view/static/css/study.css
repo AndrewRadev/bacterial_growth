@@ -9,10 +9,6 @@
     }
   }
 
-  .small {
-    font-size: 14px;
-  }
-
   h1 {
     color: var(--dark-blue);
   }
