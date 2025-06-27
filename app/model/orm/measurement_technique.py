@@ -19,6 +19,7 @@ TECHNIQUE_SHORT_NAMES = {
     'od':         'OD',
     'plates':     'PC',
     '16s':        '16S-rRNA reads',
+    'qpcr':       'qPCR',
     'metabolite': 'Metabolite',
 }
 
@@ -28,6 +29,7 @@ TECHNIQUE_LONG_NAMES = {
     'od':         'Optical Density',
     'plates':     'Plate Counts',
     '16s':        '16S-rRNA reads',
+    'qpcr':       'qPCR',
     'metabolite': 'Metabolites',
 }
 
@@ -150,6 +152,8 @@ class MeasurementTechnique(OrmBase):
         elif self.subjectType == 'strain':
             if self.type == '16s':
                 suffix = 'rRNA reads'
+            elif self.type == 'qpcr':
+                suffix = 'qPCR counts'
             elif self.type == 'fc':
                 suffix = 'FC counts'
             elif self.type == 'plates':

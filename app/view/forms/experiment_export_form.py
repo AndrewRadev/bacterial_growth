@@ -60,6 +60,8 @@ class ExperimentExportForm:
                     value_label = f"{subject.name} counts"
                 elif technique.type == 'plates':
                     value_label = f"{subject.name} plate counts"
+                elif technique.type == 'qpcr':
+                    value_label = f"{subject.name} qPCR counts"
                 else:
                     raise ValueError(f"Unknown technique type: {technique.type}")
 
