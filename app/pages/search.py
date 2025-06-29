@@ -63,8 +63,11 @@ def search_index_page():
         ).all()
 
     if studyIds:
-        query = sql.select(Study).where(Study.publicId.in_(studyIds))
-        results = g.db_session.scalars(query)
+        results = g.db_session.scalars(
+            sql.select(Study)
+            .where(Study.publicId.in_(studyIds))
+            .order_by(Study.updatedAt.desc())
+        )
 
     return render_template(
         "pages/search/index.html",
