@@ -27,7 +27,7 @@ class Taxon(OrmBase):
         if len(term) <= 0:
             return [], 0
 
-        term_pattern = '%'.join(term.split()) + '%'
+        term_pattern = '%' + '%'.join(term.split()) + '%'
         first_word = term.split()[0]
 
         query = """
