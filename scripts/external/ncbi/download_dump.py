@@ -32,6 +32,8 @@ organisms_tar_gz_path = base_dir_path / 'organisms_dictionary.tar.gz'
 organisms_dir_path = base_dir_path / 'organisms_dictionary'
 organisms_dir_path.mkdir(exist_ok=True)
 
+output_path = base_dir_path / 'data_dump.csv'
+
 with print_with_time("Downloading JensenLab data dump"):
     download_file(jensenlab_url, organisms_tar_gz_path)
 
@@ -81,7 +83,7 @@ with print_with_time("Generating filtered NCBI data dump"):
 
             identifiers.add((taxon_ncbi_id, preferred_names[taxon_serial]))
 
-    with open(base_dir_path / 'ncbi_taxa.csv', 'w') as f_out:
+    with open(output_path, 'w') as f_out:
         writer = csv.DictWriter(
             f_out,
             fieldnames=['ncbiId', 'name'],
@@ -89,5 +91,6 @@ with print_with_time("Generating filtered NCBI data dump"):
             quoting=csv.QUOTE_MINIMAL,
         )
 
+        writer.writeheader()
         for (ncbi_id, name) in sorted(identifiers):
             writer.writerow({'ncbiId': ncbi_id, 'name': name})
