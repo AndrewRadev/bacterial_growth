@@ -3,6 +3,7 @@ import math
 import itertools
 import zipfile
 import gzip
+import tarfile
 import shutil
 from io import BytesIO
 from pathlib import Path
@@ -73,6 +74,16 @@ def gunzip(path, extracted_path=None):
         with open(extracted_path, 'wb') as f_out:
             shutil.copyfileobj(f_in, f_out)
 
+def untar(path, target_dir, file_list):
+    tar_path = Path(path)
+    if '.tar' not in tar_path.suffixes:
+        raise ValueError(f"Path doesn't include .tar suffix: {path}")
+
+    target_dir = Path(target_dir)
+
+    with tarfile.open(tar_path, 'r') as tar_f:
+        for filename in file_list:
+            tar_f.extract(filename, path=target_dir)
 
 def _one_or_error(key, iterator):
     value = next(iterator)

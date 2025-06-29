@@ -503,11 +503,13 @@ DROP TABLE IF EXISTS Taxa;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE Taxa (
-  ncbiId varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  ncbiId int NOT NULL,
   `name` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   id int NOT NULL AUTO_INCREMENT,
+  updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id),
-  UNIQUE KEY Taxa_ncbiId (ncbiId)
+  UNIQUE KEY Taxa_ncbiId (ncbiId),
+  UNIQUE KEY Taxa_name (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -597,5 +599,6 @@ INSERT INTO MigrationVersions VALUES
 (153,'2025_06_17_202034_fix_project_columns','2025-06-17 18:25:56'),
 (156,'2025_06_17_203802_fix_study_columns','2025-06-17 18:43:56'),
 (158,'2025_06_22_152747_combine_modeling_params','2025-06-22 13:29:56'),
-(160,'2025_06_22_161710_create_submission_backups','2025-06-22 14:21:36');
+(160,'2025_06_22_161710_create_submission_backups','2025-06-22 14:21:36'),
+(162,'2025_06_29_142448_add_fields_to_taxa','2025-06-29 12:31:43');
 
