@@ -9,7 +9,7 @@ Page('.upload-page .step-content.step-2.active', function($step2) {
     ajax: {
       url: '/strains/completion/',
       dataType: 'json',
-      delay: 100,
+      delay: 150,
       cache: true,
     },
     templateResult: select2Highlighter,
