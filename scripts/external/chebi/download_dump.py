@@ -8,10 +8,6 @@ from long_task_printer import print_with_time
 
 from app.model.lib.util import download_file, gunzip
 
-# TODO (2025-06-26) use Mco.owl to pick chebi ids, limit results to those.
-# -> Print missing chebi ids
-# -> Print names in the database that are not in the dumps
-
 chebi_url = 'https://ftp.ebi.ac.uk/pub/databases/chebi/Flat_file_tab_delimited'
 mco_url   = 'https://raw.githubusercontent.com/microbial-conditions-ontology/microbial-conditions-ontology/master/mco.owl'
 base_dir  = Path('var/external_data/chebi/')
