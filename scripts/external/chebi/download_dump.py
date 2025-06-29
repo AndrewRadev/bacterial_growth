@@ -1,36 +1,29 @@
 import csv
 import re
+import itertools
 from pathlib import Path
+from datetime import date
+from urllib.error import URLError
 
 import pandas as pd
-from datetime import date
-from long_task_printer import print_with_time
+from bioservices import ChEBI
+from long_task_printer import print_with_time, LongTask
 
 from app.model.lib.util import download_file, gunzip
 
-chebi_url = 'https://ftp.ebi.ac.uk/pub/databases/chebi/Flat_file_tab_delimited'
-mco_url   = 'https://raw.githubusercontent.com/microbial-conditions-ontology/microbial-conditions-ontology/master/mco.owl'
-base_dir  = Path('var/external_data/chebi/')
-
+base_dir = Path('var/external_data/chebi/')
 base_dir.mkdir(exist_ok=True)
 
-names_gz_path      = base_dir / 'names.tsv.gz'
-names_path         = base_dir / 'names.tsv'
-chemical_data_path = base_dir / 'chemical_data.tsv'
-mco_owl_path       = base_dir / 'mco.owl'
+mco_url = 'https://raw.githubusercontent.com/microbial-conditions-ontology/microbial-conditions-ontology/master/mco.owl'
 
-output_path = base_dir / 'combined_dump.csv'
-
-with print_with_time("Downloading raw data files"):
-    download_file(f"{chebi_url}/names.tsv.gz",      names_gz_path)
-    download_file(f"{chebi_url}/chemical_data.tsv", chemical_data_path)
-    download_file(mco_url, mco_owl_path)
-
-    gunzip(names_gz_path, names_path)
+mco_owl_path = base_dir / 'mco.owl'
+output_path  = base_dir / 'data_dump.csv'
 
 target_chebi_ids = None
 
-with print_with_time("Processing MCO owl file"):
+with print_with_time("Downloading and processing MCO owl file"):
+    download_file(mco_url, mco_owl_path)
+
     with open(mco_owl_path, 'r') as owlfile:
         owl_text = owlfile.read()
 
@@ -38,41 +31,32 @@ with print_with_time("Processing MCO owl file"):
     target_chebi_ids = {int(chebi_id) for chebi_id in chebi_pattern.findall(owl_text)}
 
 data = {}
+chebi_api = ChEBI()
 
-with print_with_time("Parsing data into memory"):
-    with open(names_path) as f:
-        reader = csv.DictReader(f, delimiter='\t')
+with print_with_time("Fetching data from ChEBI API"):
+    long_task = LongTask(total_count=(len(target_chebi_ids) // 50))
 
-        for row in reader:
-            if row['LANGUAGE'] != 'en':
-                continue
-            if row['SOURCE'] != 'KEGG COMPOUND':
-                continue
+    for chebi_ids in itertools.batched(sorted(target_chebi_ids), 50):
+        with long_task.measure() as progress:
+            print(progress)
 
-            chebi_id = int(row['COMPOUND_ID'])
-            if chebi_id not in target_chebi_ids:
-                continue
+            for retry in range(3):
+                try:
+                    entities = chebi_api.getCompleteEntityByList(chebi_ids)
+                    break
+                except URLError as e:
+                    print(f"Connection error, retry {retry}: {e}")
+                    time.sleep(1)
+                    continue
 
-            if chebi_id not in data:
+            for entity in entities:
+                chebi_id = int(entity.chebiId.split(':')[-1])
                 data[chebi_id] = {
-                    'name':        row['NAME'].lower(),
-                    'averageMass': None,
+                    'name':        entity.chebiAsciiName,
+                    'averageMass': getattr(entity, 'mass', None),
                 }
 
-    with open(chemical_data_path) as f:
-        reader = csv.DictReader(f, delimiter='\t')
-
-        for row in reader:
-            if row['TYPE'] != 'MASS':
-                continue
-
-            chebi_id = int(row['COMPOUND_ID'])
-            if chebi_id not in data:
-                continue
-
-            data[chebi_id]['averageMass'] = row['CHEMICAL_DATA']
-
-with print_with_time("Creating combined dump"):
+with print_with_time("Creating data dump"):
     with open(output_path, 'w') as f:
         writer = csv.DictWriter(
             f,

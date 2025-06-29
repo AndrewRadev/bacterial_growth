@@ -39,3 +39,6 @@ freezegun
 
 # Development
 long_task_printer
+
+# External APIs
+bioservices

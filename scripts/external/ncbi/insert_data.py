@@ -8,7 +8,7 @@ import sqlalchemy as sql
 from long_task_printer import LongTask
 
 base_dir_path  = Path('var/external_data/ncbi/')
-ncbi_taxa_path = base_dir_path / 'ncbi_taxa.csv'
+ncbi_taxa_path = base_dir_path / 'data_dump.csv'
 
 # Count the number of lines in the file, should be quick:
 with open(ncbi_taxa_path) as f:
@@ -18,10 +18,11 @@ long_task = LongTask(total_count=ncbi_taxa_count)
 
 with get_session() as db_session:
     with open(ncbi_taxa_path) as f:
-        reader = csv.reader(f, delimiter='\t')
+        reader = csv.DictReader(f)
 
-        for (ncbi_id, name) in reader:
-            ncbi_id = int(ncbi_id)
+        for row in reader:
+            ncbi_id = int(row['ncbiId'])
+            name    = row['name']
 
             with long_task.measure() as progress:
                 existing_taxon = db_session.scalars(
