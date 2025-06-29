@@ -3,11 +3,10 @@ import re, sys, os
 import pandas as pd
 import argparse
 # The ChEBI() class, an Interface for CheBI, is part of the bioservices library
-from bioservices import *
+from bioservices import ChEBI
 # Get the path two levels up
 two_levels_up = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 sys.path.insert(0, two_levels_up)
-from utils import isFile
 from tqdm import tqdm
 import time
 
@@ -20,13 +19,12 @@ parser = argparse.ArgumentParser(
 # Add a flag argument
 parser.add_argument("--mco", action="store_true", help="Use the Raes lab dataset, too.")
 parser.add_argument("--raes", action="store_true", help="Use the Raes lab dataset, too.")
-parser.add_argument("--other", type=isFile, help="Use custom file with metabolites.")
 
 # Parse the arguments
 args = parser.parse_args()
 
-if not any([args.mco, args.raes, args.other]):
-    raise ValueError("At least one of the `mco`, `raes`, `other` flags should be used.")
+if not any([args.mco, args.raes]):
+    raise ValueError("At least one of the `mco`, `raes` flags should be used.")
 
 
 #%%% Methods
