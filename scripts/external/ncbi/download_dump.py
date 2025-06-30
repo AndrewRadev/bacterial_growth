@@ -20,24 +20,21 @@ if not metdb_dump.exists():
     print(f"Missing data dump from MetDB, please download first: {metdb_dump}")
     exit(1)
 
-selected_taxa = filter_unicellular(metdb_dump)
-
-jensenlab_url = 'https://download.jensenlab.org/organisms_dictionary.tar.gz'
+UNICELLULAR_TAXA = filter_unicellular(metdb_dump)
 
 base_dir_path = Path('var/external_data/ncbi/')
 base_dir_path.mkdir(exist_ok=True)
 
-organisms_tar_gz_path = base_dir_path / 'organisms_dictionary.tar.gz'
-
 organisms_dir_path = base_dir_path / 'organisms_dictionary'
 organisms_dir_path.mkdir(exist_ok=True)
 
-output_path = base_dir_path / 'data_dump.csv'
+data_dump_path = base_dir_path / 'data_dump.csv'
 
-with print_with_time("Downloading JensenLab data dump"):
+with print_with_time("Downloading and extracting JensenLab data dump"):
+    jensenlab_url = 'https://download.jensenlab.org/organisms_dictionary.tar.gz'
+    organisms_tar_gz_path = base_dir_path / 'organisms_dictionary.tar.gz'
+
     download_file(jensenlab_url, organisms_tar_gz_path)
-
-with print_with_time("Extracting JensenLab data dump"):
     untar(organisms_tar_gz_path, organisms_dir_path, file_list=[
         'organisms_entities.tsv',
         'organisms_groups.tsv',
@@ -52,10 +49,8 @@ identifiers          = set()
 with print_with_time("Generating filtered NCBI data dump"):
     with open(organisms_dir_path / 'organisms_preferred.tsv') as f:
         reader = csv.reader(f, delimiter='\t')
-        for row in reader:
-            serial = row[0]
-            name   = row[1]
 
+        for (serial, name) in reader:
             preferred_names[serial] = name
 
     with open(organisms_dir_path / 'organisms_entities.tsv') as f_in:
@@ -72,7 +67,7 @@ with print_with_time("Generating filtered NCBI data dump"):
             if parent_serial not in entity_data: continue
 
             parent_ncbi_id = int(entity_data[parent_serial][1])
-            if parent_ncbi_id not in selected_taxa:
+            if parent_ncbi_id not in UNICELLULAR_TAXA:
                 continue
 
             if taxon_serial not in preferred_names:
@@ -83,7 +78,7 @@ with print_with_time("Generating filtered NCBI data dump"):
 
             identifiers.add((taxon_ncbi_id, preferred_names[taxon_serial]))
 
-    with open(output_path, 'w') as f_out:
+    with open(data_dump_path, 'w') as f_out:
         writer = csv.DictWriter(
             f_out,
             fieldnames=['ncbiId', 'name'],
