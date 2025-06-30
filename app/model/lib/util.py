@@ -55,6 +55,10 @@ def humanize_camelcased_string(string: str):
 
 # Adapted from: https://stackoverflow.com/a/16696317
 def download_file(url: str, filename: str):
+    """
+    Downloads the data from the given URL, chunk by chunk, and saves it into
+    the target filename.
+    """
     with requests.get(url, stream=True) as r:
         r.raise_for_status()
 
@@ -64,6 +68,10 @@ def download_file(url: str, filename: str):
 
 
 def gunzip(path: Path, extracted_path: Optional[Path] = None):
+    """
+    Extracts the given gzip file. If no output path is given, remove the .gz
+    suffix.
+    """
     gz_path = Path(path)
     if gz_path.suffix != '.gz':
         raise ValueError(f"Path doesn't end in .gz: {path}")
@@ -78,7 +86,8 @@ def gunzip(path: Path, extracted_path: Optional[Path] = None):
 
 def untar(path: Path, target_dir: Path, file_list: list[str]):
     """
-    Extract individual files from a tar file into the given `target_dir`.
+    Extracts individual files from a tar file into the given `target_dir`. File
+    paths inside the tar file are listed in `file_list`.
     """
     tar_path = Path(path)
     if '.tar' not in tar_path.suffixes:
