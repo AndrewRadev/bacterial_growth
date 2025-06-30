@@ -45,8 +45,6 @@ def filter_unicellular(metdb_dump):
     ## From Chloroplastida / Viridiplantae
     selection.add(3166)      # tax id 3166 stands for class Chloropphyceae
     selection.add(2201463)   # tax id 2201463 stands for class Palmophyllophyceae, synonym of Prasinophyceae
-    selection.add(3166)      # tax id 3166 stands for class Chloropphyceae
-    selection.add(3166)      # tax id 3166 stands for class Chloropphyceae
 
     ## From Chromalveolata
 
@@ -75,7 +73,6 @@ def filter_unicellular(metdb_dump):
     selection.add(2825)     # tax id 2825 stands for class Chrysophyceae
     selection.add(33859)    # tax id 33859 stands for class Synurophyceae
     selection.add(557229)   # tax id 557229 stands for class Synchromophyceae
-    selection.add(2825)     # tax id 2825 stands for class Chrysophyceae
     selection.add(39119)    # tax id 39119 stands for class Dictyochophyceae
 
     ### Haptophyta
