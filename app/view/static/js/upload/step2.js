@@ -11,6 +11,7 @@ Page('.upload-page .step-content.step-2.active', function($step2) {
       dataType: 'json',
       delay: 150,
       cache: true,
+      transport: select2TransportWithLoader($existingStrainSelect),
     },
     templateResult: select2Highlighter,
   });
@@ -75,6 +76,7 @@ Page('.upload-page .step-content.step-2.active', function($step2) {
           dataType: 'json',
           delay: 100,
           cache: true,
+          transport: select2TransportWithLoader($select),
         },
         templateResult: select2Highlighter,
       });
