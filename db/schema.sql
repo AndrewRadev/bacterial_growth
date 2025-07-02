@@ -322,7 +322,8 @@ CREATE TABLE Perturbations (
   addedCompartmentId int DEFAULT NULL,
   oldCommunityId int DEFAULT NULL,
   newCommunityId int DEFAULT NULL,
-  startTimepoint int NOT NULL,
+  startTimeInSeconds int NOT NULL,
+  endTimeInSeconds int DEFAULT NULL,
   PRIMARY KEY (id),
   KEY fk_1 (experimentId),
   KEY fk_2 (studyId),
@@ -600,5 +601,6 @@ INSERT INTO MigrationVersions VALUES
 (156,'2025_06_17_203802_fix_study_columns','2025-06-17 18:43:56'),
 (158,'2025_06_22_152747_combine_modeling_params','2025-06-22 13:29:56'),
 (160,'2025_06_22_161710_create_submission_backups','2025-06-22 14:21:36'),
-(162,'2025_06_29_142448_add_fields_to_taxa','2025-06-29 12:31:43');
+(162,'2025_06_29_142448_add_fields_to_taxa','2025-06-29 12:31:43'),
+(168,'2025_07_02_114751_readd_end_time_to_perturbations','2025-07-02 10:01:49');
 
