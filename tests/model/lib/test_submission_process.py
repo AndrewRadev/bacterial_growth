@@ -207,6 +207,7 @@ class TestSubmissionProcess(DatabaseTest):
 
         submission_form = SubmissionForm(submission_id=self.submission.id, db_session=self.db_session)
         submission_form.update_study_design({
+            'timeUnits': 'h',
             'compartments': [
                 {'name': 'WC',    'mediumName': 'WC'},
                 {'name': 'MUCIN', 'mediumName': 'WC'}
@@ -228,7 +229,8 @@ class TestSubmissionProcess(DatabaseTest):
                 ],
                 'perturbations': [{
                     'description': 'Change everything',
-                    'startTimepoint': 3,
+                    'startTime': 10,
+                    'endTime': 20,
                     'removedCompartmentName': 'MUCIN',
                     'addedCompartmentName': '',
                     'newCommunityName': 'RI',
