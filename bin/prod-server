@@ -7,4 +7,4 @@ export APP_ENV=production
 pip install -r requirements.txt
 bin/migrations-run
 
-gunicorn -w 4 --bind "0.0.0.0:8081" "main:create_app()"
+gunicorn --log-level DEBUG -w 4 --bind "0.0.0.0:8081" "main:create_app()"
