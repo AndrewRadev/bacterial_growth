@@ -563,11 +563,17 @@ def _get_expected_column_names(submission_form):
         else:
             raise ValueError(f"Unexpected technique subjectType: {technique.subjectType}")
 
-    return {
+    expected_sheets = {
         'Growth data per community':  community_columns,
         'Growth data per strain':     strain_columns,
         'Growth data per metabolite': metabolite_columns,
     }
+
+    for key in list(expected_sheets.keys()):
+        if len(expected_sheets[key]) == 0:
+            del expected_sheets[key]
+
+    return expected_sheets
 
 
 def _build_strain(db_session, identifier, submission, study, user_uuid):
