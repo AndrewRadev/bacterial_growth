@@ -15,7 +15,7 @@ TAXON_NAMES = {
 }
 
 METABOLITE_NAMES = {
-    "CHEBI:422":   "(s)-lactic acid",
+    "CHEBI:422":   "(S)-lactic acid",
     "CHEBI:15361": "pyruvate",
     "CHEBI:15366": "acetic acid",
     "CHEBI:15740": "formate",
