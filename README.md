@@ -40,16 +40,32 @@ In the root of the repository, there is an `.env.example` file that contains env
 
 In the database config directory, the file [`db/config.toml.example`](db/config.toml.example) contains a template for the database configuration. Copy this file to `db/config.toml` and update it with the correct credentials to access a running mysql database. On linux, you may have to add a `unix_socket = ` field as well.
 
-The database structure can be created by running migrations:
-
-```
-bin/migrations-run
-```
-
-You can also manually interact with the configured database using:
+You can manually interact with the configured database using:
 
 ```
 bin/dbconsole
+```
+
+To load the full database structure, you can pipe the schema file into that command:
+
+```
+bin/dbconsole < db/schema.sql
+```
+
+To make changes to the database, you can create a new migration with an "up" function that makes the change in the forward direction and a "down" function that reverses it:
+
+``` bash
+# Bootstrap a new migration file:
+bin/migrations-new some_name_for_my_migration
+
+# Edit the migration, created with a timestamp under db/migrations/
+
+# Execute the new migration forward:
+bin/migrations-run
+
+# Roll it back and then execute it again to check if your reversal works:
+bin/migrations-run down
+bin/migrations-run up
 ```
 
 To launch the application in development mode on <http://localhost:8081>, run:

@@ -37,7 +37,8 @@ pytest-env
 pytest-cov
 freezegun
 
-# Streamlit app:
-# matplotlib
-# mysql-connector-python
-# prettytable
+# Development
+long_task_printer
+
+# External APIs
+bioservices

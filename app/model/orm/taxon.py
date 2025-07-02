@@ -14,7 +14,7 @@ class Taxon(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    ncbiId: Mapped[str] = mapped_column(sql.String(512))
+    ncbiId: Mapped[int] = mapped_column(sql.Integer)
     name:   Mapped[str] = mapped_column(sql.String(512))
 
     @property
@@ -32,7 +32,7 @@ class Taxon(OrmBase):
 
         query = """
             SELECT
-                ncbiId AS id,
+                ncbiId,
                 CONCAT(name, ' (NCBI:', ncbiId, ')') AS text
             FROM Taxa
             WHERE LOWER(name) LIKE :term_pattern
@@ -48,7 +48,7 @@ class Taxon(OrmBase):
             'per_page': per_page,
             'offset': (page - 1) * per_page,
         }).all()
-        results = [row._asdict() for row in results]
+        results = [{'id': row[0], 'text': row[1]} for row in results]
 
         count_query = """
             SELECT COUNT(*)

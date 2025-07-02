@@ -52,3 +52,24 @@ function select2Highlighter(state) {
 
   return $('<div>' + text + '</div>');
 }
+
+function select2TransportWithLoader($select) {
+  return function (params, success, failure) {
+    let request = $.ajax(params);
+    let $select2container = $select.next('.select2-container');
+
+    let $spinner = $select2container.find('.loading-spinner');
+    if ($spinner.length == 0) {
+      let $spinner = $("<span class='loading-spinner'></span>")
+      $select2container.append($spinner);
+    }
+
+    request.then(function(...args) {
+      $select2container.find('.loading-spinner').remove();
+      success(...args)
+    });
+    request.fail(failure);
+
+    return request;
+  }
+}

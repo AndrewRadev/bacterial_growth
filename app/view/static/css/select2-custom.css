@@ -3,6 +3,22 @@
   display: none;
 }
 
+.select2-container {
+  /* Make it relative to contain the spinner */
+  position: relative;
+}
+
+.loading-spinner {
+    background-image: url('/static/images/loader.svg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    right: 16px;
+    top: calc(50% - 9px);
+}
+
 /* Highlight query matches in result dropdown */
 .select2-highlight {
   background-color: #FAFAD2;
