@@ -12,16 +12,17 @@ class TestTaxon(DatabaseTest):
         self.create_taxon(ncbiId="2", name="Anaerovibrio")
         self.create_taxon(ncbiId="3", name="Brevibacterium linens")
 
-        results, _ = Taxon.search_by_name(self.db_conn, 'pelagius')
+        # Results only consider the prefix
+        results, _ = Taxon.search_by_name(self.db_conn, 'Vibrio')
         self.assertEqual(
             ['Vibrio pelagius (NCBI:1)'],
             [r['text'] for r in results]
         )
 
         # Matches are case-insensitive:
-        results, _ = Taxon.search_by_name(self.db_conn, 'vib')
+        results, _ = Taxon.search_by_name(self.db_conn, 'Vib')
         self.assertEqual(
-            sorted(['Vibrio pelagius (NCBI:1)', 'Anaerovibrio (NCBI:2)', 'Brevibacterium linens (NCBI:3)']),
+            sorted(['Vibrio pelagius (NCBI:1)']),
             sorted([r['text'] for r in results])
         )
 
@@ -30,25 +31,6 @@ class TestTaxon(DatabaseTest):
 
         results, _ = Taxon.search_by_name(self.db_conn, ' ')
         self.assertEqual([], [r['text'] for r in results])
-
-    def test_search_ordering_by_prefix_match(self):
-        self.create_taxon(ncbiId="1", name="Vibrio pelagius")
-        self.create_taxon(ncbiId="2", name="Vibrio anguillarum")
-        self.create_taxon(ncbiId="3", name="Anaerovibrio")
-        self.create_taxon(ncbiId="4", name="Panaeolus")
-
-        # Matches at the beginning of the word are first:
-        results, _ = Taxon.search_by_name(self.db_conn, 'vib')
-        self.assertEqual(
-            ['Vibrio anguillarum (NCBI:2)', 'Vibrio pelagius (NCBI:1)', 'Anaerovibrio (NCBI:3)'],
-            [r['text'] for r in results]
-        )
-
-        results, _ = Taxon.search_by_name(self.db_conn, 'anae')
-        self.assertEqual(
-            ['Anaerovibrio (NCBI:3)', 'Panaeolus (NCBI:4)'],
-            [r['text'] for r in results]
-        )
 
     def test_search_by_multiple_words(self):
         self.create_taxon(ncbiId="1", name="Salmonella enterica serovar Infantis")

@@ -27,8 +27,7 @@ class Taxon(OrmBase):
         if len(term) <= 0:
             return [], 0
 
-        term_pattern = '%' + '%'.join(term.split()) + '%'
-        first_word = term.split()[0]
+        term_pattern = '%'.join(term.split()) + '%'
 
         query = """
             SELECT
@@ -36,14 +35,11 @@ class Taxon(OrmBase):
                 CONCAT(name, ' (NCBI:', ncbiId, ')') AS text
             FROM Taxa
             WHERE LOWER(name) LIKE :term_pattern
-            ORDER BY
-                LOCATE(:first_word, LOWER(name)) ASC,
-                name ASC
+            ORDER BY LOWER(name) ASC
             LIMIT :per_page
             OFFSET :offset
         """
         results = db_conn.execute(sql.text(query), {
-            'first_word': first_word,
             'term_pattern': term_pattern,
             'per_page': per_page,
             'offset': (page - 1) * per_page,
