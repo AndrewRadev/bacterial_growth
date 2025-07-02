@@ -54,7 +54,7 @@
         <h3>Community: {{ experiment.community.name }}</h3>
 
         <ol>
-          {% for strain in experiment.community.get_strains(g.db_session): %}
+          {% for strain in experiment.community.strains: %}
             <li>{{ render_strain_link(strain) }}</li>
           {% endfor %}
         </ol>

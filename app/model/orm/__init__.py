@@ -1,5 +1,6 @@
 from .bioreplicate import Bioreplicate
 from .community import Community
+from .community_strain import CommunityStrain
 from .compartment import Compartment
 from .excel_file import ExcelFile
 from .experiment import Experiment

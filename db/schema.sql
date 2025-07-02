@@ -59,6 +59,23 @@ CREATE TABLE Communities (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `CommunityStrains`
+--
+
+DROP TABLE IF EXISTS CommunityStrains;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE CommunityStrains (
+  id int NOT NULL AUTO_INCREMENT,
+  communityId int NOT NULL,
+  strainId int NOT NULL,
+  createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY CommunityStrains_join (communityId,strainId)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `Compartments`
 --
 
@@ -602,5 +619,6 @@ INSERT INTO MigrationVersions VALUES
 (158,'2025_06_22_152747_combine_modeling_params','2025-06-22 13:29:56'),
 (160,'2025_06_22_161710_create_submission_backups','2025-06-22 14:21:36'),
 (162,'2025_06_29_142448_add_fields_to_taxa','2025-06-29 12:31:43'),
-(168,'2025_07_02_114751_readd_end_time_to_perturbations','2025-07-02 10:01:49');
+(168,'2025_07_02_114751_readd_end_time_to_perturbations','2025-07-02 10:01:49'),
+(177,'2025_07_02_174630_create_community_strains','2025-07-02 16:15:00');
 
