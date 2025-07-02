@@ -139,10 +139,10 @@
 
         {% for perturbation_form in form.perturbations: %}
           {{ render_perturbation_form(
-          form=perturbation_form,
-          submission_form=submission_form,
-          index=loop.index0,
-          experimentIndex=experimentIndex,
+            form=perturbation_form,
+            submission_form=submission_form,
+            index=loop.index0,
+            experimentIndex=experimentIndex,
           ) }}
         {% endfor %}
       </div>
