@@ -189,7 +189,7 @@ class TestSubmissionProcess(DatabaseTest):
         s_custom = self.db_session.scalar(sql.select(Strain).where(Strain.name == 'Custom strain'))
 
         c_full, c_ri, c_blank = communities
-        self.assertEqual(set(c_full.strainIds), {s_ri.id, s_bh.id, s_custom.id})
+        self.assertEqual(set(c_full.strains), {s_ri, s_bh, s_custom})
 
         # Remove all communities
         self.submission.studyDesign['communities'] = []

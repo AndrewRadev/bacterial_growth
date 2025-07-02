@@ -7,7 +7,8 @@ import db
 from app.model.lib.db import execute_text
 from app.model.orm import (
     Bioreplicate,
-    ModelingRequest,
+    Community,
+    CommunityStrain,
     Compartment,
     Experiment,
     ExperimentCompartment,
@@ -15,6 +16,7 @@ from app.model.orm import (
     MeasurementContext,
     MeasurementTechnique,
     Metabolite,
+    ModelingRequest,
     Project,
     Strain,
     Study,
@@ -260,6 +262,29 @@ class DatabaseTest(unittest.TestCase):
         }
 
         return self._create_orm_record(ModelingRequest, params)
+
+    def create_community(self, **params):
+        study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+
+        params = {
+            'name':    'C1',
+            'studyId': study_id,
+            **params,
+        }
+
+        return self._create_orm_record(Community, params)
+
+    def create_community_strain(self, **params):
+        community_id = self._get_or_create_dependency(params, 'communityId', ('community', 'id'))
+        strain_id    = self._get_or_create_dependency(params, 'strainId', ('strain', 'id'))
+
+        params = {
+            'communityId': community_id,
+            'strainId': strain_id,
+            **params,
+        }
+
+        return self._create_orm_record(CommunityStrain, params)
 
     def _create_orm_record(self, model_class, params):
         instance = model_class(**params)

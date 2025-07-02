@@ -10,6 +10,7 @@ import sqlalchemy as sql
 from app.model.orm import (
     Bioreplicate,
     Community,
+    CommunityStrain,
     Compartment,
     Experiment,
     ExperimentCompartment,
@@ -253,7 +254,8 @@ def _save_communities(db_session, submission_form, study, user_uuid):
         strain_identifiers = community_data.pop('strainIdentifiers')
 
         community = Community(**Community.filter_keys(community_data))
-        community.strainIds = []
+        db_session.add(community)
+        db_session.flush()
 
         for identifier in strain_identifiers:
             if identifier not in identifier_cache:
@@ -262,12 +264,15 @@ def _save_communities(db_session, submission_form, study, user_uuid):
                 db_session.add(strain)
                 db_session.flush()
 
-            community.strainIds.append(identifier_cache[identifier].id)
+            community_strain = CommunityStrain(
+                community=community,
+                strain=identifier_cache[identifier],
+            )
+            db_session.add(community_strain)
 
         communities.append(community)
 
     study.communities = communities
-    db_session.add_all(communities)
 
     return communities
 

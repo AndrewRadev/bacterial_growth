@@ -21,15 +21,22 @@ class Community(OrmBase):
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates='communities')
 
-    strainIds: Mapped[JSON] = mapped_column(JSON, nullable=False)
-
     experiments: Mapped[List['Experiment']] = relationship(back_populates='community')
 
-    # TODO make a join table to strains, this is silly
-    def get_strains(self, db_session):
-        from app.model.orm import Strain
+    communityStrains: Mapped[List['CommunityStrain']] = relationship(
+        back_populates='community',
+        cascade='all, delete-orphan',
+    )
+    strains: Mapped[List['Strain']] = relationship(
+        secondary='CommunityStrains',
+        viewonly=True,
+    )
 
-        return db_session.scalars(
-            sql.select(Strain)
-            .where(Strain.id.in_(self.strainIds))
-        ).all()
+    def diff(self, other):
+        strains       = set(self.strains)
+        other_strains = set(other.strains)
+
+        return {
+            'added':   other_strains - strains,
+            'removed': strains - other_strains,
+        }

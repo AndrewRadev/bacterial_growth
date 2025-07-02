@@ -139,14 +139,12 @@ class TestMeasurement(DatabaseTest):
 
         s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study.publicId)
         s2 = self.create_strain(name='R. intestinalis', studyId=study.publicId)
-        strain_ids = [s1.id, s2.id]
 
         t_fc = self.create_measurement_technique(
             studyUniqueID=study.uuid,
             subjectType='strain',
             type='fc',
             units='Cells/mL',
-            strainIds=strain_ids,
         )
         t_16s = self.create_measurement_technique(
             studyUniqueID=study.uuid,
@@ -154,7 +152,6 @@ class TestMeasurement(DatabaseTest):
             type='16s',
             units='reads',
             includeStd=True,
-            strainIds=strain_ids,
         )
 
         header = ",".join([

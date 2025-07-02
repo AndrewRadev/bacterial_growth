@@ -1,3 +1,5 @@
+from typing import List
+
 import sqlalchemy as sql
 from sqlalchemy.orm import (
     Mapped,
@@ -24,6 +26,8 @@ class Strain(OrmBase):
     study: Mapped['Study'] = relationship(back_populates="strains")
 
     userUniqueID: Mapped[str] = mapped_column(sql.String(100))
+
+    communityStrains: Mapped[List['CommunityStrain']] = relationship(back_populates='strain')
 
     def __lt__(self, other):
         return self.name < other.name

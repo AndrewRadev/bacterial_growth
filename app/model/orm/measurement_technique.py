@@ -48,7 +48,6 @@ class MeasurementTechnique(OrmBase):
     includeStd:  Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
 
     metaboliteIds: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
-    strainIds:     Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
     studyUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Studies.uuid'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="measurementTechniques")
