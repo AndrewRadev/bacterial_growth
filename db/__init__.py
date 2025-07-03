@@ -7,6 +7,13 @@ import sqlalchemy as sql
 import sqlalchemy.orm as orm
 import flask_sqlalchemy
 
+SQLALCHEMY_ENGINE_OPTIONS = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+    'json_serializer': lambda obj: json.dumps(obj, use_decimal=True),
+    'json_deserializer': lambda obj: json.loads(obj, use_decimal=True),
+}
+
 
 def get_config(env=None):
     if env is None:
@@ -71,9 +78,8 @@ def _create_engine():
     engine = sql.create_engine(
         uri,
         # Set echo=True for full query logging:
+        **SQLALCHEMY_ENGINE_OPTIONS,
         echo=False,
-        json_serializer=lambda obj: json.dumps(obj, use_decimal=True),
-        json_deserializer=lambda obj: json.loads(obj, use_decimal=True),
     )
 
     return engine
