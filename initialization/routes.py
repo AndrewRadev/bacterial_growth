@@ -1,18 +1,19 @@
 import os
 
-import app.pages.metabolites as metabolite_pages
-import app.pages.search as search_pages
-import app.pages.static as static_pages
-import app.pages.help as help_pages
-import app.pages.strains as strain_pages
-import app.pages.studies as study_pages
-import app.pages.experiments as experiment_pages
-import app.pages.upload as upload_pages
-import app.pages.submissions as submission_pages
-import app.pages.users as user_pages
-import app.pages.projects as project_pages
 import app.pages.comparison as comparison_pages
 import app.pages.excel_files as excel_file_pages
+import app.pages.experiments as experiment_pages
+import app.pages.help as help_pages
+import app.pages.metabolites as metabolite_pages
+import app.pages.perturbations as perturbation_pages
+import app.pages.projects as project_pages
+import app.pages.search as search_pages
+import app.pages.static as static_pages
+import app.pages.strains as strain_pages
+import app.pages.studies as study_pages
+import app.pages.submissions as submission_pages
+import app.pages.upload as upload_pages
+import app.pages.users as user_pages
 
 
 APP_ENV = os.getenv('APP_ENV', 'development')
@@ -88,6 +89,8 @@ def init_routes(app):
 
     app.add_url_rule("/strains/completion/",     view_func=strain_pages.taxa_completion_json)
     app.add_url_rule("/metabolites/completion/", view_func=metabolite_pages.metabolites_completion_json)
+
+    app.add_url_rule("/perturbation/<int:id>", view_func=perturbation_pages.perturbation_show_page)
 
     app.add_url_rule("/comparison/",      view_func=comparison_pages.comparison_show_page)
     app.add_url_rule("/comparison/chart", view_func=comparison_pages.comparison_chart_fragment, methods=["POST"])

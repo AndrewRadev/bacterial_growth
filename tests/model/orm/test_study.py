@@ -17,12 +17,13 @@ class TestStudy(DatabaseTest):
         self.create_study_user(studyUniqueID=study.uuid, userUniqueID='user2')
         self.db_session.flush()
 
-        # Unpublished: only visible to linked users:
+        # Unpublished: only visible to linked users or admins:
         self.assertFalse(study.visible_to_user(None))
-        self.assertFalse(study.visible_to_user(SimpleNamespace(uuid='user3')))
+        self.assertFalse(study.visible_to_user(SimpleNamespace(uuid='user3', isAdmin=False)))
 
-        self.assertTrue(study.visible_to_user(SimpleNamespace(uuid='user1')))
-        self.assertTrue(study.visible_to_user(SimpleNamespace(uuid='user2')))
+        self.assertTrue(study.visible_to_user(SimpleNamespace(uuid='user1', isAdmin=False)))
+        self.assertTrue(study.visible_to_user(SimpleNamespace(uuid='user2', isAdmin=False)))
+        self.assertTrue(study.visible_to_user(SimpleNamespace(uuid='user3', isAdmin=True)))
 
         self.assertTrue(study.publish())
 

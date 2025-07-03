@@ -1,5 +1,5 @@
 {% from 'pages/experiments/_bioreplicates_toc.html' import render_bioreplicates_toc %}
-{% from 'pages/experiments/_perturbation.html' import render_perturbation %}
+{% from 'pages/perturbations/_perturbation.html' import render_perturbation %}
 {% from 'utils/_strain_link.html' import render_strain_link %}
 
 {% extends '_layout.html' %}
@@ -65,7 +65,7 @@
 
           <ol>
             {% for perturbation in experiment.perturbations: %}
-              {{ render_perturbation(perturbation) }}
+              {{ render_perturbation(perturbation, link=True) }}
             {% endfor %}
           </ol>
         {% endif %}

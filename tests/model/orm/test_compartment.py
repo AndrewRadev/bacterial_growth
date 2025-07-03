@@ -26,15 +26,15 @@ class TestCompartment(DatabaseTest):
         c3 = self.create_compartment(name="C3", initialPh=8, initialTemperature=40)
 
         diff = c1.diff(c2)
-        self.assertEqual(set(diff), {('initialPh', 7, 3)})
+        self.assertEqual(set(diff), {('initial pH', 7, 3)})
 
         diff = c2.diff(c1)
-        self.assertEqual(set(diff), {('initialPh', 3, 7)})
+        self.assertEqual(set(diff), {('initial pH', 3, 7)})
 
         diff = c1.diff(c3)
         self.assertEqual(set(diff), {
-            ('initialPh', 7, 8),
-            ('initialTemperature', 37, 40),
+            ('initial pH', 7, 8),
+            ('initial temperature', 37, 40),
         })
 
 
