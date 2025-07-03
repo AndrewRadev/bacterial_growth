@@ -40,13 +40,3 @@ class Bioreplicate(OrmBase):
         secondary='MeasurementContexts',
         viewonly=True,
     )
-
-    @staticmethod
-    def find_for_study(db_session, study_id, name):
-        return db_session.scalars(
-            sql.select(Bioreplicate.id)
-            .where(
-                Bioreplicate.studyId == study_id,
-                Bioreplicate.name == name,
-            )
-        ).one()

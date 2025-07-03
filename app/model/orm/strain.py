@@ -34,12 +34,3 @@ class Strain(OrmBase):
 
     def __lt__(self, other):
         return self.name < other.name
-
-    @staticmethod
-    def find_for_study(db_conn, study_id, strain_name):
-        return execute_text(db_conn, """
-            SELECT strainId
-            FROM Strains
-            WHERE studyId = :study_id
-              AND name = :strain_name
-        """, study_id=study_id, strain_name=strain_name).scalar()
