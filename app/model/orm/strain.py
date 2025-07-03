@@ -27,7 +27,10 @@ class Strain(OrmBase):
 
     userUniqueID: Mapped[str] = mapped_column(sql.String(100))
 
-    communityStrains: Mapped[List['CommunityStrain']] = relationship(back_populates='strain')
+    communityStrains: Mapped[List['CommunityStrain']] = relationship(
+        back_populates='strain',
+        cascade='all, delete-orphan',
+    )
 
     def __lt__(self, other):
         return self.name < other.name

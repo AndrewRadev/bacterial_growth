@@ -76,3 +76,22 @@ class Compartment(OrmBase):
         ]
 
         return ', '.join(formatted_properties)
+
+    def diff(self, other):
+        comparable_properties = [
+            "volume", "pressure",
+            "stirringMode", "stirringSpeed",
+            "O2", "CO2", "H2", "N2",
+            "inoculumConcentration", "inoculumVolume",
+            "initialPh", "initialTemperature",
+        ]
+        changes = []
+
+        for prop in comparable_properties:
+            value       = getattr(self, prop)
+            other_value = getattr(other, prop)
+
+            if value != other_value:
+                changes.append((prop, value, other_value))
+
+        return changes

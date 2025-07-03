@@ -4,8 +4,10 @@
   {% if index is none: %}
     {% set prefix = '' %}
   {% else: %}
-    {% set prefix = 'experiments-{}-perturbations-{}'.format(experimentIndex, index)  %}
+    {% set prefix = 'experiments-{}-perturbations-{}-'.format(experimentIndex, index)  %}
   {% endif %}
+
+  {% set experiment_data = submission.studyDesign['experiments'] %}
 
   <div class="compact-subform-container js-subform-container">
     <hr>

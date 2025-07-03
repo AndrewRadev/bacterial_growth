@@ -3,6 +3,7 @@
   <ul class="upload-status">
     {% set experiments = submission.studyDesign['experiments'] %}
     {% set bioreplicates = submission.studyDesign['experiments']|sum(attribute='bioreplicates', start=[]) %}
+    {% set perturbations = submission.studyDesign['experiments']|sum(attribute='perturbations', start=[]) %}
 
     {% if experiments|length > 0: %}
       <li class="complete">
@@ -29,6 +30,13 @@
     {% else %}
       <li class="incomplete">
         <span class="icon"></span> No biological replicates defined
+      </li>
+    {% endif %}
+
+    {% if perturbations|length > 0: %}
+      <li class="complete">
+        <span class="icon"></span>
+        <span>{{ perturbations|length }} perturbation(s)</span>
       </li>
     {% endif %}
   </ul>

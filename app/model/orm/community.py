@@ -33,8 +33,8 @@ class Community(OrmBase):
     )
 
     def diff(self, other):
-        strains       = set(self.strains)
-        other_strains = set(other.strains)
+        strains       = frozenset(self.strains)
+        other_strains = frozenset(other.strains)
 
         return {
             'added':   other_strains - strains,
