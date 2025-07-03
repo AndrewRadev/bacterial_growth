@@ -1,0 +1,23 @@
+{% from 'pages/perturbations/_perturbation.html' import render_perturbation %}
+
+{% extends '_layout.html' %}
+
+{% block title %}: Perturbation of experiment {{ perturbation.experiment.publicId }}{% endblock %}
+
+{% block content %}
+  <div class="container perturbation-page">
+    <article>
+      <h1>
+        Perturbation of experiment
+
+        <a href="{{ url_for('experiment_show_page', publicId=perturbation.experiment.publicId) }}">
+          {{ perturbation.experiment.publicId }}
+        </a>
+      </h1>
+
+      <p>
+        {{ render_perturbation(perturbation) }}
+      </p>
+    </article>
+  </div>
+{% endblock %}
