@@ -17,6 +17,7 @@ from app.model.orm import (
     MeasurementTechnique,
     Metabolite,
     ModelingRequest,
+    Perturbation,
     Project,
     Strain,
     Study,
@@ -29,6 +30,9 @@ from app.model.orm import (
 
 class DatabaseTest(unittest.TestCase):
     def setUp(self):
+        # Don't truncate diff output:
+        self.maxDiff = None
+
         self.assertEqual(
             os.environ.get('APP_ENV'),
             'test',
@@ -285,6 +289,17 @@ class DatabaseTest(unittest.TestCase):
         }
 
         return self._create_orm_record(CommunityStrain, params)
+
+    def create_perturbation(self, **params):
+        experiment_id = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'id'))
+
+        params = {
+            'experimentId': experiment_id,
+            'startTimeInSeconds': 0,
+            **params,
+        }
+
+        return self._create_orm_record(Perturbation, params)
 
     def _create_orm_record(self, model_class, params):
         instance = model_class(**params)

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import sqlalchemy as sql
 from sqlalchemy.orm import (
     Mapped,
@@ -26,9 +28,13 @@ class Perturbation(OrmBase):
 
     removedCompartmentId: Mapped[int] = mapped_column(sql.ForeignKey('Compartments.id'))
     addedCompartmentId:   Mapped[int] = mapped_column(sql.ForeignKey('Compartments.id'))
+    oldCommunityId:       Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'))
+    newCommunityId:       Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'))
 
-    oldCommunityId: Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'))
-    newCommunityId: Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'))
+    oldCommunity:       Mapped[Optional['Community']]   = relationship(foreign_keys=[oldCommunityId])
+    newCommunity:       Mapped[Optional['Community']]   = relationship(foreign_keys=[newCommunityId])
+    removedCompartment: Mapped[Optional['Compartment']] = relationship(foreign_keys=[removedCompartmentId])
+    addedCompartment:   Mapped[Optional['Compartment']] = relationship(foreign_keys=[addedCompartmentId])
 
     @hybrid_property
     def startTimeInHours(self):
