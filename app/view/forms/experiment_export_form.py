@@ -94,7 +94,7 @@ class ExperimentExportForm:
                 value_label = f"{subject.name} ({technique.units})"
                 condition = (
                     MeasurementContext.subjectType == 'metabolite',
-                    MeasurementContext.subjectId == subject.chebiId,
+                    MeasurementContext.subjectId == subject.id,
                 )
 
                 query = self._base_bioreplicate_query(experiment, value_label).where(*condition)
