@@ -319,7 +319,6 @@ def _save_experiments(db_session, submission_form, study):
         for bioreplicate_data in bioreplicates:
             bioreplicate = Bioreplicate(
                 **Bioreplicate.filter_keys(bioreplicate_data),
-                study=study,
                 experiment=experiment,
             )
 
@@ -407,14 +406,13 @@ def _save_measurements(db_session, study, submission):
 
 
 def _create_average_measurements(db_session, study, experiment):
-    bioreplicate_ids = [b.id for b in experiment.bioreplicates]
+    bioreplicate_ids = [b.id for b in experiment.bioreplicates if not b.calculationType]
 
     # The averaged measurements will be parented by a custom-generated bioreplicate:
     average_bioreplicate = Bioreplicate(
         name=f"Average({experiment.name})",
         calculationType='average',
         experiment=experiment,
-        study=study,
     )
     db_session.add(average_bioreplicate)
 
@@ -507,7 +505,6 @@ def _create_average_measurement_context(
 
     # Create a parent context for the individual measurements:
     average_context = MeasurementContext(
-        study=study,
         bioreplicate=average_bioreplicate,
         compartment=compartment,
         subjectId=subject_id,

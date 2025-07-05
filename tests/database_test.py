@@ -205,13 +205,13 @@ class DatabaseTest(unittest.TestCase):
         return self._create_orm_record(Measurement, params)
 
     def create_measurement_technique(self, **params):
-        study_uuid = self._get_or_create_dependency(params, 'studyUniqueID', ('study', 'uuid'))
+        study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
 
         params = {
             'type': 'fc',
             'subjectType': 'bioreplicate',
             'units': '',
-            'studyUniqueID': study_uuid,
+            'studyId': study_id,
             **params,
         }
 
@@ -294,11 +294,9 @@ class DatabaseTest(unittest.TestCase):
 
     def create_perturbation(self, **params):
         experiment_id = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'id'))
-        study_id      = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
 
         params = {
             'experimentId': experiment_id,
-            'studyId': study_id,
             'startTimeInSeconds': 0,
             **params,
         }
