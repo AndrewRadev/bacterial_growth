@@ -299,15 +299,21 @@ def _save_experiments(db_session, submission_form, study):
         bioreplicates     = experiment_params.pop('bioreplicates')
         perturbations     = experiment_params.pop('perturbations')
 
-        if 'publicId' not in experiment_params:
-            experiment_params['publicId'] = Experiment.generate_public_id(db_session)
+        if publicId := experiment_params.pop('publicId', None):
+            experiment = db_session.scalars(
+                sql.select(Experiment)
+                .where(Experiment.publicId == publicId)
+                .limit(1)
+            ).one()
+        else:
+            experiment = Experiment(publicId=Experiment.generate_public_id(db_session))
+            experiment_data['publicId'] = experiment.publicId
 
-        experiment = Experiment(
+        experiment.update(
             **Experiment.filter_keys(experiment_params),
             community=communities_by_name[community_name],
         )
         db_session.add(experiment)
-        experiment_data['publicId'] = experiment.publicId
 
         for compartment_name in compartment_names:
             experiment_compartment = ExperimentCompartment(
