@@ -6,6 +6,8 @@
     After <strong>{{ perturbation.startTimeInHours }}h</strong>:
   {% endif %}
 
+  {{ perturbation.description }}
+
   {% if link: %}
     (<a target="_blank" href="{{ url_for('perturbation_show_page', id=perturbation.id) }}">more</a>)
   {% endif %}
