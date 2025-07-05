@@ -153,12 +153,10 @@ class DatabaseTest(unittest.TestCase):
         self.bioreplicate_uuid = getattr(self, 'bioreplicate_uuid', 0) + 1
         name = f"Bioreplicate {self.bioreplicate_uuid}"
 
-        study_id        = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
-        experiment_uuid = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'id'), studyId=study_id)
+        experiment_uuid = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'id'))
 
         params = {
             'name':         name,
-            'studyId':      study_id,
             'experimentId': experiment_uuid,
             **params,
         }

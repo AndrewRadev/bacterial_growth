@@ -54,9 +54,6 @@ class Study(OrmBase):
     measurementTechniques:  Mapped[List['MeasurementTechnique']]  = owner_relationship()
     measurementContexts:    Mapped[List['MeasurementContext']]    = owner_relationship()
     modelingRequests:       Mapped[List['ModelingRequest']]       = owner_relationship()
-    experimentCompartments: Mapped[List['ExperimentCompartment']] = owner_relationship()
-    bioreplicates:          Mapped[List['Bioreplicate']]          = owner_relationship()
-    perturbations:          Mapped[List['Perturbation']]          = owner_relationship()
 
     measurements: Mapped[List['Measurement']] = relationship(
         order_by='Measurement.timeInSeconds',

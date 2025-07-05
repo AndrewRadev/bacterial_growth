@@ -6,6 +6,7 @@ from db import get_session, get_transaction
 
 import pandas as pd
 import sqlalchemy as sql
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.model.orm import (
     Bioreplicate,
@@ -46,18 +47,7 @@ def persist_submission_to_database(submission_form):
         project = _save_project(db_trans_session, submission_form)
         study   = _save_study(db_trans_session, submission_form)
 
-        # First, clear out existing relationships
-        study.measurements           = []
-        study.measurementContexts    = []
-        study.measurementTechniques  = []
-        study.strains                = []
-        study.experimentCompartments = []
-        study.compartments           = []
-        study.communities            = []
-        study.experiments            = []
-        study.bioreplicates          = []
-        study.perturbations          = []
-        study.studyMetabolites       = []
+        _clear_study(study)
 
         _save_compartments(db_trans_session, submission_form, study)
         _save_communities(db_trans_session, submission_form, study, user_uuid)
@@ -70,6 +60,7 @@ def persist_submission_to_database(submission_form):
         for experiment in study.experiments:
             _create_average_measurements(db_trans_session, study, experiment)
 
+        flag_modified(submission_form.submission, 'studyDesign')
         submission_form.save()
         submission_form.save_backup(study_id=study.publicId, project_id=project.publicId)
 
@@ -230,6 +221,21 @@ def _save_project(db_session, submission_form):
     return project
 
 
+def _clear_study(study):
+    for experiment in study.experiments:
+        experiment.experimentCompartments = []
+        experiment.perturbations          = []
+        experiment.bioreplicates          = []
+
+    study.measurements           = []
+    study.measurementContexts    = []
+    study.measurementTechniques  = []
+    study.strains                = []
+    study.compartments           = []
+    study.communities            = []
+    study.studyMetabolites       = []
+
+
 def _save_compartments(db_session, submission_form, study):
     submission = submission_form.submission
     compartments = []
@@ -286,23 +292,25 @@ def _save_experiments(db_session, submission_form, study):
     compartments_by_name = group_by_unique_name(study.compartments)
 
     for experiment_data in submission.studyDesign['experiments']:
-        experiment_data = copy.deepcopy(experiment_data)
+        experiment_params = copy.deepcopy(experiment_data)
 
-        community_name    = experiment_data.pop('communityName')
-        compartment_names = experiment_data.pop('compartmentNames')
-        bioreplicates     = experiment_data.pop('bioreplicates')
-        perturbations     = experiment_data.pop('perturbations')
+        community_name    = experiment_params.pop('communityName')
+        compartment_names = experiment_params.pop('compartmentNames')
+        bioreplicates     = experiment_params.pop('bioreplicates')
+        perturbations     = experiment_params.pop('perturbations')
+
+        if 'publicId' not in experiment_params:
+            experiment_params['publicId'] = Experiment.generate_public_id(db_session)
 
         experiment = Experiment(
-            **Experiment.filter_keys(experiment_data),
+            **Experiment.filter_keys(experiment_params),
             community=communities_by_name[community_name],
-            publicId=Experiment.generate_public_id(db_session),
         )
         db_session.add(experiment)
+        experiment_data['publicId'] = experiment.publicId
 
         for compartment_name in compartment_names:
             experiment_compartment = ExperimentCompartment(
-                study=study,
                 experiment=experiment,
                 compartment=compartments_by_name[compartment_name],
             )
@@ -330,7 +338,6 @@ def _save_experiments(db_session, submission_form, study):
                 end_time_in_seconds = None
 
             perturbation = Perturbation(
-                study=study,
                 experiment=experiment,
                 startTimeInSeconds=start_time_in_seconds,
                 endTimeInSeconds=end_time_in_seconds,
