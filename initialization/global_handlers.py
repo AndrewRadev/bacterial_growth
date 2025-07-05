@@ -76,15 +76,6 @@ def _close_db_connection(response):
     if request.endpoint == 'static':
         return response
 
-    if current_app.config['SQLALCHEMY_RECORD_QUERIES']:
-        recorded_queries = list(get_recorded_queries())
-
-        for query_info in recorded_queries:
-            duration_ms = round((query_info.end_time - query_info.start_time) * 1_000, 2)
-            current_app.logger.info(f"[SQL {duration_ms}ms] " + query_info.statement)
-
-        current_app.logger.info(f"SQL query count: {len(recorded_queries)}")
-
     db_conn = g.pop('db_conn', None)
     if db_conn is not None:
         db_conn.close()

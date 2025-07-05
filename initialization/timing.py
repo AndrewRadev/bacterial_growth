@@ -27,11 +27,12 @@ def log_request_timing(response):
     duration_ns = time.monotonic_ns() - g.start_time
     duration_ms = round(duration_ns / 1_000_000, 2)
 
-    sql_duration_ms = round(g.sql_time_ns / 1_000_000, 2)
+    sql_duration_ms = round(getattr(g, 'sql_time_ns', 0.0) / 1_000_000, 2)
+    sql_query_count = getattr(g, 'sql_query_count', 0)
 
     logger = current_app.logger.getChild('timing')
     logger.info(f"[{duration_ms}ms] Full request total")
-    logger.info(f"[{sql_duration_ms}ms] Full request SQL")
+    logger.info(f"[{sql_duration_ms}ms] Full request SQL: {sql_query_count} queries")
 
     return response
 
@@ -42,6 +43,8 @@ def log_request_timing(response):
 def start_db_timing(conn, cursor, statement, parameters, context, executemany):
     if 'sql_time_ns' not in g:
         g.sql_time_ns = 0.0
+    if 'sql_query_count' not in g:
+        g.sql_query_count = 0
 
     start_time = time.monotonic_ns()
     conn.info.setdefault("start_time", []).append(start_time)
@@ -52,6 +55,7 @@ def log_db_timing(conn, cursor, statement, parameters, context, executemany):
     duration_ms = round(duration_ns / 1_000_000, 2)
 
     g.sql_time_ns += duration_ns
+    g.sql_query_count += 1
 
     if os.getenv('TIME'):
         logger = current_app.logger.getChild('timing')
