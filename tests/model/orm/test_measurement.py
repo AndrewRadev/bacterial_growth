@@ -59,10 +59,10 @@ class TestMeasurement(DatabaseTest):
         self.assertEqual(
             [(m.timeInHours, m.subjectId, m.value) for m in measurements if m.technique.id == t_fc.id],
             [
-                (2.0, str(b1.id), Decimal('1234567890.000')),
-                (4.0, str(b1.id), Decimal('234567890.000')),
-                (2.0, str(b2.id), Decimal('4567890.000')),
-                (4.0, str(b2.id), Decimal('4567890.000')),
+                (2.0, b1.id, Decimal('1234567890.000')),
+                (4.0, b1.id, Decimal('234567890.000')),
+                (2.0, b2.id, Decimal('4567890.000')),
+                (4.0, b2.id, Decimal('4567890.000')),
             ]
         )
 
@@ -70,10 +70,10 @@ class TestMeasurement(DatabaseTest):
         self.assertEqual(
             [(m.timeInHours, m.subjectId, m.value) for m in measurements if m.technique.id == t_od.id],
             [
-                (2.0, str(b1.id), Decimal('0.900')),
-                (4.0, str(b1.id), Decimal('0.800')),
-                (2.0, str(b2.id), Decimal('0.700')),
-                (4.0, str(b2.id), Decimal('0.700')),
+                (2.0, b1.id, Decimal('0.900')),
+                (4.0, b1.id, Decimal('0.800')),
+                (2.0, b2.id, Decimal('0.700')),
+                (4.0, b2.id, Decimal('0.700')),
             ]
         )
 
@@ -92,11 +92,11 @@ class TestMeasurement(DatabaseTest):
         glucose_id = self.create_study_metabolite(
             studyId=study.publicId,
             metabolite={'name': 'glucose'},
-        ).chebi_id
+        ).metabolite.id
         trehalose_id = self.create_study_metabolite(
             studyId=study.publicId,
             metabolite={'name': 'trehalose'},
-        ).chebi_id
+        ).metabolite.id
 
         self.create_measurement_technique(
             studyUniqueID=study.uuid,

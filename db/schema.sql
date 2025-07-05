@@ -183,9 +183,10 @@ CREATE TABLE MeasurementContexts (
   bioreplicateId int NOT NULL,
   compartmentId int NOT NULL,
   techniqueId int DEFAULT NULL,
-  subjectId varchar(100) NOT NULL,
+  deprecatedSubjectId varchar(100) DEFAULT NULL,
   subjectType varchar(100) NOT NULL,
   calculationType varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  subjectId int DEFAULT NULL,
   PRIMARY KEY (id),
   KEY MeasurementContexts_fk_1 (bioreplicateId),
   KEY MeasurementContexts_fk_2 (compartmentId),
@@ -620,5 +621,6 @@ INSERT INTO MigrationVersions VALUES
 (160,'2025_06_22_161710_create_submission_backups','2025-06-22 14:21:36'),
 (162,'2025_06_29_142448_add_fields_to_taxa','2025-06-29 12:31:43'),
 (168,'2025_07_02_114751_readd_end_time_to_perturbations','2025-07-02 10:01:49'),
-(177,'2025_07_02_174630_create_community_strains','2025-07-02 16:15:00');
+(177,'2025_07_02_174630_create_community_strains','2025-07-02 16:15:00'),
+(184,'2025_07_05_121137_fix_metabolite_subject_ids','2025-07-05 10:37:51');
 

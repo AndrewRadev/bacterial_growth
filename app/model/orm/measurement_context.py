@@ -41,7 +41,7 @@ class MeasurementContext(OrmBase):
 
     calculationType: Mapped[str] = mapped_column(sql.String(50))
 
-    subjectId:   Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    subjectId:   Mapped[int] = mapped_column(sql.Integer,     nullable=False)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
     def get_df(self, db_session):
@@ -108,17 +108,15 @@ class MeasurementContext(OrmBase):
         from app.model.orm import Metabolite, Strain, Bioreplicate
 
         if self.subjectType == 'metabolite':
-            subject = db_session.scalars(
-                sql.select(Metabolite)
-                .where(Metabolite.chebiId == self.subjectId)
-                .limit(1)
-            ).one_or_none()
+            SubjectClass = Metabolite
         elif self.subjectType == 'strain':
-            subject = db_session.get(Strain, self.subjectId)
+            SubjectClass = Strain
         elif self.subjectType == 'bioreplicate':
-            subject = db_session.get(Bioreplicate, self.subjectId)
+            SubjectClass = Bioreplicate
         else:
             raise ValueError(f"Unknown subject type: {self.subjectType}")
 
+        subject = db_session.get(SubjectClass, self.subjectId)
         db_session._measurement_subject_cache[cache_key] = subject
+
         return db_session._measurement_subject_cache[cache_key]
