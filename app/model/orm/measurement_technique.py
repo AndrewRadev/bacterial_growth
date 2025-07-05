@@ -113,34 +113,6 @@ class MeasurementTechnique(OrmBase):
             .where(MeasurementContext.techniqueId == self.id)
         ).all()
 
-    def get_subjects_for_bioreplicate(self, db_session, bioreplicate):
-        from app.model.orm import MeasurementContext, Measurement
-
-        match self.subjectType:
-            case 'bioreplicate':
-                from app.model.orm import Bioreplicate
-                subject_class = Bioreplicate
-            case 'strain':
-                from app.model.orm import Strain
-                subject_class = Strain
-            case 'metabolite':
-                from app.model.orm import Metabolite
-                subject_class = Metabolite
-
-        return db_session.scalars(
-            sql.select(subject_class)
-            .where(subject_class.id.in_(
-                sql.select(MeasurementContext.subjectId)
-                .join(Measurement)
-                .distinct()
-                .where(
-                    MeasurementContext.techniqueId == self.id,
-                    MeasurementContext.bioreplicateId == bioreplicate.id,
-                    Measurement.value.is_not(None),
-                )
-            ))
-        ).all()
-
     def csv_column_name(self, subject_name=None):
         if self.subjectType == 'bioreplicate':
             return f"Community {TECHNIQUE_SHORT_NAMES[self.type]}"
