@@ -9,12 +9,14 @@ import sqlalchemy as sql
 from app.model.orm import (
     Community,
     Compartment,
+    Experiment,
     Project,
-    Study,
     Strain,
+    Study,
 )
 from app.view.forms.submission_form import SubmissionForm
 from app.model.lib.submission_process import (
+    _clear_study,
     _save_project,
     _save_study,
     _save_compartments,
@@ -264,6 +266,29 @@ class TestSubmissionProcess(DatabaseTest):
         self.assertEqual(len(experiment.bioreplicates), 3)
         self.assertEqual(len(study.bioreplicates), 3)
         self.assertEqual({'RI_1', 'RI_2', 'RI_3'}, {b.name for b in study.bioreplicates})
+
+        # Generated experiment public ID is saved in the form:
+        self.assertRegex(submission_form.submission.studyDesign['experiments'][0]['publicId'], r'^EMGDB\d+$')
+
+        # Check that recreating experiments from the same study maintains their public ids:
+        experiment_public_id = experiment.publicId
+
+        # Create a new experiment
+        new_experiment = self.create_experiment()
+        self.assertNotEqual(experiment_public_id, new_experiment.publicId)
+
+        # Redo upload and check that the public ids are the same:
+        _clear_study(study)
+
+        # Experiment is not deleted:
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment.id))
+
+        communities  = _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        compartments = _save_compartments(self.db_session, submission_form, study)
+
+        experiments = _save_experiments(self.db_session, submission_form, study)
+
+        self.assertEqual(submission_form.submission.studyDesign['experiments'][0]['publicId'], experiment_public_id)
 
     def test_measurement_technique_creation(self):
         m1 = self.create_metabolite(name='pyruvate')
