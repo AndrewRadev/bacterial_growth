@@ -327,6 +327,15 @@ class DatabaseTest(unittest.TestCase):
         return instance
 
     def _get_or_create_dependency(self, params, key_name, object_name, **dependency_params):
+        """
+        Example call:
+
+            self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+
+        If the 'studyId' key is given in `params`, it is returned, otherwise,
+        the `create_study` factory is called and the `publicId` property is
+        taken from the output and returned.
+        """
         if isinstance(object_name, tuple):
             (object_name, object_key_name) = object_name
         else:
