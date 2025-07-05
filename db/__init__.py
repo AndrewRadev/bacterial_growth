@@ -7,7 +7,8 @@ import sqlalchemy as sql
 import sqlalchemy.orm as orm
 import flask_sqlalchemy
 
-SQLALCHEMY_ENGINE_OPTIONS = {
+# Documentation on pooling: https://docs.sqlalchemy.org/en/20/core/pooling.html
+APP_SQLALCHEMY_ENGINE_OPTIONS = {
     'pool_pre_ping': True,
     'pool_recycle': 300,
     'json_serializer': lambda obj: json.dumps(obj, use_decimal=True),
@@ -78,7 +79,7 @@ def _create_engine():
     engine = sql.create_engine(
         uri,
         # Set echo=True for full query logging:
-        **SQLALCHEMY_ENGINE_OPTIONS,
+        **APP_SQLALCHEMY_ENGINE_OPTIONS,
         echo=False,
     )
 
