@@ -55,6 +55,11 @@ class Study(OrmBase):
     measurementContexts:    Mapped[List['MeasurementContext']]    = owner_relationship()
     modelingRequests:       Mapped[List['ModelingRequest']]       = owner_relationship()
 
+    bioreplicates: Mapped[List['Bioreplicate']] = relationship(
+        secondary='Experiments',
+        viewonly=True,
+    )
+
     measurements: Mapped[List['Measurement']] = relationship(
         order_by='Measurement.timeInSeconds',
         secondary='MeasurementContexts',
