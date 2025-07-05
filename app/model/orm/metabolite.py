@@ -28,9 +28,6 @@ class Metabolite(OrmBase):
     def __lt__(self, other):
         return self.name < other.name
 
-    # TODO (2024-09-26) Duplicates taxa completion a lot, try to make completion
-    # logic generic, to an extent.
-    #
     @staticmethod
     def search_by_name(db_conn, term, page=1, per_page=10):
         term = term.lower().strip()
@@ -48,7 +45,7 @@ class Metabolite(OrmBase):
             WHERE LOWER(name) LIKE :term_pattern
             ORDER BY
                 LOCATE(:first_word, LOWER(name)) ASC,
-                name ASC
+                LOWER(name) ASC
             LIMIT :per_page
             OFFSET :offset
         """

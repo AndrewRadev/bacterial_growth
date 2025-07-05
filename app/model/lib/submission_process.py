@@ -10,6 +10,7 @@ import sqlalchemy as sql
 from app.model.orm import (
     Bioreplicate,
     Community,
+    CommunityStrain,
     Compartment,
     Experiment,
     ExperimentCompartment,
@@ -25,6 +26,7 @@ from app.model.orm import (
     Taxon,
 )
 from app.model.lib.util import group_by_unique_name, is_non_negative_float
+from app.model.lib.conversion import convert_time
 
 
 def persist_submission_to_database(submission_form):
@@ -130,10 +132,6 @@ def validate_data_file(submission_form, data_file=None):
 
         if 'Compartment' in df:
             uploaded_compartments = set(df['Compartment'])
-
-            if missing_compartments := expected_compartments.difference(set(df['Compartment'])):
-                compartment_description = ', '.join(missing_compartments)
-                errors.append(f"{sheet_name}: Missing compartment(s): {compartment_description}")
 
             if extra_compartments := uploaded_compartments.difference(expected_compartments):
                 compartment_description = ', '.join(extra_compartments)
@@ -256,7 +254,8 @@ def _save_communities(db_session, submission_form, study, user_uuid):
         strain_identifiers = community_data.pop('strainIdentifiers')
 
         community = Community(**Community.filter_keys(community_data))
-        community.strainIds = []
+        db_session.add(community)
+        db_session.flush()
 
         for identifier in strain_identifiers:
             if identifier not in identifier_cache:
@@ -265,12 +264,15 @@ def _save_communities(db_session, submission_form, study, user_uuid):
                 db_session.add(strain)
                 db_session.flush()
 
-            community.strainIds.append(identifier_cache[identifier].id)
+            community_strain = CommunityStrain(
+                community=community,
+                strain=identifier_cache[identifier],
+            )
+            db_session.add(community_strain)
 
         communities.append(community)
 
     study.communities = communities
-    db_session.add_all(communities)
 
     return communities
 
@@ -278,6 +280,7 @@ def _save_communities(db_session, submission_form, study, user_uuid):
 def _save_experiments(db_session, submission_form, study):
     submission = submission_form.submission
     experiments = []
+    time_units = submission.studyDesign['timeUnits']
 
     communities_by_name  = group_by_unique_name(study.communities)
     compartments_by_name = group_by_unique_name(study.compartments)
@@ -317,10 +320,20 @@ def _save_experiments(db_session, submission_form, study):
         for perturbation_data in perturbations:
             perturbation_data = copy.deepcopy(perturbation_data)
 
+            start_time = perturbation_data.pop('startTime', '0')
+            start_time_in_seconds = convert_time(int(start_time), time_units, 's')
+
+            end_time = perturbation_data.pop('endTime', None)
+            if end_time:
+                end_time_in_seconds = convert_time(int(end_time), time_units, 's')
+            else:
+                end_time_in_seconds = None
+
             perturbation = Perturbation(
                 study=study,
                 experiment=experiment,
-                startTimepoint=perturbation_data.pop('startTimepoint'),
+                startTimeInSeconds=start_time_in_seconds,
+                endTimeInSeconds=end_time_in_seconds,
                 description=perturbation_data.pop('description'),
             )
 

@@ -2,12 +2,14 @@ import os
 import unittest
 from uuid import uuid4
 from decimal import Decimal
+from datetime import datetime, UTC
 
 import db
 from app.model.lib.db import execute_text
 from app.model.orm import (
     Bioreplicate,
-    ModelingRequest,
+    Community,
+    CommunityStrain,
     Compartment,
     Experiment,
     ExperimentCompartment,
@@ -15,6 +17,8 @@ from app.model.orm import (
     MeasurementContext,
     MeasurementTechnique,
     Metabolite,
+    ModelingRequest,
+    Perturbation,
     Project,
     Strain,
     Study,
@@ -22,11 +26,15 @@ from app.model.orm import (
     StudyUser,
     Submission,
     Taxon,
+    User,
 )
 
 
 class DatabaseTest(unittest.TestCase):
     def setUp(self):
+        # Don't truncate diff output:
+        self.maxDiff = None
+
         self.assertEqual(
             os.environ.get('APP_ENV'),
             'test',
@@ -129,10 +137,12 @@ class DatabaseTest(unittest.TestCase):
         self.experiment_sequence = getattr(self, 'experiment_sequence', 0) + 1
 
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+        public_id = Experiment.generate_public_id(self.db_session)
 
         params = {
             'studyId': study_id,
             'name':    f"Experiment {self.experiment_sequence}",
+            'publicId': public_id,
             **params,
         }
 
@@ -260,6 +270,54 @@ class DatabaseTest(unittest.TestCase):
         }
 
         return self._create_orm_record(ModelingRequest, params)
+
+    def create_community(self, **params):
+        study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+
+        params = {
+            'name':    'C1',
+            'studyId': study_id,
+            **params,
+        }
+
+        return self._create_orm_record(Community, params)
+
+    def create_community_strain(self, **params):
+        community_id = self._get_or_create_dependency(params, 'communityId', ('community', 'id'))
+        strain_id    = self._get_or_create_dependency(params, 'strainId', ('strain', 'id'))
+
+        params = {
+            'communityId': community_id,
+            'strainId': strain_id,
+            **params,
+        }
+
+        return self._create_orm_record(CommunityStrain, params)
+
+    def create_perturbation(self, **params):
+        experiment_id = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'id'))
+        study_id      = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+
+        params = {
+            'experimentId': experiment_id,
+            'studyId': study_id,
+            'startTimeInSeconds': 0,
+            **params,
+        }
+
+        return self._create_orm_record(Perturbation, params)
+
+    def create_user(self, **params):
+        params = {
+            'name':        'Test user',
+            'uuid':        str(uuid4()),
+            'orcidId':     str(uuid4()),
+            'orcidToken':  str(uuid4()),
+            'lastLoginAt': datetime.now(UTC),
+            **params,
+        }
+
+        return self._create_orm_record(User, params)
 
     def _create_orm_record(self, model_class, params):
         instance = model_class(**params)

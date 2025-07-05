@@ -35,8 +35,11 @@ class UploadStep5Form(BaseForm):
             class Meta:
                 csrf = False
 
-            startTimepoint = IntegerField('startTimepoint', validators=[DataRequired()])
-            description    = TextAreaField('description', validators=[DataRequired()])
+            # Note: converted to seconds when creating perturbation
+            startTime = IntegerField('startTime', validators=[DataRequired()])
+            endTime   = IntegerField('endTime',   validators=[DataRequired()])
+
+            description = TextAreaField('description', validators=[DataRequired()])
 
             removedCompartmentName = SelectField('removedCompartmentName', choices=[], validate_choice=False)
             addedCompartmentName   = SelectField('addedCompartmentName',   choices=[], validate_choice=False)

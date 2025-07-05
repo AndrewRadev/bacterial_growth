@@ -1,6 +1,7 @@
 import tests.init  # noqa: F401
 
 from bs4 import BeautifulSoup
+from flask import session
 
 from main import create_app
 from tests.database_test import DatabaseTest
@@ -15,7 +16,7 @@ TAXON_NAMES = {
 }
 
 METABOLITE_NAMES = {
-    "CHEBI:422":   "(s)-lactic acid",
+    "CHEBI:422":   "(S)-lactic acid",
     "CHEBI:15361": "pyruvate",
     "CHEBI:15366": "acetic acid",
     "CHEBI:15740": "formate",
@@ -46,6 +47,10 @@ class PageTest(DatabaseTest):
         self.app    = create_app()
         self.client = self.app.test_client()
 
+    def _log_in(self, user):
+        with self.client:
+            self.client.post('/backdoor/', data={'user_uuid': user.uuid})
+
     def _bootstrap_taxa(self):
         for ncbi_id, name in TAXON_NAMES.items():
             self.create_taxon(ncbiId=ncbi_id, name=name)
@@ -56,4 +61,4 @@ class PageTest(DatabaseTest):
 
     def _get_text(self, response):
         soup = BeautifulSoup(response.data, 'html.parser')
-        return soup.get_text(' | ', strip=True)
+        return soup.get_text(' ', strip=True)

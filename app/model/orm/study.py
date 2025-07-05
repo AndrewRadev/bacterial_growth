@@ -88,6 +88,8 @@ class Study(OrmBase):
             return True
         elif not user or not user.uuid:
             return False
+        elif user.isAdmin:
+            return True
         else:
             return user.uuid in self.managerUuids
 

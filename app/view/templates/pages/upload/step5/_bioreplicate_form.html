@@ -14,22 +14,10 @@
         {{ form['position'](class='form-input-blue form-input-full', placeholder="A1") }}
       </label>
 
-      <label class="full" data-tooltip="A link to an external URL with additional information">
+      <label class="full" data-tooltip="A link to an external URL with additional information about the biological sample">
         <div>Biosample URL</div>
         {{ form['biosampleUrl'](class='form-input-blue form-input-full', placeholder="https://example.org") }}
       </label>
-
-      <div class="no-label">
-        <label style="white-space: nowrap;">
-          {{ form['isControl'](class='form-input-blue') }}
-          Control
-        </label>
-
-        <label style="white-space: nowrap;">
-          {{ form['isBlank'](class='form-input-blue') }}
-          Blank
-        </label>
-      </div>
 
       <div class="no-label flex-right">
         <a href="#" class="white-button flex-row js-remove-trigger">

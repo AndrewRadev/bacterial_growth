@@ -1,4 +1,5 @@
 {% from 'pages/experiments/_bioreplicates_toc.html' import render_bioreplicates_toc %}
+{% from 'pages/perturbations/_perturbation.html' import render_perturbation %}
 {% from 'utils/_strain_link.html' import render_strain_link %}
 
 {% extends '_layout.html' %}
@@ -54,13 +55,23 @@
         <h3>Community: {{ experiment.community.name }}</h3>
 
         <ol>
-          {% for strain in experiment.community.get_strains(g.db_session): %}
+          {% for strain in experiment.community.strains: %}
             <li>{{ render_strain_link(strain) }}</li>
           {% endfor %}
         </ol>
 
+        {% if experiment.perturbations|length > 0: %}
+          <h3>Perturbations</h3>
+
+          <ol>
+            {% for perturbation in experiment.perturbations: %}
+              {{ render_perturbation(perturbation, link=True) }}
+            {% endfor %}
+          </ol>
+        {% endif %}
+
         <div class="flex-row">
-          <div class="bioreplicates">
+          <div class="bioreplicates full">
             <h2>Biological replicates</h2>
 
             <ol class="bioreplicates-list">

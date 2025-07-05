@@ -28,9 +28,7 @@
               required>
             {% if submission.studyDesign['custom_strains']|length > 0 and index is not none and index < submission.studyDesign['custom_strains']|length: %}
               {% set custom_strain_data = submission.studyDesign['custom_strains'][index] %}
-              <option value="{{ custom_strain_data['species'] }}">
-              {{ custom_strain_data['species_name'] }} (NCBI:{{ custom_strain_data['species'] }})
-              </option>
+              <option value="{{ custom_strain_data['species'] }}">{{ custom_strain_data['species_name'] }} (NCBI:{{ custom_strain_data['species'] }})</option>
             {% endif %}
           </select>
         </label>

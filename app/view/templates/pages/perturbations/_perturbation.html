@@ -1,0 +1,65 @@
+{% macro render_perturbation(perturbation, link=False) %}
+
+  {% if perturbation.endTimeInSeconds: %}
+    From <strong>{{ perturbation.startTimeInHours }}h</strong> to <strong>{{ perturbation.endTimeInHours }}h</strong>:
+  {% else: %}
+    After <strong>{{ perturbation.startTimeInHours }}h</strong>:
+  {% endif %}
+
+  {{ perturbation.description }}
+
+  {% if link: %}
+    (<a target="_blank" href="{{ url_for('perturbation_show_page', id=perturbation.id) }}">more</a>)
+  {% endif %}
+
+  <ul>
+    {% if perturbation.oldCommunity and perturbation.newCommunity: %}
+      <li>
+        Community <strong>{{ perturbation.oldCommunity.name }}</strong>
+        changed to <strong>{{ perturbation.newCommunity.name }}</strong>:
+
+        {% set diff = perturbation.oldCommunity.diff(perturbation.newCommunity) %}
+
+        <ul>
+          {% if diff['removed']: %}
+            <li>
+              Strains removed:
+              {{ diff['removed']|map(attribute='name')|sort|join_tag('strong') }}
+            </li>
+          {% endif %}
+
+          {% if diff['added']: %}
+            <li>
+              Strains added:
+              {{ diff['added']|map(attribute='name')|sort|join_tag('strong') }}
+            </li>
+          {% endif %}
+        </ul>
+      </li>
+    {% elif perturbation.oldCommunity: %}
+      <li>Community <strong>{{ perturbation.oldCommunity.name }}</strong> removed
+    {% elif perturbation.newCommunity: %}
+      <li>Community <strong>{{ perturbation.newCommunity.name }}</strong> added
+    {% endif %}
+
+    {% if perturbation.removedCompartment and perturbation.addedCompartment: %}
+      <li>
+        Compartment <strong>{{ perturbation.removedCompartment.name }}</strong>
+        changed to <strong>{{ perturbation.addedCompartment.name }}</strong>:
+
+        {% set changes = perturbation.removedCompartment.diff(perturbation.addedCompartment) %}
+
+        <ul>
+          {% for (property, before, after) in changes: %}
+            <li><strong>{{ property }}</strong>: from {{ before }} to {{ after }}</li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% elif perturbation.removedCompartment: %}
+      <li>Compartment <strong>{{ perturbation.removedCompartment.name }}</strong> removed</li>
+    {% elif perturbation.addedCompartment: %}
+      <li>Compartment <strong>{{ perturbation.addedCompartment.name }}</strong> added</li>
+    {% endif %}
+  </ul>
+
+{% endmacro %}

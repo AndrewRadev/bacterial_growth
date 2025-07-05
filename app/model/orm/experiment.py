@@ -40,7 +40,10 @@ class Experiment(OrmBase):
         viewonly=True,
     )
 
-    perturbations: Mapped[List['Perturbation']] = relationship(back_populates='experiment')
+    perturbations: Mapped[List['Perturbation']] = relationship(
+        back_populates='experiment',
+        cascade="all, delete-orphan"
+    )
 
     measurementContexts: Mapped[List['MeasurementContext']] = relationship(
         secondary='Bioreplicates',
