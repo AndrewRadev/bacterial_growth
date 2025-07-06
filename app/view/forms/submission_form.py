@@ -90,6 +90,9 @@ class SubmissionForm:
 
             if previous_submission:
                 self.submission.studyDesign = previous_submission.studyDesign
+                # Clear out experiment ids:
+                for experiment_data in self.submission.studyDesign.get('experiments', []):
+                    experiment_data['publicId'] = None
 
         # Update text fields:
         self.submission.studyDesign['project'] = {
@@ -194,6 +197,10 @@ class SubmissionForm:
 
     def has_error(self, key):
         return key in self.errors
+
+    @property
+    def is_published(self):
+        return self.submission.study and self.submission.study.isPublished
 
     def error_messages(self):
         # Flatten messages per property:

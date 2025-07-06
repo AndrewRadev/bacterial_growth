@@ -286,9 +286,8 @@ class TestSubmissionProcess(DatabaseTest):
         # Experiment is not deleted:
         self.assertIsNotNone(self.db_session.get(Experiment, experiment.id))
 
-        communities  = _save_communities(self.db_session, submission_form, study, user_uuid='user1')
-        compartments = _save_compartments(self.db_session, submission_form, study)
-
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
         experiments = _save_experiments(self.db_session, submission_form, study)
 
         self.assertEqual(submission_form.submission.studyDesign['experiments'][0]['publicId'], experiment_public_id)
@@ -322,10 +321,9 @@ class TestSubmissionProcess(DatabaseTest):
         })
 
         # Create dependencies
-        study        = _save_study(self.db_session, submission_form)
-        communities  = _save_communities(self.db_session, submission_form, study, user_uuid='user1')
-        compartments = _save_compartments(self.db_session, submission_form, study)
-
+        study = _save_study(self.db_session, submission_form)
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
         experiments = _save_experiments(self.db_session, submission_form, study)
         flag_modified(submission_form.submission, 'studyDesign')
         submission_form.save()
@@ -353,10 +351,8 @@ class TestSubmissionProcess(DatabaseTest):
 
         # Redo upload
         _clear_study(study)
-
-        communities  = _save_communities(self.db_session, submission_form, study, user_uuid='user1')
-        compartments = _save_compartments(self.db_session, submission_form, study)
-
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
         experiments = _save_experiments(self.db_session, submission_form, study)
         flag_modified(submission_form.submission, 'studyDesign')
         submission_form.save()
@@ -373,6 +369,26 @@ class TestSubmissionProcess(DatabaseTest):
         # The first experiment exists in the database, the second one doesn't
         self.assertIsNotNone(self.db_session.get(Experiment, experiment_ids[0]))
         self.assertIsNone(self.db_session.get(Experiment, experiment_ids[1]))
+
+        # Do not allow inserting a different experiment by id:
+        other_experiment = self.create_experiment()
+        experiment_data = submission_form.submission.studyDesign['experiments']
+        experiment_data.append({
+            'publicId': other_experiment.publicId,
+            'name': other_experiment.name,
+            'description': 'Other experiment that should not be reassigned to this study',
+            'cultivationMode': 'batch',
+            'communityName': 'RI',
+            'compartmentNames': ['WC'],
+            'bioreplicates': [{'name': 'RI_2_1'}],
+            'perturbations': [],
+        })
+        _clear_study(study)
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
+
+        with self.assertRaises(ValueError):
+            experiments = _save_experiments(self.db_session, submission_form, study)
 
     def test_measurement_technique_creation(self):
         m1 = self.create_metabolite(name='pyruvate')

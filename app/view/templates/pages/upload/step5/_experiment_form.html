@@ -11,15 +11,30 @@
     {% set prefix = 'experiments-{}-'.format(index)  %}
   {% endif %}
 
+  {% set publicId    = form.data['publicId'] %}
+  {% set isPublished = form.data['publicId'] and submission_form.is_published %}
+
   <div
       class="subform-container box js-subform-container js-experiment-container"
       data-index="{{ index if index is not none else '' }}">
-    <h3>
-      Experiment <span class="js-index">{{ index + 1 if index is not none else '' }}</span>
-      {%- if form.data['name']: -%}: {{ form.data['name'] }}{% endif %}
-    </h3>
-
     <div class="form-row">
+      <h3>
+        Experiment <span class="js-index">{{ index + 1 if index is not none else '' }}</span>
+        {%- if form.data['name']: -%}: {{ form.data['name'] }}{% endif %}
+      </h3>
+
+      {% if publicId: %}
+        <div class="flex-right js-public-id">
+          <a target="_blank" href="{{ url_for('experiment_show_page', publicId=publicId) }}">
+            {{ publicId }}
+          </a>
+
+          {{ form.publicId() }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="form-row margin-top-10">
       <label class="full">
         <div class="required">Name</div>
         {# Note: Have to access the input using [], since there is an existing `.name` attribute #}
@@ -160,7 +175,11 @@
         </a>
       </div>
 
-      <div class="no-label flex-right">
+      <div class="flex-right help {{ "hidden" if not isPublished }} js-is-published" style="align-self: center">
+        This experiment can't be removed, since the study has been published.
+      </div>
+
+      <div class="no-label flex-right {{ "hidden" if isPublished }} js-not-published">
         <a href="#" class="white-button flex-row js-remove-trigger">
           <span class="icon icon-remove"></span> Remove experiment
         </a>
