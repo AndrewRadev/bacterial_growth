@@ -26,4 +26,4 @@ with get_session() as db_session:
     for study_key in STUDY_KEYS:
         bootstrap_study(db_session, study_key, user.uuid)
 
-print(f"> Records created, owned by user with ID: {user.uuid} ({user.name})")
+    print(f"> Records created, owned by user with ID: {user.uuid} ({user.name})")
