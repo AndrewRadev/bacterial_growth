@@ -305,6 +305,9 @@ def _save_experiments(db_session, submission_form, study):
                 .where(Experiment.publicId == publicId)
                 .limit(1)
             ).one()
+
+            if experiment.studyId != study.publicId:
+                raise ValueError(f"Experiment with ID {publicId} does not belong to study {study.publicId}")
         else:
             experiment = Experiment(publicId=Experiment.generate_public_id(db_session))
             experiment_data['publicId'] = experiment.publicId
