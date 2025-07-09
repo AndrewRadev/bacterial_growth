@@ -135,7 +135,7 @@ class ExperimentExportForm:
             .join(Compartment)
             .join(Experiment)
             .where(
-                Experiment.id == experiment.id,
+                Experiment.publicId == experiment.publicId,
                 Bioreplicate.id.in_(self.bioreplicate_uuids),
             )
             .order_by(

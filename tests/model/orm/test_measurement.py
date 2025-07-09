@@ -33,8 +33,8 @@ class TestMeasurement(DatabaseTest):
         study = self.create_study(timeUnits='h')
         experiment = self.create_experiment(studyId=study.publicId)
 
-        b1 = self.create_bioreplicate(name='b1', experimentId=experiment.id)
-        b2 = self.create_bioreplicate(name='b2', experimentId=experiment.id)
+        b1 = self.create_bioreplicate(name='b1', experimentId=experiment.publicId)
+        b2 = self.create_bioreplicate(name='b2', experimentId=experiment.publicId)
         self.create_compartment(studyId=study.publicId, name='c1')
 
         t_fc = self.create_measurement_technique(studyId=study.publicId, subjectType='bioreplicate', type='fc')
@@ -88,7 +88,7 @@ class TestMeasurement(DatabaseTest):
         study = self.create_study(timeUnits='m')
         experiment = self.create_experiment(studyId=study.publicId)
 
-        self.create_bioreplicate(name='b1', experimentId=experiment.id)
+        self.create_bioreplicate(name='b1', experimentId=experiment.publicId)
         self.create_compartment(name='c1', studyId=study.publicId)
 
         glucose_id = self.create_study_metabolite(
