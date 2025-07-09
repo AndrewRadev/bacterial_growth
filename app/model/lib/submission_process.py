@@ -300,11 +300,7 @@ def _save_experiments(db_session, submission_form, study):
         perturbations     = experiment_params.pop('perturbations')
 
         if publicId := experiment_params.pop('publicId', None):
-            experiment = db_session.scalars(
-                sql.select(Experiment)
-                .where(Experiment.publicId == publicId)
-                .limit(1)
-            ).one()
+            experiment = db_session.get(Experiment, publicId)
 
             if experiment.studyId != study.publicId:
                 raise ValueError(f"Experiment with ID {publicId} does not belong to study {study.publicId}")

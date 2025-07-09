@@ -6,7 +6,7 @@
     <ol>
       {% for experiment in study.experiments: %}
         <li>
-          <a href="#experiment-{{ experiment.id }}" class="js-smooth-scroll">
+          <a href="#experiment-{{ experiment.publicId }}" class="js-smooth-scroll">
             {{ experiment.name }}
           </a>
         </li>

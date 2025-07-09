@@ -284,7 +284,7 @@ class TestSubmissionProcess(DatabaseTest):
         _clear_study(study)
 
         # Experiment is not deleted:
-        self.assertIsNotNone(self.db_session.get(Experiment, experiment.id))
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment.publicId))
 
         _save_communities(self.db_session, submission_form, study, user_uuid='user1')
         _save_compartments(self.db_session, submission_form, study)
@@ -330,11 +330,10 @@ class TestSubmissionProcess(DatabaseTest):
         self.db_session.commit()
 
         experiment_public_ids = [e.publicId for e in experiments]
-        experiment_ids        = [e.id for e in experiments]
 
         # Both experiments exist in the database:
-        self.assertIsNotNone(self.db_session.get(Experiment, experiment_ids[0]))
-        self.assertIsNotNone(self.db_session.get(Experiment, experiment_ids[1]))
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment_public_ids[0]))
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment_public_ids[1]))
 
         # Remove experiment 2 from list, add a new one:
         experiment_data = submission_form.submission.studyDesign['experiments']
@@ -367,8 +366,8 @@ class TestSubmissionProcess(DatabaseTest):
         self.assertNotEqual(experiment_public_ids[1], new_experiment_public_ids[1])
 
         # The first experiment exists in the database, the second one doesn't
-        self.assertIsNotNone(self.db_session.get(Experiment, experiment_ids[0]))
-        self.assertIsNone(self.db_session.get(Experiment, experiment_ids[1]))
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment_public_ids[0]))
+        self.assertIsNone(self.db_session.get(Experiment, experiment_public_ids[1]))
 
         # Do not allow inserting a different experiment by id:
         other_experiment = self.create_experiment()
@@ -432,11 +431,11 @@ class TestSubmissionProcess(DatabaseTest):
         study = experiment.study
 
         c1 = self.create_compartment()
-        self.create_experiment_compartment(compartmentId=c1.id, experimentId=experiment.id)
+        self.create_experiment_compartment(compartmentId=c1.id, experimentId=experiment.publicId)
 
         mt = self.create_measurement_technique(subjectType='bioreplicate', studyId=study.publicId)
 
-        b1 = self.create_bioreplicate(name="b1", experimentId=experiment.id)
+        b1 = self.create_bioreplicate(name="b1", experimentId=experiment.publicId)
         mc1 = self.create_measurement_context(
             subjectId=b1.id,
             subjectType='bioreplicate',
@@ -447,7 +446,7 @@ class TestSubmissionProcess(DatabaseTest):
         for i, value in enumerate([10, 20, 30]):
             self.create_measurement(timeInSeconds=i, value=value, contextId=mc1.id)
 
-        b2 = self.create_bioreplicate(name="b2", experimentId=experiment.id)
+        b2 = self.create_bioreplicate(name="b2", experimentId=experiment.publicId)
         mc2 = self.create_measurement_context(
             subjectId=b2.id,
             subjectType='bioreplicate',
@@ -468,7 +467,7 @@ class TestSubmissionProcess(DatabaseTest):
         self.assertEqual([int(m.value) for m in average_bioreplicate.measurements], [15, 30, 45])
 
         # Don't create averages if their time points don't match
-        b3 = self.create_bioreplicate(name="b3", experimentId=experiment.id)
+        b3 = self.create_bioreplicate(name="b3", experimentId=experiment.publicId)
         mc3 = self.create_measurement_context(
             subjectId=b3.id,
             subjectType='bioreplicate',

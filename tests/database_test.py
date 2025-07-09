@@ -134,14 +134,12 @@ class DatabaseTest(unittest.TestCase):
         return self._create_orm_record(ExperimentCompartment, params)
 
     def create_experiment(self, **params):
-        self.experiment_sequence = getattr(self, 'experiment_sequence', 0) + 1
-
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
         public_id = Experiment.generate_public_id(self.db_session)
 
         params = {
             'studyId': study_id,
-            'name':    f"Experiment {self.experiment_sequence}",
+            'name':    f"Experiment {public_id}",
             'publicId': public_id,
             **params,
         }
@@ -150,14 +148,14 @@ class DatabaseTest(unittest.TestCase):
 
     def create_bioreplicate(self, **params):
         # Note: this is just a sequential number to ensure unique naming
-        self.bioreplicate_uuid = getattr(self, 'bioreplicate_uuid', 0) + 1
-        name = f"Bioreplicate {self.bioreplicate_uuid}"
+        self.bioreplicate_id = getattr(self, 'bioreplicate_id', 0) + 1
+        name = f"Bioreplicate {self.bioreplicate_id}"
 
-        experiment_uuid = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'id'))
+        experiment_id = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'publicId'))
 
         params = {
             'name':         name,
-            'experimentId': experiment_uuid,
+            'experimentId': experiment_id,
             **params,
         }
 
@@ -293,7 +291,7 @@ class DatabaseTest(unittest.TestCase):
         return self._create_orm_record(CommunityStrain, params)
 
     def create_perturbation(self, **params):
-        experiment_id = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'id'))
+        experiment_id = self._get_or_create_dependency(params, 'experimentId', ('experiment', 'publicId'))
 
         params = {
             'experimentId': experiment_id,
