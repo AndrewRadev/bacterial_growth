@@ -30,7 +30,7 @@ class Study(OrmBase):
     owner: Mapped['User'] = relationship(back_populates='ownedStudies')
 
     publicId:    Mapped[str] = mapped_column(sql.String(100))
-    name:        Mapped[str] = mapped_column(sql.String(100))
+    name:        Mapped[str] = mapped_column(sql.String(255))
     description: Mapped[str] = mapped_column(sql.String, nullable=True)
     url:         Mapped[str] = mapped_column(sql.String, nullable=True)
     timeUnits:   Mapped[str] = mapped_column(sql.String(100))
