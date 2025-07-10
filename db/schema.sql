@@ -185,7 +185,7 @@ CREATE TABLE MeasurementContexts (
   deprecatedSubjectId varchar(100) DEFAULT NULL,
   subjectType varchar(100) NOT NULL,
   calculationType varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  subjectId int DEFAULT NULL,
+  subjectId int NOT NULL,
   PRIMARY KEY (id),
   KEY MeasurementContexts_fk_1 (bioreplicateId),
   KEY MeasurementContexts_fk_2 (compartmentId),
@@ -628,5 +628,6 @@ INSERT INTO MigrationVersions VALUES
 (188,'2025_07_05_150703_nullify_study_ids','2025-07-05 13:15:55'),
 (192,'2025_07_05_153044_fix_measurement_technique_study_ids','2025-07-05 14:03:28'),
 (193,'2025_07_09_121550_use_experiment_public_id_as_key','2025-07-09 10:59:58'),
-(194,'2025_07_09_124639_remove_deprecated_experiment_id','2025-07-09 10:59:59');
+(194,'2025_07_09_124639_remove_deprecated_experiment_id','2025-07-09 10:59:59'),
+(196,'2025_07_10_183310_make_subject_id_not_null','2025-07-10 16:33:54');
 
