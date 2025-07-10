@@ -18,9 +18,6 @@ from app.model.orm import (
 # will allow stored submissions to be reused and made compatible with the new
 # structure.
 #
-# When the `submission.studyDesign` is modified, we need to use `flag_modified`
-# to tell the ORM to persist the field.
-#
 DEFAULT_STUDY_DESIGN = {
     'project': {'name': None, 'description': None},
     'study':   {'name': None, 'description': None, 'url': None},
@@ -104,7 +101,6 @@ class SubmissionForm:
             'description': data.get('study_description', ''),
             'url':         data.get('study_url', ''),
         }
-        flag_modified(self.submission, 'studyDesign')
 
         # Validate uniqueness:
         self._validate_unique_project_names()
@@ -136,15 +132,12 @@ class SubmissionForm:
         for strain_data in self.submission.studyDesign['custom_strains']:
             strain_data['name'] = strain_data['name'].strip()
 
-        flag_modified(self.submission, 'studyDesign')
-
     def update_study_design(self, data):
         study_design = {**self.submission.studyDesign, **data}
         if 'csrf_token' in study_design:
             del study_design['csrf_token']
 
         self.submission.studyDesign = study_design
-        flag_modified(self.submission, 'studyDesign')
 
     def fetch_taxa(self):
         strains = self.submission.studyDesign['strains']
@@ -180,6 +173,13 @@ class SubmissionForm:
         ).all()
 
     def save(self):
+        # When the `submission.studyDesign` is modified, we need to use
+        # `flag_modified` to tell the ORM to persist the field. We always do
+        # this before saving, because almost all updates to the submission are
+        # updates to the study design.
+        #
+        flag_modified(self.submission, 'studyDesign')
+
         self.db_session.add(self.submission)
         self.db_session.commit()
 

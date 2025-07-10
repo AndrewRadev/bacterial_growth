@@ -6,7 +6,6 @@ from db import get_session, get_transaction
 
 import pandas as pd
 import sqlalchemy as sql
-from sqlalchemy.orm.attributes import flag_modified
 
 from app.model.orm import (
     Bioreplicate,
@@ -60,7 +59,6 @@ def persist_submission_to_database(submission_form):
         for experiment in study.experiments:
             _create_average_measurements(db_trans_session, study, experiment)
 
-        flag_modified(submission_form.submission, 'studyDesign')
         submission_form.save()
         submission_form.save_backup(study_id=study.publicId, project_id=project.publicId)
 
