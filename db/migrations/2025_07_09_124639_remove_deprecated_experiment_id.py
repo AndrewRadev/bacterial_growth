@@ -35,6 +35,10 @@ def up(conn):
 
 
 def down(conn):
+    """
+    This migration removes `deprecatedExperimentId` columns that we no longer need
+    """
+
     # Restore id column
     query = """
         ALTER TABLE Experiments

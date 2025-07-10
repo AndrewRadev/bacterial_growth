@@ -2,13 +2,22 @@ import sqlalchemy as sql
 
 
 def up(conn):
+    """
+    This migration ensures that the three relationships of Experiments are all
+    connected to their parent Experiment by its `publicId` and not by its
+    auto-incrementing `id`. This is done for consistency with studies and
+    projects.
+    """
+
     for table in ['Bioreplicates', 'Perturbations', 'ExperimentCompartments']:
+        # Deprecate the existing column
         query = f"""
             ALTER TABLE {table}
             CHANGE experimentId deprecatedExperimentId INT DEFAULT NULL
         """
         conn.execute(sql.text(query))
 
+        # Create the new column and a foreign key to Experiments
         query = f"""
             ALTER TABLE {table}
             ADD COLUMN experimentId VARCHAR(100) COLLATE utf8mb4_bin DEFAULT NULL,
@@ -19,6 +28,8 @@ def up(conn):
         """
         conn.execute(sql.text(query))
 
+        # Find the experiments by the value in the deprecated column, get their
+        # corresponding publicId, and set it in the new column.
         query = f"SELECT DISTINCT deprecatedExperimentId from {table}"
         for (deprecated_experiment_id,) in conn.execute(sql.text(query)).all():
             experiment_public_id = conn.execute(
@@ -35,6 +46,7 @@ def up(conn):
                 'public_id': experiment_public_id,
             })
 
+        # After filling all the values, ensure that `experimentId` is not nullable
         query = f"""
             ALTER TABLE {table}
             MODIFY experimentId VARCHAR(100) COLLATE utf8mb4_bin NOT NULL
