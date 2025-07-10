@@ -5,7 +5,6 @@ from datetime import datetime, timedelta, UTC
 
 from freezegun import freeze_time
 import sqlalchemy as sql
-from sqlalchemy.orm.attributes import flag_modified
 
 from app.model.orm import (
     Community,
@@ -248,7 +247,6 @@ class TestSubmissionProcess(DatabaseTest):
         compartments = _save_compartments(self.db_session, submission_form, study)
 
         experiments = _save_experiments(self.db_session, submission_form, study)
-        flag_modified(submission_form.submission, 'studyDesign')
         submission_form.save()
 
         self.db_session.commit()
@@ -325,7 +323,6 @@ class TestSubmissionProcess(DatabaseTest):
         _save_communities(self.db_session, submission_form, study, user_uuid='user1')
         _save_compartments(self.db_session, submission_form, study)
         experiments = _save_experiments(self.db_session, submission_form, study)
-        flag_modified(submission_form.submission, 'studyDesign')
         submission_form.save()
         self.db_session.commit()
 
@@ -353,7 +350,6 @@ class TestSubmissionProcess(DatabaseTest):
         _save_communities(self.db_session, submission_form, study, user_uuid='user1')
         _save_compartments(self.db_session, submission_form, study)
         experiments = _save_experiments(self.db_session, submission_form, study)
-        flag_modified(submission_form.submission, 'studyDesign')
         submission_form.save()
         self.db_session.commit()
 
