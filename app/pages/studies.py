@@ -133,6 +133,7 @@ def study_download_models_csv(publicId):
         download_name=f"{publicId}_models.csv",
     )
 
+
 def study_reset_action(publicId):
     study = _fetch_study(publicId, check_user_visibility=False)
     if study.ownerUuid != g.current_user.uuid:
@@ -233,7 +234,6 @@ def study_modeling_submit_action(publicId):
 def study_modeling_check_json(publicId):
     study = _fetch_study(publicId)
 
-    modeling_requests = [r for r in study.modelingRequests]
     result_states = {}
 
     for modeling_request in study.modelingRequests:

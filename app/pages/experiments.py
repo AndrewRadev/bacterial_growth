@@ -1,4 +1,3 @@
-import sqlalchemy as sql
 from flask import (
     g,
     render_template,

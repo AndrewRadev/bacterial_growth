@@ -1,7 +1,6 @@
 import tests.init  # noqa: F401
 
 from bs4 import BeautifulSoup
-from flask import session
 
 from main import create_app
 from tests.database_test import DatabaseTest

@@ -42,7 +42,6 @@ def up(conn):
         conn.execute(sql.text(query))
 
 
-
 def down(conn):
     for table in ['Bioreplicates', 'Perturbations', 'ExperimentCompartments']:
         query = f"""
