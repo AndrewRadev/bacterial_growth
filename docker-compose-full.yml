@@ -1,0 +1,31 @@
+services:
+  mgrowthdb_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ./bin/prod-server
+    ports:
+      - 8081:8081
+    volumes:
+      - ./var:/home/var:rw
+    depends_on:
+      - mgrowthdb_mysql
+  mgrowthdb_mysql:
+    image: mysql:8.4
+    restart: always
+    container_name: mgrowthdb_mysql
+    ports:
+      - 3306
+    environment:
+      MYSQL_DATABASE:      'BacterialGrowth'
+      MYSQL_USER:          'bacterial_growth'
+      MYSQL_PASSWORD:      'nVI8imBD3bl24pcP'
+      MYSQL_ROOT_PASSWORD: 'nVI8imBD3bl24pcP'
+    volumes:
+      - ./var/mysql/:/var/lib/mysql/:rw
+  mgrowthdb_redis:
+    image: redis:7.4-alpine
+    restart: always
+    container_name: mgrowthdb_redis
+    ports:
+      - "6380:6379"

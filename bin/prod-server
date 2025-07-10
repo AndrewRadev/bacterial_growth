@@ -3,6 +3,7 @@
 set -e
 
 export APP_ENV=production
+export PYTHONPATH=.
 
 pip install -r requirements.txt
 bin/migrations-run

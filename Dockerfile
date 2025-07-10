@@ -17,13 +17,16 @@ FROM python:3.12
 # Install a text editor
 # RUN apt-get install -y vim
 
-# Set paths to mount
-WORKDIR /mnt/
-RUN chmod 777 /mnt/ &&\
-    chmod g+s /mnt/
-
 # Copy microbetag utils
 WORKDIR /home
+
+# Expose mount directory for data
+RUN mkdir ./var
+
+COPY requirements.txt ./requirements.txt
+RUN pip install -r requirements.txt
+
+COPY db/config.toml.dockerfile db/config.toml
 
 COPY app/ ./app/
 COPY bin/ ./bin/
@@ -35,16 +38,4 @@ COPY tests/ ./tests/
 
 COPY main.py ./main.py
 COPY pyproject.toml ./pyproject.toml
-COPY requirements.txt ./requirements.txt
 COPY .env ./.env
-
-# Expose mount directory for data
-RUN mkdir ./var
-VOLUME ./var
-
-RUN pip install -r requirements.txt
-
-# Set ports
-EXPOSE 8081
-
-CMD ["./bin/server"]
