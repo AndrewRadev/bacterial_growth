@@ -177,6 +177,8 @@ class TestMeasurement(DatabaseTest):
             b1,c1,5400,300,600,300.234,30.23,600.456,
         """)
 
+        # Needed so that calling `study.<relationship>` makes a fresh query to
+        # fetch the new data:
         self.db_session.refresh(study)
 
         measurements = Measurement.insert_from_csv_string(
