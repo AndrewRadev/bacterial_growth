@@ -2,6 +2,15 @@ import sqlalchemy as sql
 
 
 def up(conn):
+    """
+    This migration changes MeasurementTechniques to point to studies by
+    `publicId` and not by the private `uuid`. Originally, the intent was to
+    have the private ID be the primary key, but in practice, it's fairly
+    inconvenient, because we fetch studies by public ID in pages. Let's just
+    commit to consistently using `publicId` as the primary key.
+    """
+
+    # Allow the `studyUniqueId` field to be null and add a new `studyId` column
     query = """
         ALTER TABLE MeasurementTechniques
         CHANGE studyUniqueId studyUniqueId varchar(100) COLLATE utf8mb4_bin DEFAULT NULL,
@@ -13,6 +22,8 @@ def up(conn):
     """
     conn.execute(sql.text(query))
 
+    # Loop over studies and set the new `studyId` of MeasurementContexts to the
+    # public ID of the corresponding Study.
     query = "SELECT uuid, publicId FROM Studies"
     for (study_uuid, study_id) in conn.execute(sql.text(query)).all():
         query = """
