@@ -1,11 +1,8 @@
 import os
 import sys
 import csv
-import re
 from pathlib import Path
 
-import pandas as pd
-from datetime import date
 from long_task_printer import print_with_time
 
 from app.model.lib.util import download_file, untar

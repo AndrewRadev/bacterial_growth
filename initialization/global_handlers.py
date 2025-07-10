@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 from flask import (
-    current_app,
     g,
     redirect,
     render_template,
@@ -11,7 +10,6 @@ from flask import (
 )
 import sqlalchemy as sql
 import sqlalchemy.exc as sql_exceptions
-from flask_sqlalchemy.record_queries import get_recorded_queries
 
 from db import get_connection, FLASK_DB
 from app.model.orm import User

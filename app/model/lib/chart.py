@@ -124,7 +124,7 @@ class Chart:
                 exponentformat="power",
             ),
             xaxis=dict(
-                title=dict(text=f"Time (h)"),
+                title=dict(text='Time (h)'),
             )
         )
 

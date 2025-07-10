@@ -1,6 +1,5 @@
 import csv
 from pathlib import Path
-from decimal import Decimal
 
 from db import get_session
 from app.model.orm import Metabolite
