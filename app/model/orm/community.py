@@ -6,7 +6,6 @@ from sqlalchemy.orm import (
     relationship,
     Mapped,
 )
-from sqlalchemy.types import JSON
 
 from app.model.orm.orm_base import OrmBase
 

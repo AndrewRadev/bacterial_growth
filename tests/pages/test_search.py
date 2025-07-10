@@ -68,6 +68,5 @@ class TestSearch(PageTest):
         self.assertIn("RI, BT and BH in chemostat: Controls", response_text)
 
 
-
 if __name__ == '__main__':
     unittest.main()

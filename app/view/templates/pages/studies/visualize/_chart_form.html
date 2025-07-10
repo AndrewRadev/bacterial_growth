@@ -4,7 +4,7 @@
       <span>Experiment:</span>
       <select name="experimentId" class="form-input-blue full">
         {% for experiment in study.experiments: %}
-          <option value="{{ experiment.id }}">
+          <option value="{{ experiment.publicId }}">
             {{- experiment.name }}: {{ experiment.description -}}
           </option>
         {% endfor %}
@@ -15,7 +15,7 @@
   {% for experiment in study.experiments: %}
     <div
         class="experiment-container hidden js-experiment-container"
-        data-experiment-id="{{ experiment.id }}">
+        data-experiment-id="{{ experiment.publicId }}">
       <p>{{ experiment.description }}</p>
     </div>
   {% endfor %}
@@ -36,10 +36,10 @@
   {% for experiment in study.experiments: %}
     <div
         class="experiment-container margin-top-10 hidden js-experiment-container"
-        data-experiment-id="{{ experiment.id }}">
+        data-experiment-id="{{ experiment.publicId }}">
       <div class="experiment">
         {% for technique in study.measurementTechniques: %}
-          {% for (bioreplicate, compartment), contexts in technique.get_grouped_contexts() if bioreplicate.experimentId == experiment.id: %}
+          {% for (bioreplicate, compartment), contexts in technique.get_grouped_contexts() if bioreplicate.experimentId == experiment.publicId: %}
             {% if technique.subjectType != 'bioreplicate': %}
               <div
                   class="form-row hidden js-technique-row"

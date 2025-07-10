@@ -1,12 +1,9 @@
-from typing import List
-
 import sqlalchemy as sql
 from sqlalchemy.orm import (
     mapped_column,
     relationship,
     Mapped,
 )
-from sqlalchemy.types import JSON
 
 from app.model.orm.orm_base import OrmBase
 

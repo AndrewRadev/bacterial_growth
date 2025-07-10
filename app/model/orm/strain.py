@@ -7,7 +7,6 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from app.model.lib.db import execute_text
 from app.model.orm.orm_base import OrmBase
 
 

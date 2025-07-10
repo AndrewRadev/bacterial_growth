@@ -35,7 +35,7 @@ def bootstrap_study(db_session, study_key, user_uuid):
     ).one_or_none()
 
     if existing_project:
-        print(f"> Skipping project {project_name}, already exists ({existing_project.publicId})")
+        print(f"> Skipping project [{existing_project.publicId}] {project_name}, already exists")
         return
 
     data_excel_path = f"scripts/bootstrap/measurement_data/{study_key}.xlsx"

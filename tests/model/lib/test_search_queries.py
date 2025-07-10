@@ -30,7 +30,7 @@ class TestSearch(unittest.TestCase):
         query, values = dynamical_query([
             {'option': 'Microbial Strain', 'value': 'Rhodospirillum'}
         ])
-        self.assertSqlQuery(query, f"""
+        self.assertSqlQuery(query, """
             SELECT DISTINCT publicId
             FROM (
                 SELECT studyId as publicId, name, NCBId

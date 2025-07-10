@@ -1,0 +1,383 @@
+{
+  "study": {
+    "url": "https://doi.org/10.7554/eLife.37090.001",
+    "name": "Integrated culturing, modeling and transcriptomics uncovers complex interactions and emergent behavior in a three-species synthetic gut community: Fermentation experiments",
+    "description": "Systematic mono- and pair-wise fermentation experiments between Roseburia intestinalis L1-82, Faecalibacterium prausnitzii A2-165 and Blautia hydrogenotrophica S5a33.\r\n\r\nA constant pH of 6.8 was imposed and controlled automatically, using 1.5M solutions of NaOH and H3PO4."
+  },
+  "project": {
+    "name": "Integrated culturing, modeling and transcriptomics uncovers complex interactions and emergent behavior in a three-species synthetic gut community",
+    "description": "We established a synthetic community composed of three representative human gut isolates (Roseburia intestinalis L1-82, Faecalibacterium prausnitzii A2-165 and Blautia hydrogenotrophica S5a33) and explored their interactions under well-controlled conditions in vitro."
+  },
+  "strains": [
+    "536231"
+  ],
+  "timeUnits": "m",
+  "techniques": [
+    {
+      "type": "fc",
+      "units": "Cells/mL",
+      "includeStd": true,
+      "description": "Flow cytometric counts were obtained using an Accuri C6 flow cytometer (BD Biosciences), equipped with a 50 mW solid state laser (488 nm). Green fluorescence was measured in the FL1 channel (530 ± 15 nm) and all data were processed with the Cflow Plus software (Accuri). Gating was performed to distinguish signals from noise. All data were collected as a FL1/SSC density plot with a primary threshold of 10,000 on the FL1 channel. Measurements were performed in triplicate.",
+      "subjectType": "bioreplicate",
+      "metaboliteIds": []
+    },
+    {
+      "type": "od",
+      "units": "",
+      "includeStd": true,
+      "description": "Optical density at 600 nm (OD600) was measured against ultrapure water as blank with a VIS spectrophotometer (Genesys 20; Thermo Scientific, Waltham, MA, USA). Each measurement was performed in triplicate.",
+      "subjectType": "bioreplicate",
+      "metaboliteIds": []
+    },
+    {
+      "type": "qpcr",
+      "units": "Cells/mL",
+      "includeStd": true,
+      "description": "qPCR assays with strain-specific TaqMan primers and probes were performed to quantify the abundance of each strain separately",
+      "subjectType": "strain",
+      "metaboliteIds": []
+    },
+    {
+      "type": "metabolite",
+      "units": "mM",
+      "includeStd": true,
+      "description": "Determined through high-performance liquid chromatography (HPLC) with refractive index detection, using a Waters chromatograph (Waters, Milford, MA, USA) equipped with an ICSep ICE ORH-801 column (Transgenomic North America, Omaha, NE, USA)",
+      "subjectType": "metabolite",
+      "metaboliteIds": [
+        "CHEBI:15366",
+        "CHEBI:16236",
+        "CHEBI:28757",
+        "CHEBI:30751",
+        "CHEBI:30768",
+        "CHEBI:30772",
+        "CHEBI:422"
+      ]
+    }
+  ],
+  "communities": [
+    {
+      "name": "BH",
+      "strainIdentifiers": [
+        "custom|Blautia hydrogenotrophica S5a33"
+      ]
+    },
+    {
+      "name": "FP",
+      "strainIdentifiers": [
+        "custom|Faecalibacterium prausnitzii A2-165"
+      ]
+    },
+    {
+      "name": "RI",
+      "strainIdentifiers": [
+        "existing|536231"
+      ]
+    },
+    {
+      "name": "FP_BH",
+      "strainIdentifiers": [
+        "custom|Faecalibacterium prausnitzii A2-165",
+        "custom|Blautia hydrogenotrophica S5a33"
+      ]
+    },
+    {
+      "name": "RI_BH",
+      "strainIdentifiers": [
+        "existing|536231",
+        "custom|Blautia hydrogenotrophica S5a33"
+      ]
+    },
+    {
+      "name": "RI_FP",
+      "strainIdentifiers": [
+        "existing|536231",
+        "custom|Faecalibacterium prausnitzii A2-165"
+      ]
+    },
+    {
+      "name": "RI_FP_BH",
+      "strainIdentifiers": [
+        "existing|536231",
+        "custom|Faecalibacterium prausnitzii A2-165",
+        "custom|Blautia hydrogenotrophica S5a33"
+      ]
+    }
+  ],
+  "experiments": [
+    {
+      "name": "RI",
+      "description": "RI monoculture",
+      "bioreplicates": [
+        {
+          "name": "RI_8",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_14",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_15",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_16",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "RI",
+      "perturbations": [],
+      "timepointCount": 17,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "FP",
+      "description": "FP monoculture",
+      "bioreplicates": [
+        {
+          "name": "FP_4",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "FP_14",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "FP_15",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "FP",
+      "perturbations": [],
+      "timepointCount": 18,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "BH",
+      "description": "BH monoculture",
+      "bioreplicates": [
+        {
+          "name": "BH_14",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "BH_15",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "BH_16",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "BH",
+      "perturbations": [],
+      "timepointCount": 18,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "RI_FP",
+      "description": "RI and FP co-culture",
+      "bioreplicates": [
+        {
+          "name": "RI_FP_8",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_FP_9",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "BH",
+      "perturbations": [],
+      "timepointCount": 17,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "RI_BH +Ac",
+      "description": "RI and BH co-culture with initial acetate",
+      "bioreplicates": [
+        {
+          "name": "RI_BH_4",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_BH_6",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "RI_BH",
+      "perturbations": [],
+      "timepointCount": 17,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "RI_BH -Ac",
+      "description": "RI and BH co-culture without initial acetate",
+      "bioreplicates": [
+        {
+          "name": "RI_BH_5",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_BH_7",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "BH",
+      "perturbations": [],
+      "timepointCount": 17,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "FP_BH +Ac",
+      "description": "FP and BH co-culture with initial acetate",
+      "bioreplicates": [
+        {
+          "name": "FP_BH_1",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "FP_BH_2",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "FP_BH",
+      "perturbations": [],
+      "timepointCount": 17,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "FP_BH -Ac",
+      "description": "FP and BH co-culture without initial acetate",
+      "bioreplicates": [
+        {
+          "name": "FP_BH_3",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "FP_BH",
+      "perturbations": [],
+      "timepointCount": 17,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    },
+    {
+      "name": "RI_FP_BH",
+      "description": "RI, FP, BH in tri-culture",
+      "bioreplicates": [
+        {
+          "name": "RI_FP_BH_10",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_FP_BH_11",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_FP_BH_12",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_FP_BH_13",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_FP_BH_14",
+          "position": "",
+          "biosampleUrl": ""
+        },
+        {
+          "name": "RI_FP_BH_15",
+          "position": "",
+          "biosampleUrl": ""
+        }
+      ],
+      "communityName": "RI_FP_BH",
+      "perturbations": [],
+      "timepointCount": 17,
+      "cultivationMode": "batch",
+      "compartmentNames": [
+        "C1"
+      ]
+    }
+  ],
+  "compartments": [
+    {
+      "H2": null,
+      "N2": 100.0,
+      "O2": null,
+      "CO2": null,
+      "name": "C1",
+      "volume": 1500.0,
+      "pressure": null,
+      "initialPh": 6.8,
+      "mediumUrl": "https://doi.org/10.1016/j.ijfoodmicro.2016.05.015",
+      "mediumName": "mMCB",
+      "stirringMode": "",
+      "stirringSpeed": 200.0,
+      "inoculumVolume": 75.0,
+      "initialTemperature": 37.0,
+      "inoculumConcentration": null
+    }
+  ],
+  "custom_strains": [
+    {
+      "name": "Faecalibacterium prausnitzii A2-165",
+      "species": "411483",
+      "description": "The strain F. prausnitzii A2-165 was classified into F. duncaniae in Sakamoto et al: https://doi.org/10.1099/ijsem.0.005995",
+      "species_name": "Faecalibacterium duncaniae"
+    },
+    {
+      "name": "Blautia hydrogenotrophica S5a33",
+      "species": "53443",
+      "description": "",
+      "species_name": "Blautia hydrogenotrophica"
+    }
+  ]
+}

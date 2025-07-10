@@ -3,7 +3,6 @@ import tests.init  # noqa: F401
 import unittest
 
 from tests.page_test import PageTest
-from app.model.lib.dev import bootstrap_study
 
 
 class TestPerturbation(PageTest):

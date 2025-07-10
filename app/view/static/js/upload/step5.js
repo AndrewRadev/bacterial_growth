@@ -92,8 +92,13 @@ Page('.upload-page .step-content.step-5.active', function($step5) {
     },
 
     onDuplicate: function($newForm) {
-      // Reset names (including for bioreplicates
+      // Reset names (including for bioreplicates)
       $newForm.find('input[name$="name"]').val('');
+
+      // Remove public IDs and reset published state:
+      $newForm.find('.js-public-id').remove();
+      $newForm.find('.js-is-published').addClass('hidden');
+      $newForm.find('.js-not-published').removeClass('hidden');
     },
   })
 

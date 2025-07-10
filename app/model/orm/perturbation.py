@@ -17,11 +17,13 @@ class Perturbation(OrmBase):
     id:          Mapped[int] = mapped_column(primary_key=True)
     description: Mapped[str] = mapped_column(sql.String)
 
-    studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
-    study: Mapped['Study'] = relationship(back_populates='perturbations')
-
-    experimentId: Mapped[int] = mapped_column(sql.ForeignKey('Experiments.id'), nullable=False)
+    experimentId: Mapped[str] = mapped_column(sql.ForeignKey('Experiments.publicId'), nullable=False)
     experiment: Mapped['Experiment'] = relationship(back_populates='perturbations')
+
+    study: Mapped['Study'] = relationship(
+        secondary='Experiments',
+        viewonly=True,
+    )
 
     startTimeInSeconds: Mapped[int] = mapped_column(sql.Integer, nullable=False)
     endTimeInSeconds:   Mapped[int] = mapped_column(sql.Integer, nullable=False)

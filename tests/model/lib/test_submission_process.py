@@ -9,12 +9,14 @@ import sqlalchemy as sql
 from app.model.orm import (
     Community,
     Compartment,
+    Experiment,
     Project,
-    Study,
     Strain,
+    Study,
 )
 from app.view.forms.submission_form import SubmissionForm
 from app.model.lib.submission_process import (
+    _clear_study,
     _save_project,
     _save_study,
     _save_compartments,
@@ -245,8 +247,9 @@ class TestSubmissionProcess(DatabaseTest):
         compartments = _save_compartments(self.db_session, submission_form, study)
 
         experiments = _save_experiments(self.db_session, submission_form, study)
+        submission_form.save()
 
-        self.db_session.flush()
+        self.db_session.commit()
 
         self.assertEqual(len(experiments), 1)
         self.assertEqual(experiments, study.experiments)
@@ -258,12 +261,129 @@ class TestSubmissionProcess(DatabaseTest):
         self.assertEqual(experiment.compartments, compartments)
 
         self.assertEqual(len(experiment.perturbations), 1)
-        self.assertEqual(experiment.perturbations, study.perturbations)
         self.assertEqual(experiment.perturbations[0].newCommunityId, communities[0].id)
 
         self.assertEqual(len(experiment.bioreplicates), 3)
-        self.assertEqual(len(study.bioreplicates), 3)
-        self.assertEqual({'RI_1', 'RI_2', 'RI_3'}, {b.name for b in study.bioreplicates})
+        self.assertEqual({'RI_1', 'RI_2', 'RI_3'}, {b.name for b in experiment.bioreplicates})
+
+        # Generated experiment public ID is saved in the form:
+        self.assertRegex(submission_form.submission.studyDesign['experiments'][0]['publicId'], r'^EMGDB\d+$')
+
+        # Check that recreating experiments from the same study maintains their public ids:
+        experiment_public_id = experiment.publicId
+
+        # Create a new experiment
+        new_experiment = self.create_experiment()
+        self.assertNotEqual(experiment_public_id, new_experiment.publicId)
+
+        self.db_session.refresh(study)
+
+        # Redo upload and check that the public ids are the same:
+        _clear_study(study)
+
+        # Experiment is not deleted:
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment.publicId))
+
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
+        experiments = _save_experiments(self.db_session, submission_form, study)
+
+        self.assertEqual(submission_form.submission.studyDesign['experiments'][0]['publicId'], experiment_public_id)
+
+    def test_experiment_removal(self):
+        t_ri = self.create_taxon(name='Roseburia intestinalis')
+
+        submission_form = SubmissionForm(submission_id=self.submission.id, db_session=self.db_session)
+        submission_form.update_study_design({
+            'timeUnits': 'h',
+            'compartments': [{'name': 'WC', 'mediumName': 'WC'}],
+            'communities': [{'name': 'RI', 'strainIdentifiers': [f"existing|{t_ri.ncbiId}"]}],
+
+            'experiments': [{
+                'name': 'RI_1',
+                'description': 'RI experiment',
+                'cultivationMode': 'batch',
+                'communityName': 'RI',
+                'compartmentNames': ['WC'],
+                'bioreplicates': [{'name': 'RI_1_1'}],
+                'perturbations': [],
+            }, {
+                'name': 'RI_2',
+                'description': 'RI experiment',
+                'cultivationMode': 'batch',
+                'communityName': 'RI',
+                'compartmentNames': ['WC'],
+                'bioreplicates': [{'name': 'RI_2_1'}],
+                'perturbations': [],
+            }]
+        })
+
+        # Create dependencies
+        study = _save_study(self.db_session, submission_form)
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
+        experiments = _save_experiments(self.db_session, submission_form, study)
+        submission_form.save()
+        self.db_session.commit()
+
+        experiment_public_ids = [e.publicId for e in experiments]
+
+        # Both experiments exist in the database:
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment_public_ids[0]))
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment_public_ids[1]))
+
+        # Remove experiment 2 from list, add a new one:
+        experiment_data = submission_form.submission.studyDesign['experiments']
+        experiment_data.pop()
+        experiment_data.append({
+            'name': 'RI_3',
+            'description': 'RI experiment',
+            'cultivationMode': 'batch',
+            'communityName': 'RI',
+            'compartmentNames': ['WC'],
+            'bioreplicates': [{'name': 'RI_2_1'}],
+            'perturbations': [],
+        })
+
+        # Redo upload
+        _clear_study(study)
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
+        experiments = _save_experiments(self.db_session, submission_form, study)
+        submission_form.save()
+        self.db_session.commit()
+
+        self.assertEqual([e.name for e in experiments], ["RI_1", "RI_3"])
+
+        # First experiment id doesn't change, the second one does:
+        new_experiment_public_ids = [e.publicId for e in experiments]
+
+        self.assertEqual(experiment_public_ids[0], new_experiment_public_ids[0])
+        self.assertNotEqual(experiment_public_ids[1], new_experiment_public_ids[1])
+
+        # The first experiment exists in the database, the second one doesn't
+        self.assertIsNotNone(self.db_session.get(Experiment, experiment_public_ids[0]))
+        self.assertIsNone(self.db_session.get(Experiment, experiment_public_ids[1]))
+
+        # Do not allow inserting a different experiment by id:
+        other_experiment = self.create_experiment()
+        experiment_data = submission_form.submission.studyDesign['experiments']
+        experiment_data.append({
+            'publicId': other_experiment.publicId,
+            'name': other_experiment.name,
+            'description': 'Other experiment that should not be reassigned to this study',
+            'cultivationMode': 'batch',
+            'communityName': 'RI',
+            'compartmentNames': ['WC'],
+            'bioreplicates': [{'name': 'RI_2_1'}],
+            'perturbations': [],
+        })
+        _clear_study(study)
+        _save_communities(self.db_session, submission_form, study, user_uuid='user1')
+        _save_compartments(self.db_session, submission_form, study)
+
+        with self.assertRaises(ValueError):
+            experiments = _save_experiments(self.db_session, submission_form, study)
 
     def test_measurement_technique_creation(self):
         m1 = self.create_metabolite(name='pyruvate')
@@ -303,49 +423,47 @@ class TestSubmissionProcess(DatabaseTest):
         self.assertEqual({m.name for m in study.metabolites}, {'pyruvate', 'butyrate'})
 
     def test_average_measurement_creation(self):
-        study      = self.create_study()
-        experiment = self.create_experiment(name="e1", studyId=study.publicId)
+        experiment = self.create_experiment(name="e1")
+        study = experiment.study
 
-        c1 = self.create_compartment(studyId=study.publicId)
-        self.create_experiment_compartment(compartmentId=c1.id, experimentId=experiment.id)
+        c1 = self.create_compartment()
+        self.create_experiment_compartment(compartmentId=c1.id, experimentId=experiment.publicId)
 
-        mt = self.create_measurement_technique(subjectType='bioreplicate', studyUniqueID=study.uuid)
+        mt = self.create_measurement_technique(subjectType='bioreplicate', studyId=study.publicId)
 
-        b1 = self.create_bioreplicate(name="b1", studyId=study.publicId, experimentId=experiment.id)
+        b1 = self.create_bioreplicate(name="b1", experimentId=experiment.publicId)
         mc1 = self.create_measurement_context(
             subjectId=b1.id,
             subjectType='bioreplicate',
             bioreplicateId=b1.id,
             techniqueId=mt.id,
             compartmentId=c1.id,
-            studyId=study.publicId,
         )
         for i, value in enumerate([10, 20, 30]):
             self.create_measurement(timeInSeconds=i, value=value, contextId=mc1.id)
 
-        b2 = self.create_bioreplicate(name="b2", studyId=study.publicId, experimentId=experiment.id)
+        b2 = self.create_bioreplicate(name="b2", experimentId=experiment.publicId)
         mc2 = self.create_measurement_context(
             subjectId=b2.id,
             subjectType='bioreplicate',
             bioreplicateId=b2.id,
             techniqueId=mt.id,
             compartmentId=c1.id,
-            studyId=study.publicId,
         )
         for i, value in enumerate([20, 40, 60]):
             self.create_measurement(timeInSeconds=i, value=value, contextId=mc2.id)
 
-        self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2"})
+        self.assertEqual({b.name for b in experiment.bioreplicates}, {"b1", "b2"})
         _create_average_measurements(self.db_session, study, experiment)
-        self.db_session.refresh(study)
-        self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2", "Average(e1)"})
+        self.db_session.refresh(experiment)
+        self.assertEqual({b.name for b in experiment.bioreplicates}, {"b1", "b2", "Average(e1)"})
 
-        average_bioreplicate = next(b for b in study.bioreplicates if b.name == "Average(e1)")
+        average_bioreplicate = next(b for b in experiment.bioreplicates if b.name == "Average(e1)")
         self.assertEqual(average_bioreplicate.calculationType, 'average')
         self.assertEqual([int(m.value) for m in average_bioreplicate.measurements], [15, 30, 45])
 
         # Don't create averages if their time points don't match
-        b3 = self.create_bioreplicate(name="b3", studyId=study.publicId, experimentId=experiment.id)
+        b3 = self.create_bioreplicate(name="b3", experimentId=experiment.publicId)
         mc3 = self.create_measurement_context(
             subjectId=b3.id,
             subjectType='bioreplicate',
@@ -361,14 +479,13 @@ class TestSubmissionProcess(DatabaseTest):
         self.db_session.delete(average_bioreplicate)
         self.db_session.flush()
 
-        self.db_session.refresh(study)
         self.db_session.refresh(experiment)
 
         # Average bioreplicate doesn't get created:
-        self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2", "b3"})
+        self.assertEqual({b.name for b in experiment.bioreplicates}, {"b1", "b2", "b3"})
         _create_average_measurements(self.db_session, study, experiment)
-        self.db_session.refresh(study)
-        self.assertEqual({b.name for b in study.bioreplicates}, {"b1", "b2", "b3"})
+        self.db_session.refresh(experiment)
+        self.assertEqual({b.name for b in experiment.bioreplicates}, {"b1", "b2", "b3"})
 
 
 if __name__ == '__main__':

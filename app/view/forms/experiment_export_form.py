@@ -94,7 +94,7 @@ class ExperimentExportForm:
                 value_label = f"{subject.name} ({technique.units})"
                 condition = (
                     MeasurementContext.subjectType == 'metabolite',
-                    MeasurementContext.subjectId == subject.chebiId,
+                    MeasurementContext.subjectId == subject.id,
                 )
 
                 query = self._base_bioreplicate_query(experiment, value_label).where(*condition)
@@ -135,7 +135,7 @@ class ExperimentExportForm:
             .join(Compartment)
             .join(Experiment)
             .where(
-                Experiment.id == experiment.id,
+                Experiment.publicId == experiment.publicId,
                 Bioreplicate.id.in_(self.bioreplicate_uuids),
             )
             .order_by(

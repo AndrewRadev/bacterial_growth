@@ -114,4 +114,3 @@ class RScript:
         LOGGER.error("STDERR:")
         for line in result.stderr.decode('utf-8').split("\n"):
             LOGGER.error(line)
-

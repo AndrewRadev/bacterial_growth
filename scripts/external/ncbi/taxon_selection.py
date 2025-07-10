@@ -25,7 +25,6 @@ def filter_unicellular(metdb_dump):
     selection.add(85705)     # tax id 85705 stands for family Ancyromonadidae
     selection.add(1294546)   # tax id 1294546 stands for family Planomonadidae
 
-
     ### From supergroup Excavata, clade Discoba (Discristates)
     selection.add(33682)     # tax id 2157 stands for phylum Euglenozoa
     selection.add(5752)      # tax id 5752 stands for phylum Heterolobosea (includes Percolomonadidae)
