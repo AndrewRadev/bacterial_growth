@@ -18,7 +18,7 @@ COPY requirements.txt ./requirements.txt
 RUN pip install -r requirements.txt
 
 # Install a text editor
-# RUN apt-get install -y vim
+RUN apt-get install -y vim
 
 COPY db/ ./db/
 COPY db/config.toml.dockerfile db/config.toml
