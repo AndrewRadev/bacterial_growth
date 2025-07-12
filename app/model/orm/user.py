@@ -58,3 +58,6 @@ class User(OrmBase):
     @property
     def orcidUrl(self):
         return orcid.get_user_url(self)
+
+    def __str__(self):
+        return f"<User id={self.id} name={self.name}>"
