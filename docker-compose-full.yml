@@ -14,8 +14,10 @@ services:
       mgrowthdb_redis:
         condition: 'service_started'
     environment:
+      APP_ENV:    'production'
       REDIS_HOST: 'mgrowthdb_redis'
       REDIS_PORT: '6379'
+      DOCKER:     '1'
 
   mgrowthdb_mysql:
     image: mysql:8.4
