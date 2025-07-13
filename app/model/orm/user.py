@@ -27,7 +27,7 @@ class User(OrmBase):
 
     uuid:       Mapped[str] = mapped_column(sql.String(100), nullable=False)
     orcidId:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    orcidToken: Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    orcidToken: Mapped[str] = mapped_column(sql.String(100))
 
     name:    Mapped[str]  = mapped_column(sql.String(255), nullable=False)
     isAdmin: Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)

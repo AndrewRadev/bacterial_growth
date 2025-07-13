@@ -2,8 +2,14 @@
 
 FROM python:3.12
 
-RUN apt-get update && \
-      apt-get install -y r-base-core r-base-dev
+# Packages:
+# - R dependencies
+# - Mysql client (technically mariadb)
+# - Vim for editing in the container
+RUN apt-get update && apt-get install -y \
+      r-base-core r-base-dev \
+      default-mysql-client \
+      vim
 
 RUN Rscript -e 'install.packages("growthrates", repos="https://cloud.r-project.org")' &&\
     Rscript -e 'install.packages("jsonlite", repos="https://cloud.r-project.org")'

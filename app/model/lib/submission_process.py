@@ -43,8 +43,8 @@ def persist_submission_to_database(submission_form):
     with get_transaction() as db_transaction:
         db_trans_session = get_session(db_transaction)
 
-        project = _save_project(db_trans_session, submission_form)
-        study   = _save_study(db_trans_session, submission_form)
+        project = _save_project(db_trans_session, submission_form, user_uuid)
+        study   = _save_study(db_trans_session, submission_form, user_uuid)
 
         _clear_study(study)
 
@@ -161,7 +161,7 @@ def validate_data_file(submission_form, data_file=None):
     return errors
 
 
-def _save_study(db_session, submission_form):
+def _save_study(db_session, submission_form, user_uuid=None):
     submission = submission_form.submission
 
     params = {
@@ -172,6 +172,7 @@ def _save_study(db_session, submission_form):
         'uuid':        submission.studyUniqueID,
         'projectUuid': submission.projectUniqueID,
         'timeUnits':   submission.studyDesign['timeUnits'],
+        'ownerUuid':   user_uuid,
     }
 
     if submission_form.type != 'update_study':
@@ -193,7 +194,7 @@ def _save_study(db_session, submission_form):
     return study
 
 
-def _save_project(db_session, submission_form):
+def _save_project(db_session, submission_form, user_uuid=None):
     submission = submission_form.submission
 
     params = {
@@ -201,6 +202,7 @@ def _save_project(db_session, submission_form):
         'name':        submission.studyDesign['project']['name'].strip(),
         'description': submission.studyDesign['project'].get('description', '').strip(),
         'uuid':        submission.projectUniqueID,
+        'ownerUuid':   user_uuid,
     }
 
     if submission_form.type == 'new_project':
