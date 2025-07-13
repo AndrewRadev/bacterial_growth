@@ -5,7 +5,7 @@ from celery import Celery, Task
 
 def init_celery(app):
     """
-    The redis config defaults to port 6380 of localhost, which is the same one
+    The redis config defaults to port 6379 of localhost, which is the same one
     used in the "services" docker image.
 
     This can be overridden by two environment variables:
@@ -18,7 +18,7 @@ def init_celery(app):
                 return self.run(*args, **kwargs)
 
     redis_host = os.getenv('REDIS_HOST', 'localhost')
-    redis_port = os.getenv('REDIS_PORT', '6380')
+    redis_port = os.getenv('REDIS_PORT', '6379')
 
     redis_url = f"redis://{redis_host}:{redis_port}/0"
 
