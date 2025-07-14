@@ -46,7 +46,7 @@ extensions = [
 # -- Options for autoapi -------------------------------------------------------
 
 # NOTE: This pair works good in the RTD
-autoapi_dirs = ['../app', '../initialization']
+autoapi_dirs = ['../initialization', '../app']
 autoapi_ignore = []
 
 
@@ -120,7 +120,7 @@ html_js_files = [
 html_output_encoding = "utf-8"
 
 # -- Options for PDF output --------------------------------------------------
-latex_logo = "_static/logo.png"
+latex_logo = "_static/logo-free-white.png"
 
 # -- Templating --------------------------------------------------------------
 
