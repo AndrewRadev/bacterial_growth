@@ -9,7 +9,6 @@ from sqlalchemy.orm import (
     relationship,
     validates,
 )
-from sqlalchemy.schema import FetchedValue
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
@@ -54,8 +53,8 @@ class ModelingResult(OrmBase):
     error:    Mapped[str] = mapped_column(sql.String)
     rSummary: Mapped[str] = mapped_column(sql.String)
 
-    createdAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
-    updatedAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
+    createdAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
+    updatedAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     calculatedAt: Mapped[datetime] = mapped_column(UtcDateTime)
 
     @validates('type')

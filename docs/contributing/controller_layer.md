@@ -1,4 +1,4 @@
-# Controller layer: `pages`, `initialization.routes`
+# Controller layer: `app.pages`, `initialization.routes`
 
 When the flask app is started, it needs to have a mapping between the browser URL and some python code that determines how it's handled. This is the job of the controller layer.
 
@@ -56,7 +56,7 @@ An important context that can contain arbitrary state for the duration of the re
 
 ## Response
 
-The response of a handler function is usually `return render_template`, or it could return some other string. There are a few other things a function might do.
+The response of a handler function is usually `return render_template(...)`, or it could return some other string. There are a few other things a function might do.
 
 ### `flash` and `redirect`
 
