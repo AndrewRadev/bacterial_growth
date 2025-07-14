@@ -8,7 +8,6 @@ from sqlalchemy.orm import (
     relationship,
     validates,
 )
-from sqlalchemy.schema import FetchedValue
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
@@ -46,8 +45,8 @@ class ModelingRequest(OrmBase):
     state:   Mapped[str] = mapped_column(sql.String(100), default='pending')
     error:   Mapped[str] = mapped_column(sql.String)
 
-    createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
-    updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
+    createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
+    updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
 
     results: Mapped[List['ModelingResult']] = relationship(
         back_populates='request',

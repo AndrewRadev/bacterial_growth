@@ -5,8 +5,6 @@ from sqlalchemy.orm import (
     Mapped,
     mapped_column,
 )
-from sqlalchemy.types import JSON
-from sqlalchemy.schema import FetchedValue
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
@@ -21,5 +19,5 @@ class SubmissionBackup(OrmBase):
     studyId:     Mapped[int]      = mapped_column(sql.String,  nullable=False)
     userUuid:    Mapped[str]      = mapped_column(sql.String,  nullable=False)
     dataFileId:  Mapped[int]      = mapped_column(sql.Integer, nullable=False)
-    studyDesign: Mapped[JSON]     = mapped_column(JSON,        nullable=False)
-    createdAt:   Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
+    studyDesign: Mapped[sql.JSON] = mapped_column(sql.JSON,    nullable=False)
+    createdAt:   Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
