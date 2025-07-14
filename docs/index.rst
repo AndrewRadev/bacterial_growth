@@ -45,6 +45,6 @@
    :caption: Developer Guide
 
    contributing/intro
-   contributing/model_layer
+   contributing/orm_models
    contributing/controller_layer
    contributing/workers
