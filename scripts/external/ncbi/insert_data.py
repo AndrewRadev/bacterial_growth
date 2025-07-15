@@ -14,11 +14,12 @@ ncbi_taxa_path = base_dir_path / 'data_dump.csv'
 with open(ncbi_taxa_path) as f:
     ncbi_taxa_count = len(f.readlines())
 
-long_task = LongTask(total_count=ncbi_taxa_count)
+long_task = LongTask(total_count=ncbi_taxa_count, max_samples=500)
 
 with get_session() as db_session:
     with open(ncbi_taxa_path) as f:
         reader = csv.DictReader(f)
+        data_to_insert = []
 
         for row in reader:
             ncbi_id = int(row['ncbiId'])
@@ -39,6 +40,16 @@ with get_session() as db_session:
                     db_session.commit()
                 else:
                     print(f"[{progress}] Working on: {(ncbi_id, name)}: Insert")
-                    taxon = Taxon(ncbiId=ncbi_id, name=name)
-                    db_session.add(taxon)
+                    # Accumulate taxa for a batch-insert
+                    data_to_insert.append({'ncbiId': ncbi_id, 'name': name})
+
+                if len(data_to_insert) >= 100:
+                    db_session.execute(sql.insert(Taxon), data_to_insert)
                     db_session.commit()
+                    data_to_insert = []
+
+        # Final insert of any leftovers after the loop:
+        if len(data_to_insert) > 0:
+            db_session.execute(sql.insert(Taxon), data_to_insert)
+            db_session.commit()
+            data_to_insert = []
