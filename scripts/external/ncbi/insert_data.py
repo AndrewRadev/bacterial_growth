@@ -14,7 +14,8 @@ ncbi_taxa_path = base_dir_path / 'data_dump.csv'
 with open(ncbi_taxa_path) as f:
     ncbi_taxa_count = len(f.readlines())
 
-long_task = LongTask(total_count=ncbi_taxa_count, max_samples=500)
+batch_size = 400
+long_task = LongTask(total_count=ncbi_taxa_count, max_samples=batch_size * 5)
 
 with get_session() as db_session:
     with open(ncbi_taxa_path) as f:
@@ -43,7 +44,7 @@ with get_session() as db_session:
                     # Accumulate taxa for a batch-insert
                     data_to_insert.append({'ncbiId': ncbi_id, 'name': name})
 
-                if len(data_to_insert) >= 100:
+                if len(data_to_insert) >= batch_size:
                     db_session.execute(sql.insert(Taxon), data_to_insert)
                     db_session.commit()
                     data_to_insert = []
@@ -52,4 +53,3 @@ with get_session() as db_session:
         if len(data_to_insert) > 0:
             db_session.execute(sql.insert(Taxon), data_to_insert)
             db_session.commit()
-            data_to_insert = []
