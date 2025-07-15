@@ -6,11 +6,12 @@ set -e
 export PYTHONPATH=.
 
 #
-# Create database if it doesn't exist
+# Create database if it doesn't exist. Database name is lowercased to account
+# for Windows case-insensitivity.
 #
-DB_NAME=$(echo "SHOW DATABASES LIKE 'BacterialGrowth'" | bin/dbconsole | tail -1)
+DB_NAME=$(echo "SHOW DATABASES LIKE 'BacterialGrowth'" | bin/dbconsole | tail -1 | tr '[:upper:]' '[:lower:]')
 
-if [ "$DB_NAME" = "BacterialGrowth" ]; then
+if [ "$DB_NAME" = "bacterialgrowth" ]; then
   # Database exists, only run migrations
   bin/migrations-run
 else
