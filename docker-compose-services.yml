@@ -9,7 +9,6 @@ services:
     environment:
       # The credentials are hardcoded, because this database is not expected to
       # be exposed to the outer world:
-      MYSQL_DATABASE:      'BacterialGrowth'
       MYSQL_USER:          'bacterial_growth'
       MYSQL_PASSWORD:      'nVI8imBD3bl24pcP'
       MYSQL_ROOT_PASSWORD: 'nVI8imBD3bl24pcP'
