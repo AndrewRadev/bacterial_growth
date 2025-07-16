@@ -41,6 +41,12 @@ ADMIN_ORCID="1234-1234-1234-1234" ./scripts/init.sh
 
 Note the variable `$ADMIN_ORCID`, which is set to the ORCID identifier of the first admin user to be created. If you omit it, the id will be set to `0000-0000-0000-0000`, and you can change it later by manipulating the database. If you provide your own ORCID identifier, you can log in with that and automatically be granted ownership of the initial studies and admin permissions to your local copy of the site. Note, however, that logging in requires setting up an ORCID app as described above.
 
+When updating the application from git, make sure to run migrations (inside the "app" container) to apply database changes before taking the docker container down and then back up:
+
+```
+bin/migrations-run
+```
+
 ## Local installation for development (on Linux or macOS)
 
 First, you should copy the `.env.example` file to `.env` and fill in the environment variables.
