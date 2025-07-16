@@ -13,9 +13,11 @@ DB_NAME=$(echo "SHOW DATABASES LIKE 'BacterialGrowth'" | bin/dbconsole | tail -1
 
 if [ "$DB_NAME" = "bacterialgrowth" ]; then
   # Database exists, only run migrations
+  echo "> Database BacterialGrowth exists, migrating"
   bin/migrations-run
 else
   # Database does not exist, create it through a root connection:
+  echo "> Creating database"
   query="CREATE DATABASE BacterialGrowth; GRANT ALL ON BacterialGrowth.* TO bacterial_growth;"
 
   if [ -n "$DOCKER" ]; then

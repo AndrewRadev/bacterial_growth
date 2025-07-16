@@ -14,6 +14,7 @@ services:
       mgrowthdb_redis:
         condition: 'service_started'
     environment:
+      PYTHONPATH: '.'
       APP_ENV:    'production'
       REDIS_HOST: 'mgrowthdb_redis'
       REDIS_PORT: '6379'
@@ -26,7 +27,6 @@ services:
     ports:
       - 3306
     environment:
-      MYSQL_DATABASE:      'BacterialGrowth'
       MYSQL_USER:          'bacterial_growth'
       MYSQL_PASSWORD:      'nVI8imBD3bl24pcP'
       MYSQL_ROOT_PASSWORD: 'nVI8imBD3bl24pcP'
