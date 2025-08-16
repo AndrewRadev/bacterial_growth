@@ -1,5 +1,3 @@
-# TODO: work in progress
-
 FROM python:3.12
 
 # Packages:
