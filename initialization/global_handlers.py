@@ -18,6 +18,7 @@ from app.model.lib.errors import LoginRequired
 
 def init_global_handlers(app):
     app.before_request(_make_session_permanent)
+    app.before_request(_set_flags)
     app.before_request(_open_db_connection)
     app.before_request(_fetch_user)
 
@@ -37,6 +38,13 @@ def init_global_handlers(app):
 def _make_session_permanent():
     # By default, expires in 31 days
     session.permanent = True
+
+
+def _set_flags():
+    if request.cookies.get('sidebar-open', 'true') == 'true':
+        g.sidebar_open = True
+    else:
+        g.sidebar_open = False
 
 
 def _open_db_connection():
