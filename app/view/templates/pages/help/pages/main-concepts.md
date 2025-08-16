@@ -18,7 +18,7 @@ An experiment entry is described by:
 
 ## Biological replicate (bioreplicate)
 
-A biological replicate is a distinct biological system that implements the experimental design of a particular experiment. Multiple biological replicates are recommended for each experiment. Once uploaded, a synthetic "average" replicate is created for each experiment for each possible measurement.
+A biological replicate is a distinct biological system that implements the experimental design of a particular experiment. Multiple biological replicates are recommended for each experiment. Once uploaded, a synthetic "average" replicate is created for each experiment for each possible measurement, as long as all of the time points for the replicates align.
 
 The bioreplicate is considered to be a single biological system. All measurements are performed within the context of this replicate.
 
