@@ -1,7 +1,7 @@
 {% if search_results is not none: %}
   {% for result in search_results: %}
     <li>
-      <a href="{{ url_for('help_show_page', name="bacterial-growth-data") }}">
+      <a href="{{ url_for('help_show_page', name=result['name']) }}">
         {{ result['name']|replace('-', ' ')|title }}
       </a>
 
