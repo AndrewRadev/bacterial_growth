@@ -19,7 +19,7 @@ def create_app():
     app = Flask(
         __name__,
         template_folder="app/view/templates",
-        static_folder="app/view/static"
+        static_folder="static"
     )
 
     app = init_config(app)
