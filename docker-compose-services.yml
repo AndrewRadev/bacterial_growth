@@ -19,4 +19,4 @@ services:
     restart: always
     container_name: mgrowthdb_redis
     ports:
-      - 6379
+      - 6379:6379
