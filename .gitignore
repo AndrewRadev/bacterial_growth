@@ -26,6 +26,7 @@ db/config.toml
 # Compiled assets:
 static/build/*
 static/.webassets-cache/*
+static/export/*
 
 # Micromamba environment
 .micromamba/*
