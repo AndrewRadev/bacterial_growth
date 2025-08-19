@@ -267,6 +267,8 @@ def upload_step7_page():
             g.db_session.add(study)
             g.db_session.commit()
 
+            submission_form.submission.export_data(message="Study published")
+
             return redirect(url_for('study_show_page', publicId=study.publicId))
 
     return render_template(
