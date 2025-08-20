@@ -27,7 +27,7 @@ class ExperimentExportForm:
             sql.select(Experiment)
             .join(Bioreplicate)
             .where(Bioreplicate.id.in_(self.bioreplicate_uuids))
-            .group_by(Experiment.id)
+            .group_by(Experiment.publicId)
         ).all()
 
     def get_experiment_data(self):
