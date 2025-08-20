@@ -1,4 +1,3 @@
-import sqlalchemy as sql
 from flask import (
     g,
     render_template,
@@ -15,11 +14,7 @@ def experiment_show_page(publicId):
 
 
 def _fetch_experiment(publicId):
-    experiment = g.db_session.scalars(
-        sql.select(Experiment)
-        .where(Experiment.publicId == publicId)
-        .limit(1)
-    ).one()
+    experiment = g.db_session.get(Experiment, publicId)
 
     if not experiment.study.visible_to_user(g.current_user):
         raise Forbidden()

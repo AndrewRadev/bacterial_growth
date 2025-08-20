@@ -23,19 +23,19 @@ DROP TABLE IF EXISTS Bioreplicates;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE Bioreplicates (
-  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   id int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  experimentId int NOT NULL,
   biosampleUrl text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   position varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   isControl tinyint(1) NOT NULL DEFAULT '0',
   isBlank tinyint(1) NOT NULL DEFAULT '0',
   calculationType varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  experimentId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (id),
   UNIQUE KEY studyId (studyId,`name`),
-  KEY fk_1 (experimentId),
-  CONSTRAINT BioReplicatesPerExperiment_fk_1 FOREIGN KEY (experimentId) REFERENCES Experiments (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  KEY Bioreplicates_experimentId (experimentId),
+  CONSTRAINT Bioreplicates_experimentId FOREIGN KEY (experimentId) REFERENCES Experiments (publicId) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT BioReplicatesPerExperiment_fk_2 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -133,16 +133,16 @@ DROP TABLE IF EXISTS ExperimentCompartments;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE ExperimentCompartments (
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  experimentId int NOT NULL,
   compartmentId int NOT NULL,
   id bigint unsigned NOT NULL AUTO_INCREMENT,
+  experimentId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (id),
   KEY fk_2 (compartmentId),
   KEY fk_4 (studyId),
-  KEY CompartmentsPerExperiment_fk_1 (experimentId),
-  CONSTRAINT CompartmentsPerExperiment_fk_1 FOREIGN KEY (experimentId) REFERENCES Experiments (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  KEY ExperimentCompartments_experimentId (experimentId),
   CONSTRAINT CompartmentsPerExperiment_fk_2 FOREIGN KEY (compartmentId) REFERENCES Compartments (id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT CompartmentsPerExperiment_fk_4 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT CompartmentsPerExperiment_fk_4 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ExperimentCompartments_experimentId FOREIGN KEY (experimentId) REFERENCES Experiments (publicId) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -155,13 +155,12 @@ DROP TABLE IF EXISTS Experiments;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE Experiments (
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  id int NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   cultivationMode varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   communityId int DEFAULT NULL,
-  publicId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  PRIMARY KEY (id),
+  publicId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  PRIMARY KEY (publicId),
   UNIQUE KEY Experiments_publicId (publicId),
   KEY fk_1 (studyId),
   KEY Experiment_fk_1 (communityId),
@@ -183,9 +182,10 @@ CREATE TABLE MeasurementContexts (
   bioreplicateId int NOT NULL,
   compartmentId int NOT NULL,
   techniqueId int DEFAULT NULL,
-  subjectId varchar(100) NOT NULL,
+  deprecatedSubjectId varchar(100) DEFAULT NULL,
   subjectType varchar(100) NOT NULL,
   calculationType varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  subjectId int NOT NULL,
   PRIMARY KEY (id),
   KEY MeasurementContexts_fk_1 (bioreplicateId),
   KEY MeasurementContexts_fk_2 (compartmentId),
@@ -212,13 +212,16 @@ CREATE TABLE MeasurementTechniques (
   units varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` text,
   includeStd tinyint(1) NOT NULL DEFAULT '0',
-  studyUniqueId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  studyUniqueId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   metaboliteIds json DEFAULT (json_array()),
   strainIds json DEFAULT (json_array()),
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (id),
   KEY MeasurementTechniques_studyUniqueId (studyUniqueId),
+  KEY MeasurementTechniques_studyId (studyId),
+  CONSTRAINT MeasurementTechniques_studyId FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT MeasurementTechniques_studyUniqueId FOREIGN KEY (studyUniqueId) REFERENCES Studies (uuid) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -333,7 +336,6 @@ DROP TABLE IF EXISTS Perturbations;
 CREATE TABLE Perturbations (
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   id int NOT NULL AUTO_INCREMENT,
-  experimentId int NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   removedCompartmentId int DEFAULT NULL,
   addedCompartmentId int DEFAULT NULL,
@@ -341,11 +343,12 @@ CREATE TABLE Perturbations (
   newCommunityId int DEFAULT NULL,
   startTimeInSeconds int NOT NULL,
   endTimeInSeconds int DEFAULT NULL,
+  experimentId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (id),
-  KEY fk_1 (experimentId),
   KEY fk_2 (studyId),
-  CONSTRAINT Perturbation_fk_1 FOREIGN KEY (experimentId) REFERENCES Experiments (id) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT Perturbation_fk_2 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY Perturbations_experimentId (experimentId),
+  CONSTRAINT Perturbation_fk_2 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT Perturbations_experimentId FOREIGN KEY (experimentId) REFERENCES Experiments (publicId) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -620,5 +623,11 @@ INSERT INTO MigrationVersions VALUES
 (160,'2025_06_22_161710_create_submission_backups','2025-06-22 14:21:36'),
 (162,'2025_06_29_142448_add_fields_to_taxa','2025-06-29 12:31:43'),
 (168,'2025_07_02_114751_readd_end_time_to_perturbations','2025-07-02 10:01:49'),
-(177,'2025_07_02_174630_create_community_strains','2025-07-02 16:15:00');
+(177,'2025_07_02_174630_create_community_strains','2025-07-02 16:15:00'),
+(184,'2025_07_05_121137_fix_metabolite_subject_ids','2025-07-05 10:37:51'),
+(188,'2025_07_05_150703_nullify_study_ids','2025-07-05 13:15:55'),
+(192,'2025_07_05_153044_fix_measurement_technique_study_ids','2025-07-05 14:03:28'),
+(193,'2025_07_09_121550_use_experiment_public_id_as_key','2025-07-09 10:59:58'),
+(194,'2025_07_09_124639_remove_deprecated_experiment_id','2025-07-09 10:59:59'),
+(196,'2025_07_10_183310_make_subject_id_not_null','2025-07-10 16:33:54');
 

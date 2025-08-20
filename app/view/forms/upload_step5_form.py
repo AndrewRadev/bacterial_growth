@@ -2,6 +2,7 @@ from wtforms import (
     BooleanField,
     FieldList,
     FormField,
+    HiddenField,
     IntegerField,
     SelectField,
     SelectMultipleField,
@@ -46,6 +47,7 @@ class UploadStep5Form(BaseForm):
             oldCommunityName       = SelectField('oldCommunityName',       choices=[], validate_choice=False)
             newCommunityName       = SelectField('newCommunityName',       choices=[], validate_choice=False)
 
+        publicId       = HiddenField('publicId')
         name           = StringField('name', validators=[DataRequired()])
         description    = TextAreaField('description', validators=[DataRequired()])
         timepointCount = IntegerField('timepointCount', validators=[DataRequired()])

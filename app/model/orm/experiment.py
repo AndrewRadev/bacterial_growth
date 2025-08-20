@@ -14,9 +14,8 @@ from app.model.orm.orm_base import OrmBase
 class Experiment(OrmBase):
     __tablename__ = "Experiments"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    publicId: Mapped[str] = mapped_column(sql.String(100), primary_key=True)
 
-    publicId:    Mapped[str] = mapped_column(sql.String(100))
     name:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
     description: Mapped[str] = mapped_column(sql.String)
 
@@ -34,7 +33,10 @@ class Experiment(OrmBase):
 
     cultivationMode: Mapped[str] = mapped_column(sql.String(50))
 
-    experimentCompartments: Mapped[List['ExperimentCompartment']] = relationship(back_populates='experiment')
+    experimentCompartments: Mapped[List['ExperimentCompartment']] = relationship(
+        back_populates='experiment',
+        cascade='all, delete-orphan'
+    )
     compartments: Mapped[List['Compartment']] = relationship(
         secondary='ExperimentCompartments',
         viewonly=True,

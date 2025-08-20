@@ -30,7 +30,7 @@ class Study(OrmBase):
     owner: Mapped['User'] = relationship(back_populates='ownedStudies')
 
     publicId:    Mapped[str] = mapped_column(sql.String(100))
-    name:        Mapped[str] = mapped_column(sql.String(100))
+    name:        Mapped[str] = mapped_column(sql.String(255))
     description: Mapped[str] = mapped_column(sql.String, nullable=True)
     url:         Mapped[str] = mapped_column(sql.String, nullable=True)
     timeUnits:   Mapped[str] = mapped_column(sql.String(100))
@@ -51,12 +51,14 @@ class Study(OrmBase):
     communities:  Mapped[List['Community']]   = owner_relationship()
     compartments: Mapped[List['Compartment']] = owner_relationship()
 
-    measurementTechniques:  Mapped[List['MeasurementTechnique']]  = owner_relationship()
-    measurementContexts:    Mapped[List['MeasurementContext']]    = owner_relationship()
-    modelingRequests:       Mapped[List['ModelingRequest']]       = owner_relationship()
-    experimentCompartments: Mapped[List['ExperimentCompartment']] = owner_relationship()
-    bioreplicates:          Mapped[List['Bioreplicate']]          = owner_relationship()
-    perturbations:          Mapped[List['Perturbation']]          = owner_relationship()
+    measurementTechniques:  Mapped[List['MeasurementTechnique']] = owner_relationship()
+    measurementContexts:    Mapped[List['MeasurementContext']]   = owner_relationship()
+    modelingRequests:       Mapped[List['ModelingRequest']]      = owner_relationship()
+
+    bioreplicates: Mapped[List['Bioreplicate']] = relationship(
+        secondary='Experiments',
+        viewonly=True,
+    )
 
     measurements: Mapped[List['Measurement']] = relationship(
         order_by='Measurement.timeInSeconds',

@@ -1,5 +1,3 @@
-import simplejson as json
-
 from db import get_config_uri, FLASK_DB, APP_SQLALCHEMY_ENGINE_OPTIONS
 
 

@@ -68,7 +68,7 @@
         <div class="experiments full">
           {% for experiment in study.experiments: %}
             <div class="experiment-container">
-              <h2 id="experiment-{{ experiment.id }}">
+              <h2 id="experiment-{{ experiment.publicId }}">
                 Experiment {{ loop.index }}: {{ experiment.name }}
               </h2>
 
