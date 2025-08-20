@@ -1,6 +1,6 @@
 # μGrowthDB
 
-[μGrowthDB](https://mgrowthdb.gbiomed.kuleuven.be) is the first crowd-sourced database for microbial growth data. It supports a range of measurement techniques: Colony Forming Units (CFU), Flow Cytometry, Optical Density, 16S sequencing. It also supports storage of accompanying metabolic data.
+[μGrowthDB](https://mgrowthdb.gbiomed.kuleuven.be) is the first crowd-sourced database for microbial growth data. It supports a range of measurement techniques: Colony Forming Units (CFU), Flow Cytometry, Optical Density, 16S sequencing, qPCR. It also supports storage of accompanying metabolic data.
 
 In this repo, you can find the code of the resource, known issues and discussions, while you are more than welcome to share your thoughts on the resource and of course [contribute](./CONTRIBUTING.md).
 
@@ -15,7 +15,41 @@ To upload your own data, you need to authenticate by using [ORCID](https://orcid
 
 - Upload process: <https://mgrowthdb.gbiomed.kuleuven.be/help/upload-process/>
 
-## Local installation
+## Local installation using docker
+
+If you'd like to get the app running to use in a local environment, a docker container can be a working cross-platform choice. The provided Dockerfile is meant for launching the app in production mode and not for development purposes.
+
+First, copy the `.env.example` file to an `.env` file and fill in the environment variables. Ideally, you should set a random string for session encryption. If you want to be able to log in, you'll need to follow [the ORCID documentation](https://info.orcid.org/documentation/integration-guide/) to create an ORCID app and fill in its information. If you skip that part, you'll only have read access to the data.
+
+To start the application, you can run the following docker-compose command in the root of the application:
+
+```
+docker compose -f docker-compose-full.yml up --build
+```
+
+The file `docker-compose-full.yml` starts a complete app with a mysql server and a redis server. You can "detach" it by adding `-d` to the command-line, or you can keep it running in a terminal or in a systemd service to see the app's logs. To bootstrap the data the application needs, you can run bash inside the running compartment with `docker compose exec`:
+
+```
+docker compose -f docker-compose-full.yml exec -it mgrowthdb_app bash
+```
+
+While inside the container, you can run the script `./scripts/init.sh` that will create the initial structure, download ontology data from ChEBI and [JensenLab](https://jensenlab.org/), and create a few initial studies:
+
+```
+ADMIN_ORCID="1234-1234-1234-1234" ./scripts/init.sh
+```
+
+Note the variable `$ADMIN_ORCID`, which is set to the ORCID identifier of the first admin user to be created. If you omit it, the id will be set to `0000-0000-0000-0000`, and you can change it later by manipulating the database. If you provide your own ORCID identifier, you can log in with that and automatically be granted ownership of the initial studies and admin permissions to your local copy of the site. Note, however, that logging in requires setting up an ORCID app as described above.
+
+When updating the application from git, make sure to run migrations (inside the "app" container) to apply database changes before taking the docker container down and then back up:
+
+```
+bin/migrations-run
+```
+
+## Local installation for development (on Linux or macOS)
+
+First, you should copy the `.env.example` file to `.env` and fill in the environment variables.
 
 To set up a working python environment, it's recommended to use [micromamba](https://mamba.readthedocs.io/en/latest/installation/micromamba-installation.html) with the given environment file:
 
@@ -38,7 +72,13 @@ Rscript -e 'install.packages(c("growthrates", "jsonlite"), repos="https://cloud.
 
 In the root of the repository, there is an `.env.example` file that contains environment variables the app needs. You can copy that to `.env` and fill them in with your own values.
 
-In the database config directory, the file [`db/config.toml.example`](db/config.toml.example) contains a template for the database configuration. Copy this file to `db/config.toml` and update it with the correct credentials to access a running mysql database. On linux, you may have to add a `unix_socket = ` field as well.
+In the database config directory, the file [`db/config.toml.example`](db/config.toml.example) contains a template for the database configuration. Copy this file to `db/config.toml` and update it with the correct credentials to access a running mysql database. You can launch one by using the provided "services" dockerfile:
+
+```
+docker-compose -f docker-compose-services.yml up --build -d
+```
+
+In case you decide to use this, take a look at the file to see the mysql usernames, passwords, etc, for your configuration.
 
 You can manually interact with the configured database using:
 
@@ -79,6 +119,8 @@ To launch a background job worker that processes growth modeling requests, run (
 ```
 bin/worker
 ```
+
+The worker uses redis to coordinate with the app. A redis server is included in the "services" docker-compose config file that should "just work", but you can launch your own and start the server with `REDIS_HOST` and `REDIS_PORT` set to whatever you need.
 
 ## Code structure
 

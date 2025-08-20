@@ -7,8 +7,6 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
-from sqlalchemy.types import JSON
-from sqlalchemy.schema import FetchedValue
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
@@ -34,7 +32,7 @@ class Submission(OrmBase):
     userUniqueID: Mapped[str] = mapped_column(sql.ForeignKey('Users.uuid'), nullable=False)
     user: Mapped['User'] = relationship(back_populates='submissions')
 
-    studyDesign: Mapped[JSON] = mapped_column(JSON, nullable=False)
+    studyDesign: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
     dataFileId: Mapped[int] = mapped_column(sql.ForeignKey('ExcelFiles.id'), nullable=True)
     dataFile: Mapped[Optional['ExcelFile']] = relationship(
@@ -43,8 +41,8 @@ class Submission(OrmBase):
         single_parent=True,
     )
 
-    createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
-    updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=FetchedValue())
+    createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
+    updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
 
     @property
     def completed_step_count(self):

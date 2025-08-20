@@ -3,8 +3,9 @@
 set -e
 
 export APP_ENV=production
+export PYTHONPATH=.
 
-pip install -r requirements.txt
-bin/migrations-run
+gunicorn --log-level DEBUG -w 4 --bind "0.0.0.0:8081" "main:create_app()" &
+celery -A scripts.run_celery worker --loglevel INFO &
 
-gunicorn --log-level DEBUG -w 4 --bind "0.0.0.0:8081" "main:create_app()"
+wait

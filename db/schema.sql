@@ -545,7 +545,7 @@ CREATE TABLE Users (
   id int NOT NULL AUTO_INCREMENT,
   uuid varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   orcidId varchar(100) NOT NULL,
-  orcidToken varchar(100) NOT NULL,
+  orcidToken varchar(100) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   isAdmin tinyint(1) NOT NULL DEFAULT '0',
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -629,5 +629,6 @@ INSERT INTO MigrationVersions VALUES
 (192,'2025_07_05_153044_fix_measurement_technique_study_ids','2025-07-05 14:03:28'),
 (193,'2025_07_09_121550_use_experiment_public_id_as_key','2025-07-09 10:59:58'),
 (194,'2025_07_09_124639_remove_deprecated_experiment_id','2025-07-09 10:59:59'),
-(196,'2025_07_10_183310_make_subject_id_not_null','2025-07-10 16:33:54');
+(196,'2025_07_10_183310_make_subject_id_not_null','2025-07-10 16:33:54'),
+(198,'2025_07_13_121621_make_orcid_token_nullable','2025-07-13 10:17:32');
 

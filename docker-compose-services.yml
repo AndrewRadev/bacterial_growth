@@ -4,9 +4,11 @@ services:
     restart: always
     container_name: mgrowthdb_mysql
     ports:
+      # Currently, on our production, port 3306 is taken
       - "3307:3306"
     environment:
-      MYSQL_DATABASE:      'BacterialGrowth'
+      # The credentials are hardcoded, because this database is not expected to
+      # be exposed to the outer world:
       MYSQL_USER:          'bacterial_growth'
       MYSQL_PASSWORD:      'nVI8imBD3bl24pcP'
       MYSQL_ROOT_PASSWORD: 'nVI8imBD3bl24pcP'
@@ -17,4 +19,4 @@ services:
     restart: always
     container_name: mgrowthdb_redis
     ports:
-      - "6380:6379"
+      - "6379:6379"
