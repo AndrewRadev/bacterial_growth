@@ -58,6 +58,10 @@ class Submission(OrmBase):
             1 if self.study and self.study.isPublished else 0,
         ])
 
+    @property
+    def is_finished(self):
+        return self.completed_step_count == 7
+
     def build_techniques(self):
         from app.model.orm import MeasurementTechnique
         return [MeasurementTechnique(**m) for m in self.studyDesign['techniques']]
