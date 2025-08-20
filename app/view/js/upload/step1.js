@@ -1,9 +1,6 @@
 Page('.upload-page .step-content.step-1.active', function($step1) {
   let $form = $step1.find('form');
 
-  updateProjectFields();
-  updateStudyFields();
-
   $step1.on('change', '.js-project-select', function() { updateProjectFields(); });
   $step1.on('change', '.js-study-select', function() { updateStudyFields(); });
 

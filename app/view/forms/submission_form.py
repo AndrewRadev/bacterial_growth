@@ -54,7 +54,7 @@ class SubmissionForm:
                 projectUniqueID=None,
                 studyUniqueID=None,
                 userUniqueID=user_uuid,
-                studyDesign=DEFAULT_STUDY_DESIGN,
+                studyDesign={**DEFAULT_STUDY_DESIGN},
             )
 
         # Check for an existing project/study and set the submission "type" accordingly:
