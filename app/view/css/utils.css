@@ -259,6 +259,10 @@ form.simple-form {
     cursor: pointer;
   }
 
+  textarea {
+    line-height: 1.5em;
+  }
+
   input.error,
   textarea.error {
     border: 1px solid red;

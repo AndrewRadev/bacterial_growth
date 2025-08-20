@@ -1,6 +1,8 @@
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, UTC
+from pathlib import Path
 
+import simplejson as json
 import sqlalchemy as sql
 from sqlalchemy.orm import (
     Mapped,
@@ -56,6 +58,39 @@ class Submission(OrmBase):
             1 if self.study and self.study.isPublished else 0,
         ])
 
+    @property
+    def is_finished(self):
+        return self.completed_step_count == 7
+
     def build_techniques(self):
         from app.model.orm import MeasurementTechnique
         return [MeasurementTechnique(**m) for m in self.studyDesign['techniques']]
+
+    def export_data(self, message, timestamp=None):
+        assert(self.study is not None)
+        assert(self.study.isPublished)
+
+        if timestamp is None:
+            timestamp = datetime.now(UTC)
+
+        base_dir = Path(f"static/export/{self.study.publicId}")
+        base_dir.mkdir(parents=True, exist_ok=True)
+
+        # Clean up previous files:
+        for file in base_dir.glob('*.csv'):
+            file.unlink()
+        for file in base_dir.glob('*.json'):
+            file.unlink()
+
+        # Export study design:
+        with open(base_dir / 'study_design.json', 'w') as f:
+            json.dump(self.studyDesign, f, use_decimal=True, indent=2)
+
+        # Export data files:
+        for name, df in self.dataFile.extract_sheets().items():
+            file_name = '_'.join(name.lower().split()) + '.csv'
+            df.to_csv(base_dir / file_name, index=False)
+
+        # Record a changelog entry
+        with open(base_dir / 'changes.log', 'a') as f:
+            print(f"[{timestamp.isoformat()}] {message}", file=f)

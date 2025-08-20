@@ -37,7 +37,7 @@ lower <- c(y0    = 1e-9,
            h0    = 1e-9)
 
 # Fitting methods:
-# “Marq”, “Port”, “Newton”, “Nelder-Mead”, “BFGS”, “CG”, “L-BFGS-B”, “SANN”, “Pseudo”, “bobyqa”
+# "Marq", "Port", "Newton", "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Pseudo", "bobyqa"
 
 model_fit <- fit_growthmodel(FUN       = grow_baranyi,
                              method    = 'CG',

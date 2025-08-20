@@ -64,6 +64,9 @@ def persist_submission_to_database(submission_form):
 
         db_trans_session.commit()
 
+        if study.isPublished:
+            submission_form.submission.export_data(message="Study update")
+
         return []
 
 

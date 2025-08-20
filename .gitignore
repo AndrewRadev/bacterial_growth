@@ -24,8 +24,9 @@ var/mysql/*
 db/config.toml
 
 # Compiled assets:
-app/view/static/build/*
-app/view/static/.webassets-cache/*
+static/build/*
+static/.webassets-cache/*
+static/export/*
 
 # Micromamba environment
 .micromamba/*

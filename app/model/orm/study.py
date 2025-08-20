@@ -79,7 +79,7 @@ class Study(OrmBase):
 
     @hybrid_property
     def isPublished(self):
-        return self.publishedAt
+        return self.publishedAt != None
 
     @hybrid_property
     def isPublishable(self):

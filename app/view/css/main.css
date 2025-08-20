@@ -43,25 +43,34 @@ a.external::after {
 
 #page-sidebar {
   position: fixed;
-  width: var(--sidebar-width);
   transition: width var(--transition-length);
   overflow-x: hidden;
   background-color: var(--sidebar-color);
   height: 100%;
   padding-top: 20px;
 
+  width: 0;
+  &.open { width: var(--sidebar-width); }
+
   nav {
     margin: 0 auto;
+  }
+
+  a {
+    white-space: nowrap;
   }
 }
 
 #main {
-  margin-left: var(--sidebar-width);
   transition: margin-left var(--transition-length);
   padding-top: 20px;
+
+  &.with-open-sidebar {
+    margin-left: var(--sidebar-width);
+  }
 }
 
-.open-sidebar {
+.open-sidebar-trigger {
   position: fixed;
   top: 20px;
   left: 0px;
@@ -69,7 +78,11 @@ a.external::after {
   border-radius: 0 10px 10px 0;
 
   /* Expanded to 40px when sidebar is closed: */
+  height: 36px;
   width: 0px;
+  &.active {
+    width: 40px;
+  }
 
   transition: width var(--transition-length);
   font-size: 24px;
@@ -88,7 +101,7 @@ a.external::after {
   }
 }
 
-.close-sidebar {
+.close-sidebar-trigger {
   position: absolute;
   border-radius: 10px 0 0 10px;
   font-size: 24px;

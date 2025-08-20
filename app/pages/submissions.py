@@ -5,6 +5,7 @@ from flask import (
     url_for,
 )
 import sqlalchemy as sql
+from werkzeug.exceptions import Forbidden
 
 from app.model.orm import Submission
 
@@ -23,6 +24,14 @@ def edit_submission_action(id):
 
 
 def delete_submission_action(id):
+    if not g.current_user:
+        raise Forbidden
+
+    submission = g.db_session.get(Submission, id)
+
+    if submission.userUniqueID != g.current_user.uuid:
+        raise Forbidden
+
     if 'submission_id' in session and session['submission_id'] == id:
         del session['submission_id']
 

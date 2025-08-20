@@ -1,5 +1,6 @@
 $(document).ready(function() {
   let currentPath = window.location.pathname;
+  let transitionLengthMs = parseInt($(':root').css('--transition-length'), 10);
 
   $('.nav-links a').each(function() {
     let $link = $(this);
@@ -13,26 +14,30 @@ $(document).ready(function() {
     }
   });
 
-  $('#page-sidebar .close-sidebar a').on('click', function(e) {
+  // Closing the sidebar
+  $('#page-sidebar .close-sidebar-trigger a').on('click', function(e) {
     e.preventDefault();
 
-    $(':root').css('--sidebar-width', '0px');
-    $('#main .open-sidebar').css('width', '50px');
+    $('#page-sidebar').removeClass('open').addClass('closed');
+    $('#main .open-sidebar-trigger').addClass('active');
+    $('#main').removeClass('with-open-sidebar');
 
-    let transitionLengthMs = parseInt($(':root').css('--transition-length'), 10);
     setTimeout(function() {
+      Cookies.set('sidebar-open', false);
       $(document).trigger('x-sidebar-resize')
     }, transitionLengthMs + 1);
   });
 
-  $('#main .open-sidebar a').on('click', function(e) {
+  // Opening the sidebar:
+  $('#main .open-sidebar-trigger a').on('click', function(e) {
     e.preventDefault();
 
-    $(':root').css('--sidebar-width', '250px');
-    $('#main .open-sidebar').css('width', '0px');
+    $('#page-sidebar').removeClass('closed').addClass('open');
+    $('#main .open-sidebar-trigger').removeClass('active');
+    $('#main').addClass('with-open-sidebar');
 
-    let transitionLengthMs = parseInt($(':root').css('--transition-length'), 10);
     setTimeout(function() {
+      Cookies.set('sidebar-open', true);
       $(document).trigger('x-sidebar-resize')
     }, transitionLengthMs + 1);
   });

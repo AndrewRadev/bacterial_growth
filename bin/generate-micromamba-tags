@@ -4,4 +4,4 @@ ctags \
   --languages=Python \
   --kinds-Python=-Y \
   -o micromamba.tags \
-  -R .micromamba/envs/bacterial_growth/lib/*/site-packages
+  -R .micromamba/envs/mgrowthdb/lib/*/site-packages

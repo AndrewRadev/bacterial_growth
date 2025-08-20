@@ -19,8 +19,8 @@
   </head>
 
   <body>
-    <aside id="page-sidebar">
-      <div class="close-sidebar">
+    <aside id="page-sidebar" class="{{ 'open' if g.sidebar_open }}">
+      <div class="close-sidebar-trigger">
         <a href="#">
           <img alt="Close sidebar" src="{{ url_for('static', filename='images/icons/chevrons-left.svg') }}" />
         </a>
@@ -107,8 +107,8 @@
       </nav>
     </aside>
 
-    <main id="main">
-      <div class="open-sidebar">
+    <main id="main" class="{{ 'with-open-sidebar' if g.sidebar_open }}">
+      <div class="open-sidebar-trigger {{ 'active' if not g.sidebar_open }}">
         <a href="#">
           <img alt="Open sidebar" src="{{ url_for('static', filename='images/icons/chevrons-right.svg') }}" />
         </a>
