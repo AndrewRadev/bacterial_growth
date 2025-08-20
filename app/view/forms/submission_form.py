@@ -1,3 +1,4 @@
+import copy
 import itertools
 from uuid import uuid4
 
@@ -46,7 +47,7 @@ class SubmissionForm:
 
         if self.submission is not None:
             self.submission.studyDesign = {
-                **DEFAULT_STUDY_DESIGN,
+                **copy.deepcopy(DEFAULT_STUDY_DESIGN),
                 **self.submission.studyDesign,
             }
         else:
@@ -54,7 +55,7 @@ class SubmissionForm:
                 projectUniqueID=None,
                 studyUniqueID=None,
                 userUniqueID=user_uuid,
-                studyDesign={**DEFAULT_STUDY_DESIGN},
+                studyDesign=copy.deepcopy(DEFAULT_STUDY_DESIGN),
             )
 
         # Check for an existing project/study and set the submission "type" accordingly:
