@@ -21,6 +21,7 @@ def init_assets(app):
         '../app/view/js/lib/util.js',
         '../app/view/js/lib/page.js',
         '../app/view/js/lib/tooltips.js',
+        '../app/view/js/lib/compare_buttons.js',
         # Pages:
         '../app/view/js/upload/step1.js',
         '../app/view/js/upload/step2.js',
