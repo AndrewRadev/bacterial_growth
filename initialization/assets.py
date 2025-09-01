@@ -34,6 +34,7 @@ def init_assets(app):
         '../app/view/js/study.js',
         '../app/view/js/study_visualize.js',
         '../app/view/js/study_manage.js',
+        '../app/view/js/experiment.js',
         '../app/view/js/comparison.js',
         '../app/view/js/help.js',
         filters='rjsmin',
