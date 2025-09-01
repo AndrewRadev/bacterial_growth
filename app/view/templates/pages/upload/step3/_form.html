@@ -1,4 +1,4 @@
-{% from 'pages/upload/step3/_bioreplicate_form.html' import render_bioreplicate_form %}
+{% from 'pages/upload/step3/_community_form.html' import render_community_form %}
 {% from 'pages/upload/step3/_strain_form.html' import render_strain_form %}
 {% from 'pages/upload/step3/_metabolite_form.html' import render_metabolite_form %}
 
@@ -64,7 +64,7 @@
     </div>
 
     <template class="bioreplicate-form">
-      {{ render_bioreplicate_form(data=None, index=None) }}
+      {{ render_community_form(data=None, index=None) }}
     </template>
 
     <template class="strain-form">
