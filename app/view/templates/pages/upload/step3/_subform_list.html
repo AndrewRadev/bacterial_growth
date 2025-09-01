@@ -1,5 +1,5 @@
 {% from 'utils/_form_errors.html' import render_form_errors %}
-{% from 'pages/upload/step3/_bioreplicate_form.html' import render_bioreplicate_form %}
+{% from 'pages/upload/step3/_community_form.html' import render_community_form %}
 {% from 'pages/upload/step3/_strain_form.html' import render_strain_form %}
 {% from 'pages/upload/step3/_metabolite_form.html' import render_metabolite_form %}
 
@@ -7,7 +7,7 @@
 
 {% for technique in submission_form.submission['studyDesign']['techniques']: %}
   {% if technique['subjectType'] == 'bioreplicate': %}
-    {{ render_bioreplicate_form(data=technique, index=loop.index0) }}
+    {{ render_community_form(data=technique, index=loop.index0) }}
   {% elif technique['subjectType'] == 'strain': %}
     {{ render_strain_form(data=technique, index=loop.index0) }}
   {% elif technique['subjectType'] == 'metabolite': %}
