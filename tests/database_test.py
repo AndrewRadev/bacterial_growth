@@ -336,7 +336,7 @@ class DatabaseTest(unittest.TestCase):
             object_key_name = key_name
 
         if key_name in params:
-            key_value = params[key_name]
+            key_value = params.pop(key_name)
         else:
             creator_func = getattr(self, f"create_{object_name}")
             dependency_params = {
