@@ -9,9 +9,6 @@ from app.model.orm import (
 )
 from app.model.lib.db import execute_into_df
 
-# TODO (2025-03-08) Tests
-# TODO (2025-03-08) Benchmark, improve performance
-
 
 class ExperimentExportForm:
     def __init__(self, db_session, args):
@@ -28,6 +25,7 @@ class ExperimentExportForm:
             .join(Bioreplicate)
             .where(Bioreplicate.id.in_(self.bioreplicate_uuids))
             .group_by(Experiment.publicId)
+            .order_by(Experiment.publicId)
         ).all()
 
     def get_experiment_data(self):
@@ -76,8 +74,8 @@ class ExperimentExportForm:
 
             # Bioreplicate-level measurements:
             for technique in measurement_targets['bioreplicate']:
-                if technique.units is None:
-                    value_label = technique
+                if technique.units is None or technique.units == '':
+                    value_label = technique.short_name
                 else:
                     value_label = f"{technique.short_name} ({technique.units})"
 
