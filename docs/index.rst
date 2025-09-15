@@ -39,9 +39,8 @@
 
    faqs/faqs
 
-
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 5
    :caption: Developer Guide
 
    contributing/intro
