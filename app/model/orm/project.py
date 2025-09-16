@@ -14,12 +14,12 @@ from app.model.orm.orm_base import OrmBase
 class Project(OrmBase):
     __tablename__ = 'Projects'
 
-    uuid:      Mapped[str] = mapped_column(sql.String(100), primary_key=True)
-    ownerUuid: Mapped[str] = mapped_column(sql.ForeignKey('Users.uuid'))
+    publicId: Mapped[str] = mapped_column(sql.String(100), primary_key=True)
+    uuid:     Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
-    owner: Mapped['User'] = relationship(back_populates='ownedProjects')
+    ownerUuid: Mapped[str]    = mapped_column(sql.ForeignKey('Users.uuid'))
+    owner:     Mapped['User'] = relationship(back_populates='ownedProjects')
 
-    publicId:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
     name:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
     description: Mapped[str] = mapped_column(sql.String,      nullable=False)
 
