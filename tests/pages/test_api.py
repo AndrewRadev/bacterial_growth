@@ -8,6 +8,9 @@ from tests.page_test import PageTest
 class TestApiPages(PageTest):
     def test_project_json(self):
         project = self.create_project(name='Example project')
+        s1 = self.create_study(projectUuid=project.uuid)
+        s2 = self.create_study(projectUuid=project.uuid)
+
         self.db_session.commit()
 
         response = self.client.get(f"/api/v1/project/{project.publicId}.json")
@@ -15,6 +18,7 @@ class TestApiPages(PageTest):
 
         self.assertEqual(response_json['id'], project.publicId)
         self.assertEqual(response_json['name'], 'Example project')
+        self.assertEqual([s['id'] for s in response_json['studies']], [s1.publicId, s2.publicId])
 
         # Nonexisting project:
         response = self.client.get(f"/api/v1/project/nonexisting.json")

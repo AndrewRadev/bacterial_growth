@@ -14,6 +14,13 @@ def project_json(publicId):
     return {
         'id': project.publicId,
         'name': project.name,
+        'studies': [
+            {
+                'id':   s.publicId,
+                'name': s.name,
+            }
+            for s in project.studies
+        ]
     }
 
 def study_json(publicId):
