@@ -1,12 +1,11 @@
 from flask import g
+from werkzeug.exceptions import NotFound
 
 from app.model.orm import (
     Project,
     Study,
     Experiment,
 )
-
-# TODO (2025-09-16) Test non-public study/experiment
 
 
 def project_json(publicId):
@@ -20,14 +19,28 @@ def project_json(publicId):
 def study_json(publicId):
     study = g.db_session.get_one(Study, publicId)
 
-    return {
-        'id': study.publicId,
+    data = {
+        'id':   study.publicId,
         'name': study.name,
     }
+
+    if study.isPublished:
+        data['experiments'] = [
+            {
+                'id':   e.publicId,
+                'name': e.name,
+            }
+            for e in study.experiments
+        ]
+
+    return data
 
 
 def experiment_json(publicId):
     experiment = g.db_session.get_one(Experiment, publicId)
+
+    if not experiment.study.isPublished:
+        raise NotFound
 
     return {
         'id': experiment.publicId,
