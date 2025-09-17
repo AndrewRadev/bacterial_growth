@@ -45,10 +45,9 @@ extensions = [
 
 # -- Options for autoapi -------------------------------------------------------
 
-# NOTE: This pair works good in the RTD
 autoapi_dirs = ['../initialization', '../app']
 autoapi_ignore = []
-
+autoapi_template_dir = '_templates/autoapi'
 
 # Enable typehints
 autodoc_typehints = "signature"
