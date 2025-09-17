@@ -8,8 +8,7 @@
       :alt: Documentation Status
 
 .. toctree::
-   :numbered: 1
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: About μGrowthDB
 
    about/introduction
@@ -17,7 +16,7 @@
    about/history
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Developer Guides
 
    contributing/intro
