@@ -15,11 +15,16 @@ import app.pages.submissions as submission_pages
 import app.pages.upload as upload_pages
 import app.pages.users as user_pages
 
+import app.pages.api as api_pages
+
 
 APP_ENV = os.getenv('APP_ENV', 'development')
 
 
 def init_routes(app):
+    #
+    # Web routes
+    #
     app.add_url_rule("/",       view_func=static_pages.static_home_page)
     app.add_url_rule("/about/", view_func=static_pages.static_about_page)
 
@@ -113,6 +118,13 @@ def init_routes(app):
     app.add_url_rule("/claim-study/",   view_func=user_pages.user_claim_study_action,   methods=["POST"])
 
     app.add_url_rule("/excel_files/<id>.xlsx", view_func=excel_file_pages.download_excel_file)
+
+    #
+    # API routes
+    #
+    app.add_url_rule("/api/v1/project/<string:publicId>.json",    view_func=api_pages.project_json)
+    app.add_url_rule("/api/v1/study/<string:publicId>.json",      view_func=api_pages.study_json)
+    app.add_url_rule("/api/v1/experiment/<string:publicId>.json", view_func=api_pages.experiment_json)
 
     return app
 

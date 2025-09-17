@@ -1,5 +1,6 @@
 import tests.init  # noqa: F401
 
+import simplejson as json
 from bs4 import BeautifulSoup
 
 from main import create_app
@@ -61,3 +62,6 @@ class PageTest(DatabaseTest):
     def _get_text(self, response):
         soup = BeautifulSoup(response.data, 'html.parser')
         return soup.get_text(' ', strip=True)
+
+    def _get_json(self, response):
+        return json.loads(response.data)
