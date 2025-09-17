@@ -16,34 +16,15 @@
    about/known-issues
    about/history
 
-
 .. toctree::
-   :numbered:
-   :maxdepth: 3
-   :caption: Data Submission
-
-   submission/upload
-
-
-.. toctree::
-   :numbered:
-   :maxdepth: 3
-   :caption: Data Discovery and Retrieval
-
-   retrieval/discover
-
-.. toctree::
-   :numbered:
-   :maxdepth: 3
-   :caption: Tips and hints
-
-   faqs/faqs
-
-.. toctree::
-   :maxdepth: 5
-   :caption: Developer Guide
+   :maxdepth: 2
+   :caption: Developer Guides
 
    contributing/intro
    contributing/orm_models
    contributing/controller_layer
    contributing/workers
+
+.. toctree::
+   :maxdepth: 3
+   :caption: Code Documentation
