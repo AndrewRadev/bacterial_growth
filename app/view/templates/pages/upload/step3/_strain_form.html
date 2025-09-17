@@ -66,6 +66,12 @@
               </option>
             </optgroup>
 
+            <optgroup label="Biomass concentration">
+              <option value="g/L" {{ "selected" if data['units'] == 'g/L' }}>
+                g/L
+              </option>
+            </optgroup>
+
             <optgroup label="Indirect measurements">
               <option value="reads" {{ "selected" if data['units'] == 'reads' }}>
                 Reads
