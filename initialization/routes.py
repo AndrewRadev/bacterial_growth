@@ -16,10 +16,15 @@ import app.pages.upload as upload_pages
 import app.pages.users as user_pages
 
 
-APP_ENV = os.getenv('APP_ENV', 'development')
-
-
 def init_routes(app):
+    """
+    Main entry point of the module.
+
+    Assigns all routes used by the application to handler functions that live
+    in ``app.pages``.
+    """
+    app_env = os.getenv('app_env', 'development')
+
     app.add_url_rule("/",       view_func=static_pages.static_home_page)
     app.add_url_rule("/about/", view_func=static_pages.static_about_page)
 
@@ -106,7 +111,7 @@ def init_routes(app):
     app.add_url_rule("/login/",   view_func=user_pages.user_login_page)
     app.add_url_rule("/logout/",  view_func=user_pages.user_logout_action, methods=["POST"])
 
-    if APP_ENV in ('development', 'test'):
+    if app_env in ('development', 'test'):
         app.add_url_rule("/backdoor/", view_func=user_pages.user_backdoor_page, methods=["GET", "POST"])
 
     app.add_url_rule("/claim-project/", view_func=user_pages.user_claim_project_action, methods=["POST"])
@@ -118,6 +123,14 @@ def init_routes(app):
 
 
 def dump_routes(rules, filename):
+    """
+    A custom function useful for development purposes.
+
+    This dumps all active routes into a JSON file that can be used by a text
+    editor (e.g. Vim) to provide navigation from a URL to the python function
+    that handles it.
+    """
+
     import json
 
     mapping = {}
