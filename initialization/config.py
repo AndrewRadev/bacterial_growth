@@ -5,7 +5,14 @@ from dotenv import load_dotenv
 
 def init_config(app):
     """
-    Configuration reference: <https://flask.palletsprojects.com/en/stable/config/>
+    Main entry point of the module.
+
+    Some configuration comes from the ``.env`` file at the root of the
+    application. The hardcoded config in this file is mostly configuration that
+    will not vary across installations like turning on DEBUG mode in
+    development.
+
+    Full configuration reference: https://flask.palletsprojects.com/en/stable/config/
     """
     app_env   = os.getenv('APP_ENV', 'development')
     log_level = os.getenv('LOG_LEVEL', None)

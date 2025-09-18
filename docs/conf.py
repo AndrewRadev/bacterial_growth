@@ -45,9 +45,18 @@ extensions = [
 
 # -- Options for autoapi -------------------------------------------------------
 
-autoapi_dirs = ['../initialization', '../app']
-autoapi_ignore = []
+autoapi_dirs = ['../initialization', '../app', '../db']
+# autoapi_dirs = ['../initialization']
 autoapi_template_dir = '_templates/autoapi'
+
+autoapi_options =  [
+    'members',
+    'undoc-members',
+    'show-inheritance',
+    'show-module-summary',
+    'special-members',
+    'imported-members',
+]
 
 # Enable typehints
 autodoc_typehints = "signature"
