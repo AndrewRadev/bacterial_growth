@@ -35,7 +35,6 @@ extensions = [
 
     # Local packages.
     "youtube",
-    "trello",
     "variables",
     "tags",
     "links",
