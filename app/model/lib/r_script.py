@@ -13,9 +13,9 @@ class RScript:
     """
     A generic interface to executing an R script.
 
-    It uses the`Rscript` executable found in the PATH. It expects to be given a
-    root directory (likely a temporary one) where it'll look for its input
-    files and produce its outputs.
+    It uses the ``Rscript`` executable found in the PATH. It expects to be
+    given a root directory (likely a temporary one) where it'll look for its
+    input files and produce its outputs.
     """
 
     def __init__(self, root_path):
