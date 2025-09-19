@@ -9,6 +9,7 @@ MEASUREMENT_RATIOS = {
     ('μM',       'pM'):       1_000_000,
     ('nM',       'pM'):       1_000,
 }
+"A conversion table for the ratios between pairs of units"
 
 
 def convert_measurement_units(
