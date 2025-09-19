@@ -9,6 +9,8 @@ from app.model.orm.orm_base import OrmBase
 
 
 class ExperimentCompartment(OrmBase):
+    "Join table between Experiments and Compartments"
+
     __tablename__ = 'ExperimentCompartments'
 
     id: Mapped[int] = mapped_column(sql.Integer, primary_key=True)

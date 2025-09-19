@@ -15,6 +15,15 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Submission(OrmBase):
+    """
+    A temporary container for the data of a ``Study``, uploaded by a particular ``User``.
+
+    The study design is stored in a JSON field, built up over several steps in
+    a frontend form. The study measurements are stored in an uploaded excel
+    file. Both of these are processed to create individual entities that are
+    accessible to the public.
+    """
+
     __tablename__ = 'Submissions'
 
     id: Mapped[int] = mapped_column(primary_key=True)

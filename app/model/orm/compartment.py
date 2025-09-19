@@ -24,6 +24,7 @@ PROPERTY_NAMES = {
     'initialPh':             'initial pH',
     'initialTemperature':    'initial temperature',
 }
+"The human-readable names of the properties of a Compartment"
 
 PROPERTY_UNITS = {
     'volume':                'mL',
@@ -39,9 +40,23 @@ PROPERTY_UNITS = {
     'initialPh':             '',
     'initialTemperature':    '°C',
 }
+"The units that properties of a Compartment are measured in"
 
 
 class Compartment(OrmBase):
+    """
+    The environment of a particular bioreplicate.
+
+    There could be multiple of these within the same bioreplicate that form a
+    single biological system, but can be measured separately.
+
+    One compartment may change to a different compartment due to a
+    ``Perturbation``.
+
+    In the future, this entity may be broken down into a separate "compartment"
+    and "environment".
+    """
+
     __tablename__ = "Compartments"
 
     id:   Mapped[int] = mapped_column(primary_key=True)

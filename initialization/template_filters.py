@@ -7,6 +7,16 @@ from app.view.filters import (
 
 
 def init_template_filters(app):
+    """
+    Main entry point of the module.
+
+    Imports a number of helper functions that live in ``app.view.filters`` and
+    plugs them into Jinja2 as "filters".
+
+    New template filters should be defined there and linked here, to avoid
+    non-trivial (testable) code living in the "initialization" module.
+    """
+
     app.template_filter('join_tag')(lists.join_tag)
     app.template_filter('relative_time')(time.relative_time)
     app.template_filter('map_scientific')(numbers.map_scientific)

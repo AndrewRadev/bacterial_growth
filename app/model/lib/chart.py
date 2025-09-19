@@ -6,13 +6,24 @@ from plotly.subplots import make_subplots
 from app.model.lib.conversion import convert_measurement_units
 
 PLOTLY_TEMPLATE = 'plotly_white'
+"List of templates can be found at plotly.com/python/templates"
 
 CELL_COUNT_UNITS = ('Cells/mL', 'Cells/μL')
+"Units that measure number of cells per volume"
+
 CFU_COUNT_UNITS  = ('CFUs/mL', 'CFUs/μL')
+"Units that measure number of CFUs per volume"
+
 METABOLITE_UNITS = ('mM', 'μM', 'nM', 'pM', 'g/L')
+"Units for metabolites, both molar and mass concentration"
 
 
 class Chart:
+    """
+    An object that encapsulates the common properties of Plotly charts across
+    the site.
+    """
+
     def __init__(
         self,
         time_units,

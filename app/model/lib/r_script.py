@@ -6,15 +6,16 @@ import shutil
 import logging
 from pathlib import Path
 
-LOGGER = logging.getLogger()
+_LOGGER = logging.getLogger()
 
 
 class RScript:
     """
-    This object provides a generic interface to executing an R script using an
-    `Rscript` executable found in the PATH. It expects to be given a root
-    directory (likely a temporary one) where it'll look for its input files and
-    produce its outputs.
+    A generic interface to executing an R script.
+
+    It uses the ``Rscript`` executable found in the PATH. It expects to be
+    given a root directory (likely a temporary one) where it'll look for its
+    input files and produce its outputs.
     """
 
     def __init__(self, root_path):
@@ -38,7 +39,7 @@ class RScript:
             raise ValueError(f"Failed RScript call: {script_path}")
 
         for line in result.stderr.decode('utf-8').split("\n"):
-            LOGGER.warning(line)
+            _LOGGER.warning(line)
 
         return result.stdout.decode('utf-8')
 
@@ -102,15 +103,15 @@ class RScript:
             return None
 
         text = path.read_text()
-        LOGGER.info(f"{filename}: {text}")
+        _LOGGER.info(f"{filename}: {text}")
 
         return json.loads(text, use_decimal=True)
 
     def _log_failure(self, result):
-        LOGGER.error("STDOUT:")
+        _LOGGER.error("STDOUT:")
         for line in result.stdout.decode('utf-8').split("\n"):
-            LOGGER.error(line)
+            _LOGGER.error(line)
 
-        LOGGER.error("STDERR:")
+        _LOGGER.error("STDERR:")
         for line in result.stderr.decode('utf-8').split("\n"):
-            LOGGER.error(line)
+            _LOGGER.error(line)

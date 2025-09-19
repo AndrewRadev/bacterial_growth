@@ -5,12 +5,14 @@ from celery import Celery, Task
 
 def init_celery(app):
     """
-    The redis config defaults to port 6379 of localhost, which is the same one
-    used in the "services" docker image.
+    Main entry point of the module.
 
-    This can be overridden by two environment variables:
-    - REDIS_HOST
-    - REDIS_PORT
+    The redis config defaults to port ``6379`` of ``localhost`` to match the
+    one used in the "services" docker image. This can be overridden by two
+    environment variables:
+
+    * ``REDIS_HOST``
+    * ``REDIS_PORT``
     """
     class AppTask(Task):
         def __call__(self, *args: object, **kwargs: object) -> object:

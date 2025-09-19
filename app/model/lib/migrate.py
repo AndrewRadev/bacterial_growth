@@ -7,14 +7,14 @@ from db import get_connection
 
 def run(file, up, down, direction=None):
     """
-    Run a migration
+    Run a migration.
 
-    Inputs
-    ------
-    file:      The filename of the migration, will be stored in the database after running
-    up:        The function to execute to apply the migration
-    down:      The function that reverts the migration
-    direction: "up" or "down", taken from command-line arguments if not provided, defaults to "up"
+    Inputs:
+
+    * file:      The filename of the migration, will be stored in the database after running
+    * up:        The function to execute to apply the migration
+    * down:      The function that reverts the migration
+    * direction: "up" or "down", taken from command-line arguments if not provided, defaults to "up"
     """
     migration_name = Path(file).stem
     if direction is None:

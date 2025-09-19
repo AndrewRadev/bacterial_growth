@@ -16,6 +16,16 @@ from app.model.lib.util import group_by_unique_name
 
 
 class Measurement(OrmBase):
+    """
+    A single observed measurement at a particular time point.
+
+    A measurement may be an average of multiple technical replicates with a
+    standard deviation. It may also be a "calculated" measurement from an
+    average of multiple biological replicates. This information is encapsulated
+    in a ``MeasurementContext``, while this record mostly contains the time and
+    recorded value.
+    """
+
     __tablename__ = "Measurements"
 
     # A relationship that goes through the parent measurement context:

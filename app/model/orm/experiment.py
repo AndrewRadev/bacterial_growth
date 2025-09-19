@@ -12,6 +12,17 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Experiment(OrmBase):
+    """
+    An entity that describes the design of a particular experiment.
+
+    The specific measurements of an experiment are connected to its biological
+    replicates (``Bioreplicate``), which are the concrete implementations of
+    the experimental design.
+
+    A published study contains experiments with fixed ``publicId`` identifiers
+    starting with the prefix "EMGDB".
+    """
+
     __tablename__ = "Experiments"
 
     publicId: Mapped[str] = mapped_column(sql.String(100), primary_key=True)

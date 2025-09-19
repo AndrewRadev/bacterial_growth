@@ -2,10 +2,18 @@ import flask_assets
 
 
 def init_assets(app):
-    assets = flask_assets.Environment(app)
+    """
+    Main entry point of the module.
 
-    # Note: All paths are relative to the "static/" directory. The compiled CSS
-    # and JS bundles are placed there.
+    Initializes Flask-Assets for the Flask app by collecting JavaScript and CSS
+    files for compilation and bundling.
+
+    The source JS and CSS files are in app/view, so all paths in this function
+    are described relative to the "static/" directory at the root, which holds
+    the compiled CSS and JS bundles.
+    """
+
+    assets = flask_assets.Environment(app)
 
     assets.register('app_js', flask_assets.Bundle(
         # External libraries:

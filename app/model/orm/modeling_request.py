@@ -12,27 +12,34 @@ from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
 
-VALID_TYPES = [
+MODEL_NAMES = {
+    'easy_linear':     '"Easy linear" method',
+    'logistic':        'Logistic model',
+    'baranyi_roberts': 'Baranyi-Roberts model',
+}
+"The human-readable names of the supported models/methods"
+
+_VALID_TYPES = [
     'easy_linear',
     'logistic',
     'baranyi_roberts',
 ]
-
-VALID_STATES = [
+_VALID_STATES = [
     'pending',
     'in_progress',
     'ready',
     'error',
 ]
 
-MODEL_NAMES = {
-    'easy_linear':     '"Easy linear" method',
-    'logistic':        'Logistic model',
-    'baranyi_roberts': 'Baranyi-Roberts model',
-}
-
 
 class ModelingRequest(OrmBase):
+    """
+    A container for a background job that fits a model onto a set of measurements.
+
+    This will likely be renamed or removed in the future, since it doesn't fit
+    well in the modeling process.
+    """
+
     __tablename__ = "ModelingRequests"
 
     id:   Mapped[int] = mapped_column(primary_key=True)
@@ -83,11 +90,11 @@ class ModelingRequest(OrmBase):
 
     @validates('type')
     def _validate_type(self, key, value):
-        return self._validate_inclusion(key, value, VALID_TYPES)
+        return self._validate_inclusion(key, value, _VALID_TYPES)
 
     @validates('state')
     def _validate_state(self, key, value):
-        return self._validate_inclusion(key, value, VALID_STATES)
+        return self._validate_inclusion(key, value, _VALID_STATES)
 
     @property
     def long_name(self):

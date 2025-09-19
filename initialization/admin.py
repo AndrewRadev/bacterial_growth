@@ -49,10 +49,12 @@ from app.model.lib.util import humanize_camelcased_string
 
 
 def json_formatter(_view, data, _name):
+    "Format JSON using ``simplejson`` with ``use_decimal=True``"
     return Markup(f"<pre>{json.dumps(data, indent=2, use_decimal=True)}</pre>")
 
 
 def record_formatter(_view, record, *args):
+    "Format ORM records to make them easier to read"
     if hasattr(record, 'publicId'):
         return record.publicId
     elif hasattr(record, 'name'):
@@ -61,16 +63,15 @@ def record_formatter(_view, record, *args):
         return str(record)
 
 
-FORMATTERS = {
+_FORMATTERS = {
     dict: json_formatter,
     OrmBase: record_formatter,
 }
 
 
 class AppJSONField(fields.TextAreaField):
-    """
-    Copied from Flask-admin to replace `json` with `simplejson` with `use_decimal=True`
-    """
+    "Copied from Flask-admin to replace ``json`` with ``simplejson`` with ``use_decimal=True``"
+
     def _value(self):
         if self.raw_data:
             return self.raw_data[0]
@@ -81,6 +82,8 @@ class AppJSONField(fields.TextAreaField):
             return '{}'
 
     def process_formdata(self, valuelist):
+        "Process data received over the wire from a form."
+
         if valuelist:
             value = valuelist[0]
 
@@ -96,6 +99,8 @@ class AppJSONField(fields.TextAreaField):
 
 
 class AppModelConverter(AdminModelConverter):
+    "Custom converter for JSON and datetime fields"
+
     @converts('JSON')
     def convert_JSON(self, field_args, **extra):
         return AppJSONField(**field_args)
@@ -106,7 +111,11 @@ class AppModelConverter(AdminModelConverter):
 
 
 class AppDateTimeField(form.DateTimeField):
+    "Ensures that timestamps in the database are stored in the UTC timezone"
+
     def process_formdata(self, valuelist):
+        "Process data received over the wire from a form."
+
         if not valuelist:
             return
 
@@ -122,6 +131,8 @@ class AppDateTimeField(form.DateTimeField):
 
 
 class AppAdminIndexView(AdminIndexView):
+    "Blocks the entire admin for non-admin users"
+
     @expose('/')
     def index(self):
         if not g.current_user or not g.current_user.isAdmin:
@@ -130,26 +141,41 @@ class AppAdminIndexView(AdminIndexView):
 
 
 class AppView(ModelView):
+    "Custom view with common functionality for ORM records"
+
     can_export       = True
     can_view_details = True
 
     model_form_converter = AppModelConverter
+    "Custom converter for JSON and datetime"
 
     def prettify_name(self, name):
+        "Overridden to render camelCased strings nicely in various places"
         return humanize_camelcased_string(name).title()
 
-    column_type_formatters        = FORMATTERS
-    column_type_formatters_export = FORMATTERS
-    column_type_formatters_detail = FORMATTERS
+    column_type_formatters = _FORMATTERS
+    "Custom formatters for the list view"
+
+    column_type_formatters_export = _FORMATTERS
+    "Custom formatters for the export view"
+
+    column_type_formatters_detail = _FORMATTERS
+    "Custom formatters for the detail view"
 
     def is_accessible(self):
+        "Only allow admin users to the admin"
         return g.current_user and g.current_user.isAdmin
 
     def inaccessible_callback(self, name, **kwargs):
+        "Raise 404 instead of 403 to hide the presence of the endpoint for bots"
         raise NotFound()
 
 
 def init_admin(app):
+    """
+    Main entry point of the module, initializes Flask-Admin for our Flask app
+    """
+
     configure_mappers()
 
     admin = Admin(

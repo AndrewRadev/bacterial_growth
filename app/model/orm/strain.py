@@ -11,6 +11,8 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Strain(OrmBase):
+    "A microbial strain used in a particular study"
+
     __tablename__ = 'Strains'
 
     id: Mapped[int] = mapped_column(sql.Integer, primary_key=True)

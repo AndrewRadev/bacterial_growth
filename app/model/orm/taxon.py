@@ -10,6 +10,13 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Taxon(OrmBase):
+    """
+    A taxon record imported from NCBI.
+
+    This entity is independent from any particular study and it represents the
+    general information about a specific taxon.
+    """
+
     __tablename__ = 'Taxa'
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -17,6 +17,14 @@ from app.model.lib.errors import LoginRequired
 
 
 def init_global_handlers(app):
+    """
+    Main entry point of the module.
+
+    Assigns a number of request callbacks and error handlers. This includes
+    storing a database connection in ``g.db_session`` and fetching the
+    currently logged-in user in ``g.current_user``.
+    """
+
     app.before_request(_make_session_permanent)
     app.before_request(_set_flags)
     app.before_request(_open_db_connection)

@@ -4,6 +4,8 @@ from sqlalchemy import LargeBinary
 
 
 class OrmBase(DeclarativeBase):
+    "The shared base class of all the ORM models"
+
     @classmethod
     def filter_keys(Self, data: dict):
         return {k: v for k, v in data.items() if hasattr(Self, k)}

@@ -12,6 +12,12 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Project(OrmBase):
+    """
+    A collection of studies.
+
+    It has a fixed ``publicId`` identifier starting with the prefix "PMGDB".
+    """
+
     __tablename__ = 'Projects'
 
     uuid:      Mapped[str] = mapped_column(sql.String(100), primary_key=True)

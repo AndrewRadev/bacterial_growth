@@ -14,6 +14,8 @@ from app.model.orm.orm_base import OrmBase
 
 
 class ExcelFile(OrmBase):
+    "An uploaded excel file with measurement data"
+
     __tablename__ = 'ExcelFiles'
 
     id: Mapped[int] = mapped_column(primary_key=True)
