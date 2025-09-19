@@ -47,11 +47,6 @@ from app.model.orm import (
 )
 from app.model.lib.util import humanize_camelcased_string
 
-_FORMATTERS = {
-    dict: json_formatter,
-    OrmBase: record_formatter,
-}
-
 
 def json_formatter(_view, data, _name):
     "Format JSON using ``simplejson`` with ``use_decimal=True``"
@@ -66,6 +61,12 @@ def record_formatter(_view, record, *args):
         return record.name
     else:
         return str(record)
+
+
+_FORMATTERS = {
+    dict: json_formatter,
+    OrmBase: record_formatter,
+}
 
 
 class AppJSONField(fields.TextAreaField):

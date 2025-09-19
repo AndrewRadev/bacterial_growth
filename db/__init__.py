@@ -17,7 +17,7 @@ APP_SQLALCHEMY_ENGINE_OPTIONS = {
 "Custom configuration for SQLAlchemy"
 
 
-def get_config(env: string=None) -> dict:
+def get_config(env: str=None) -> dict:
     "Returns the config in ``db/config.toml`` for the current environment"
     if env is None:
         env = os.getenv('APP_ENV', 'development')
