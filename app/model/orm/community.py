@@ -11,6 +11,8 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Community(OrmBase):
+    "A collection of strains measured in a particular study"
+
     __tablename__ = "Communities"
 
     id:   Mapped[int] = mapped_column(primary_key=True)

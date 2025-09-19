@@ -12,6 +12,13 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Metabolite(OrmBase):
+    """
+    A metabolite record imported from ChEBI.
+
+    This entity is independent from any particular study and it represents the
+    general information about a metabolite.
+    """
+
     __tablename__ = 'Metabolites'
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -11,6 +11,8 @@ from app.model.orm.orm_base import OrmBase
 
 
 class SubmissionBackup(OrmBase):
+    "A backup recording of a particular past submission"
+
     __tablename__ = 'SubmissionBackups'
 
     id: Mapped[int] = mapped_column(primary_key=True)

@@ -21,6 +21,7 @@ TECHNIQUE_SHORT_NAMES = {
     'qpcr':       'qPCR',
     'metabolite': 'Metabolite',
 }
+"Human-readable short names of techniques"
 
 TECHNIQUE_LONG_NAMES = {
     'ph':         'pH',
@@ -31,9 +32,12 @@ TECHNIQUE_LONG_NAMES = {
     'qpcr':       'qPCR',
     'metabolite': 'Metabolites',
 }
+"Human-readable long names of techniques"
 
 
 class MeasurementTechnique(OrmBase):
+    "The technique used for a particular set of measurements."
+
     __tablename__ = "MeasurementTechniques"
 
     id: Mapped[int] = mapped_column(primary_key=True)

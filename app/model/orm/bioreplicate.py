@@ -11,6 +11,15 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Bioreplicate(OrmBase):
+    """
+    A specific physical implementation of a particular experiment.
+
+    This would usually be a specific vessel or a connected combination of
+    vessels (``Compartment`` records). All bioreplicates of one particular
+    experiment have the same experimental design. All measurements are made
+    within the context of a bioreplicate.
+    """
+
     __tablename__ = 'Bioreplicates'
 
     id:   Mapped[int] = mapped_column(primary_key=True)
