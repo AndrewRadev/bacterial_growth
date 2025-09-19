@@ -14,7 +14,7 @@ from app.model.orm import (
     MeasurementContext,
 )
 
-LOGGER = get_task_logger(__name__)
+_LOGGER = get_task_logger(__name__)
 
 
 @shared_task
@@ -78,7 +78,7 @@ def _process_modeling_request(db_session, modeling_request_id, measurement_conte
                 script_name = f"scripts/modeling/{modeling_request.type}.R"
                 output      = rscript.run(script_name)
 
-                LOGGER.info(output)
+                _LOGGER.info(output)
 
                 fit          = rscript.read_flat_json('fit.json', discard_keys="_row")
                 coefficients = rscript.read_key_value_json(
@@ -112,7 +112,7 @@ def _process_modeling_request(db_session, modeling_request_id, measurement_conte
                 modeling_result.state = 'error'
                 modeling_result.error = 'RScript error'
                 has_error = True
-                LOGGER.error(e)
+                _LOGGER.error(e)
 
     if has_error:
         modeling_request.state = 'error'
