@@ -9,6 +9,8 @@ from app.model.orm.orm_base import OrmBase
 
 
 class CommunityStrain(OrmBase):
+    "Join table between Communities and Strains"
+
     __tablename__ = "CommunityStrains"
 
     id: Mapped[int] = mapped_column(primary_key=True)

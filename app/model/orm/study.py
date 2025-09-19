@@ -15,6 +15,16 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Study(OrmBase):
+    """
+    The main container for a particular scientific study.
+
+    Updates to experiments and measurements can only be done by issuing a
+    ``Submission`` to update a particular study. Access control over the
+    individual experiments is also done at the study level.
+
+    It has a fixed ``publicId`` identifier starting with the prefix "SMGDB".
+    """
+
     __tablename__ = 'Studies'
 
     # A relationship representing ownership of these records. Clearing them out

@@ -12,6 +12,15 @@ from app.model.orm.orm_base import OrmBase
 
 
 class Perturbation(OrmBase):
+    """
+    The description of a change over time in a particular experiment's environment.
+
+    A perturbation is described by the addition or removal of a ``Compartment``
+    to the experiment or by the change from one ``Community`` to another.
+
+    This may be changed in the future as we collect more studies with perturbations.
+    """
+
     __tablename__ = 'Perturbations'
 
     id:          Mapped[int] = mapped_column(primary_key=True)
