@@ -10,13 +10,5 @@ Please see the following links:
     - :link:`Issues on GitHub <https://github.com/msysbio/bacterial_growth/issues>`
     - :link:`Discussions on GitHub <https://github.com/msysbio/bacterial_growth/discussions>`
 
-
-.. Example for hyperlink:
-.. :link:`asdas <https://www.ncbi.nlm.nih.gov/taxonomy/?term=39946>`
-
-
-
-
 .. important::
     If you have data sets that you would like to see integrated into the database, but you find challenges on how to do so, please let us know by starting a discussion.
-
