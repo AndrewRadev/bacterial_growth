@@ -46,9 +46,11 @@ class DatabaseTest(unittest.TestCase):
 
         # Clean up database state before each test:
         tables = execute_text(self.db_session, 'SHOW TABLES').scalars().all()
+        execute_text(self.db_session, 'SET FOREIGN_KEY_CHECKS=0')
         for table in tables:
             if table != 'MigrationVersions':
                 execute_text(self.db_session, f'DELETE FROM {table}')
+        execute_text(self.db_session, 'SET FOREIGN_KEY_CHECKS=1')
         self.db_session.commit()
 
     def tearDown(self):
@@ -134,13 +136,16 @@ class DatabaseTest(unittest.TestCase):
         return self._create_orm_record(ExperimentCompartment, params)
 
     def create_experiment(self, **params):
-        study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+        study_id     = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+        community_id = self._get_or_create_dependency(params, 'communityId', ('community', 'id'))
+
         public_id = Experiment.generate_public_id(self.db_session)
 
         params = {
-            'studyId': study_id,
-            'name':    f"Experiment {public_id}",
-            'publicId': public_id,
+            'studyId':     study_id,
+            'communityId': community_id,
+            'name':        f"Experiment {public_id}",
+            'publicId':    public_id,
             **params,
         }
 

@@ -158,13 +158,13 @@ CREATE TABLE Experiments (
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   cultivationMode varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  communityId int DEFAULT NULL,
+  communityId int NOT NULL,
   publicId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   PRIMARY KEY (publicId),
   UNIQUE KEY Experiments_publicId (publicId),
   KEY fk_1 (studyId),
   KEY Experiment_fk_1 (communityId),
-  CONSTRAINT Experiment_fk_1 FOREIGN KEY (communityId) REFERENCES Communities (id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT Experiments_communityId FOREIGN KEY (communityId) REFERENCES Communities (id) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT Experiments_fk_1 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -630,5 +630,6 @@ INSERT INTO MigrationVersions VALUES
 (193,'2025_07_09_121550_use_experiment_public_id_as_key','2025-07-09 10:59:58'),
 (194,'2025_07_09_124639_remove_deprecated_experiment_id','2025-07-09 10:59:59'),
 (196,'2025_07_10_183310_make_subject_id_not_null','2025-07-10 16:33:54'),
-(198,'2025_07_13_121621_make_orcid_token_nullable','2025-07-13 10:17:32');
+(198,'2025_07_13_121621_make_orcid_token_nullable','2025-07-13 10:17:32'),
+(202,'2025_09_22_175842_make_experiment_community_id_non_null','2025-09-22 16:08:08');
 
