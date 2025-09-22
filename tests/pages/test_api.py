@@ -54,13 +54,31 @@ class TestApiPages(PageTest):
         response = self.client.get(f"/api/v1/study/{study.publicId}.json")
         response_json = self._get_json(response)
 
-        # Study is visible, but no experiments are returned:
+        # Study is visible, but limited data is returned
         self.assertEqual(response_json['id'], study.publicId)
-        self.assertNotIn('experiments', response_json)
+        self.assertEqual(set(response_json.keys()), {'id', 'name', 'projectId'})
 
     def test_published_experiment_json(self):
-        study      = self.create_study(publishedAt=datetime.now(UTC))
-        experiment = self.create_experiment(name='Example experiment', studyId=study.publicId)
+        study        = self.create_study(publishedAt=datetime.now(UTC))
+        experiment   = self.create_experiment(name='Example experiment', studyId=study.publicId)
+        bioreplicate = self.create_bioreplicate(experimentId=experiment.publicId)
+
+        self.create_measurement_context(
+            bioreplicateId=bioreplicate.id,
+            subjectId=bioreplicate.id,
+            subjectType='bioreplicate',
+        )
+        self.create_measurement_context(
+            bioreplicateId=bioreplicate.id,
+            subjectId=self.create_strain(name='Roseburia').id,
+            subjectType='strain',
+        )
+        self.create_measurement_context(
+            bioreplicateId=bioreplicate.id,
+            subjectId=self.create_metabolite(name='glucose').id,
+            subjectType='metabolite',
+        )
+
         self.db_session.commit()
 
         response = self.client.get(f"/api/v1/experiment/{experiment.publicId}.json")
@@ -68,6 +86,9 @@ class TestApiPages(PageTest):
 
         self.assertEqual(response_json['id'], experiment.publicId)
         self.assertEqual(response_json['name'], 'Example experiment')
+
+        self.assertEqual(len(response_json['bioreplicates']), 1)
+        self.assertEqual(len(response_json['bioreplicates'][0]['measurementContexts']), 3)
 
     def test_nonexisting_experiment(self):
         response = self.client.get('/api/v1/experiment/nonexisting.json')
