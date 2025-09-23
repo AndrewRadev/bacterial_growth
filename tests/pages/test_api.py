@@ -59,8 +59,21 @@ class TestApiPages(PageTest):
         self.assertEqual(set(response_json.keys()), {'id', 'name', 'projectId'})
 
     def test_published_experiment_json(self):
-        study        = self.create_study(publishedAt=datetime.now(UTC))
-        experiment   = self.create_experiment(name='Example experiment', studyId=study.publicId)
+        study = self.create_study(publishedAt=datetime.now(UTC))
+
+        # Create community for the experiment:
+        community = self.create_community(studyId=study.publicId)
+        self.create_community_strain(communityId=community.id)
+        self.create_community_strain(communityId=community.id)
+
+        # Create experiment:
+        experiment = self.create_experiment(name='Example experiment', studyId=study.publicId, communityId=community.id)
+
+        # Add compartments:
+        compartment = self.create_compartment(studyId=study.publicId)
+        self.create_experiment_compartment(experimentId=experiment.publicId, compartmentId=compartment.id)
+
+        # Add 1 bioreplicate with 3 measurement contexts:
         bioreplicate = self.create_bioreplicate(experimentId=experiment.publicId)
 
         self.create_measurement_context(
@@ -86,6 +99,8 @@ class TestApiPages(PageTest):
 
         self.assertEqual(response_json['id'], experiment.publicId)
         self.assertEqual(response_json['name'], 'Example experiment')
+
+        self.assertEqual(len(response_json['communityStrains']), 2)
 
         self.assertEqual(len(response_json['bioreplicates']), 1)
         self.assertEqual(len(response_json['bioreplicates'][0]['measurementContexts']), 3)
