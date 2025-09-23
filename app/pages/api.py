@@ -53,20 +53,25 @@ def experiment_json(publicId):
     if not experiment.study.isPublished:
         raise NotFound
 
+    if experiment.community:
+        community_strains = experiment.community.strains
+    else:
+        community_strains = []
+
     return {
-        'id':          experiment.publicId,
-        'name':        experiment.name,
-        'description': experiment.description,
-        'studyId':     experiment.study.publicId,
+        'id':              experiment.publicId,
+        'name':            experiment.name,
+        'description':     experiment.description,
+        'studyId':         experiment.study.publicId,
         'cultivationMode': experiment.cultivationMode,
 
         'communityStrains': [
             {
                 'id':     s.id,
-                'ncbiId': s.ncbiId,
+                'NCBId': s.NCBId,
                 'custom': not s.defined,
                 'name':   s.name,
-            } for s in (experiment.community or [])
+            } for s in community_strains
         ],
 
         'compartments': [
@@ -100,14 +105,29 @@ def experiment_json(publicId):
                         'id':             mc.id,
                         'techniqueType':  mc.technique.type,
                         'techniqueUnits': mc.technique.units,
-                        'subject': {
-                            'type': mc.subjectType,
-                            'id':   mc.subjectId,
-                        },
+                        'subject':        _render_measurement_subject(mc),
                     }
                     for mc in b.measurementContexts
                 ]
             }
             for b in experiment.bioreplicates
         ]
+    }
+
+def _render_measurement_subject(measurement_context):
+    subject = measurement_context.get_subject(g.db_session)
+    subject_type = measurement_context.subjectType
+
+    if subject_type == 'strain':
+        extra_data = {'NCBId': subject.NCBId}
+    elif subject_type == 'metabolite':
+        extra_data = {'chebiId': int(subject.chebiId.removeprefix('CHEBI:'))}
+    else:
+        extra_data = {}
+
+    return {
+        'id':   subject.id,
+        'type': subject_type,
+        'name': subject.name,
+        **extra_data,
     }
