@@ -21,6 +21,7 @@ def project_json(publicId):
         ]
     }
 
+
 def study_json(publicId):
     study = g.db_session.get_one(Study, publicId)
 
@@ -58,14 +59,37 @@ def experiment_json(publicId):
         'description': experiment.description,
         'studyId':     experiment.study.publicId,
         'cultivationMode': experiment.cultivationMode,
-        'community': {
-            'id':   experiment.community.id,
-            'name': experiment.community.name,
-        },
+
+        'communityStrains': [
+            {
+                'id':     s.id,
+                'ncbiId': s.ncbiId,
+                'custom': not s.defined,
+                'name':   s.name,
+            } for s in (experiment.community or [])
+        ],
+
         'compartments': [
-            {'id': c.id, 'name': c.name}
+            {
+                'name':                  c.name,
+                'volume':                c.volume,
+                'pressure':              c.pressure,
+                'stirringSpeed':         c.stirringSpeed,
+                'stirringMode':          c.stirringMode,
+                'O2':                    c.O2,
+                'CO2':                   c.CO2,
+                'H2':                    c.H2,
+                'N2':                    c.N2,
+                'inoculumConcentration': c.inoculumConcentration,
+                'inoculumVolume':        c.inoculumVolume,
+                'initialPh':             c.initialPh,
+                'initialTemperature':    c.initialTemperature,
+                'mediumName':            c.mediumName,
+                'mediumUrl':             c.mediumName,
+            }
             for c in experiment.compartments
         ],
+
         'bioreplicates': [
             {
                 'id':                  b.id,
