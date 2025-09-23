@@ -25,7 +25,7 @@ class Experiment(OrmBase):
         cascade="all, delete-orphan"
     )
 
-    communityId: Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'), nullable=False)
+    communityId: Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'))
     community: Mapped['Community'] = relationship(back_populates='experiments')
 
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
