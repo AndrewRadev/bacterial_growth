@@ -14,6 +14,14 @@ from app.model.lib import orcid
 
 
 class User(OrmBase):
+    """
+    A visitor to the site that is identified by ORCID.
+
+    Every project and study need to be owned by a specific user and may be
+    editable by other users. This ensures a trace for who uploaded a particular
+    study in case moderation or editing is needed.
+    """
+
     __tablename__ = 'Users'
 
     # A relationship representing ownership of these records. Clearing them out

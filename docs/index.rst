@@ -5,26 +5,27 @@
 
    .. image:: https://readthedocs.org/projects/crest/badge/?version=latest
       :target: https://mgrowthdb.readthedocs.io/en/latest/?badge=latest
-      :alt: Documentation Status
+      :alt: Documentation status
 
 .. toctree::
-   :numbered: 1
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: About μGrowthDB
 
    about/introduction
+   about/installation
    about/known-issues
    about/history
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Developer Guides
+   :maxdepth: 1
+   :caption: Developer guides
 
-   contributing/intro
    contributing/orm_models
    contributing/controller_layer
    contributing/workers
 
 .. toctree::
    :maxdepth: 3
-   :caption: Code Documentation
+   :caption: Reference documentation
+
+   api.md

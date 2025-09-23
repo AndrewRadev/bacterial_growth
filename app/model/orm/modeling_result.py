@@ -13,26 +13,34 @@ from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
 
-VALID_TYPES = [
-    'easy_linear',
-    'logistic',
-    'baranyi_roberts',
-]
-
-VALID_STATES = [
-    'pending',
-    'ready',
-    'error',
-]
-
 MODEL_NAMES = {
     'easy_linear':     '"Easy linear" method',
     'logistic':        'Logistic model',
     'baranyi_roberts': 'Baranyi-Roberts model',
 }
+"The human-readable names of the supported models/methods"
+
+_VALID_TYPES = [
+    'easy_linear',
+    'logistic',
+    'baranyi_roberts',
+]
+_VALID_STATES = [
+    'pending',
+    'ready',
+    'error',
+]
 
 
 class ModelingResult(OrmBase):
+    """
+    The results of fitting a model onto a set of measurements.
+
+    The measurements are represented by a ``ModelingContext`` and the results
+    of the calculation are stored in the ``params`` field. The ``state`` of the
+    record describes the status of the job that runs the calculations.
+    """
+
     __tablename__ = "ModelingResults"
 
     id:   Mapped[int] = mapped_column(primary_key=True)
@@ -59,11 +67,11 @@ class ModelingResult(OrmBase):
 
     @validates('type')
     def _validate_type(self, key, value):
-        return self._validate_inclusion(key, value, VALID_TYPES)
+        return self._validate_inclusion(key, value, _VALID_TYPES)
 
     @validates('state')
     def _validate_state(self, key, value):
-        return self._validate_inclusion(key, value, VALID_STATES)
+        return self._validate_inclusion(key, value, _VALID_STATES)
 
     @classmethod
     def empty_params(Self, model_type):

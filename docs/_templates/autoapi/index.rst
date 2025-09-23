@@ -1,5 +1,5 @@
-Full Reference Documentation
-============================
+Code Documentation
+==================
 
 This page contains reference documentation generated from code comments [#f1]_.
 

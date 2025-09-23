@@ -17,9 +17,6 @@
          {% set visible_submodules = obj.submodules|selectattr("display")|list %}
          {% set visible_submodules = (visible_subpackages + visible_submodules)|sort %}
          {% if visible_submodules %}
-Submodules
-----------
-
 .. toctree::
    :maxdepth: 1
 
