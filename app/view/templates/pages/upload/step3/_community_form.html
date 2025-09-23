@@ -66,6 +66,12 @@
               </option>
             </optgroup>
 
+            <optgroup label="Biomass concentration">
+              <option value="g/L" {{ "selected" if data['units'] == 'g/L' }}>
+                g/L
+              </option>
+            </optgroup>
+
             <optgroup label="Unitless/unknown">
               <option value="" {{ "selected" if data['units'] == '' }}>
                 N/A

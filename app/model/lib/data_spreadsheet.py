@@ -5,16 +5,16 @@ from openpyxl.utils import get_column_letter
 
 from app.model.lib.excel import export_to_xlsx
 
-TIME_UNITS = {
+_TIME_UNITS = {
     'h': 'hours',
     'm': 'minutes',
     's': 'seconds',
 }
 
-RED   = 'D02631'
-WHITE = 'FFFFFF'
+_RED   = 'D02631'
+_WHITE = 'FFFFFF'
 
-TECHNIQUE_DESCRIPTIONS = {
+_TECHNIQUE_DESCRIPTIONS = {
     'fc':          "Flow-cytometry values per time-point in {units}, use a period (.) as the decimal separator",
     'fc_ps':       "FC counts values per time-point for strain {strain} in {units}, use a period (.) as the decimal separator",
     'od':          "Optical density values per time-point, use a period (.) as the decimal separator",
@@ -29,10 +29,12 @@ TECHNIQUE_DESCRIPTIONS = {
 
 
 def create_excel(submission, metabolite_names, strain_names):
+    "Create a template data file based on the submission's study design"
+
     workbook = Workbook()
 
     short_time_units = submission.studyDesign['timeUnits']
-    long_time_units = TIME_UNITS[short_time_units]
+    long_time_units = _TIME_UNITS[short_time_units]
 
     headers_common = {
         # 'Position':           'Predetermine position based on the type of vessel specified before.',

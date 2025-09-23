@@ -12,6 +12,14 @@ from app.model.lib.db import execute_into_df
 
 
 class MeasurementContext(OrmBase):
+    """
+    A collection of measurements of a particular subject with a particular technique.
+
+    All connections between measurements and other entities are encapsulated
+    here, so the individual ``Measurement`` objects can be packages of time and
+    value alone.
+    """
+
     __tablename__ = "MeasurementContexts"
 
     id: Mapped[int] = mapped_column(primary_key=True)

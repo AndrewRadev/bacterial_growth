@@ -9,6 +9,8 @@ from app.model.orm.orm_base import OrmBase
 
 
 class StudyMetabolite(OrmBase):
+    "Join table between Studies and Metabolites"
+
     __tablename__ = 'StudyMetabolites'
 
     id: Mapped[int] = mapped_column(sql.Integer, primary_key=True, autoincrement=True)

@@ -9,6 +9,13 @@ from app.model.orm.orm_base import OrmBase
 
 
 class StudyUser(OrmBase):
+    """
+    Join table between Studies and Users.
+
+    The users recorded in this table have the ability to manage a particular
+    study, to update it, or to reuse its components in other uploads.
+    """
+
     __tablename__ = 'StudyUsers'
 
     id: Mapped[int] = mapped_column(sql.Integer, primary_key=True)
