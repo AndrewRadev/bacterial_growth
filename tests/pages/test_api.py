@@ -44,6 +44,7 @@ class TestApiPages(PageTest):
         response = self.client.get('/api/v1/study/nonexisting.json')
         response_json = self._get_json(response)
 
+        self.assertEqual(response.status, '404 NOT FOUND')
         self.assertEqual(response_json['error'], '404 Not found')
 
     def test_non_published_study(self):
@@ -109,6 +110,7 @@ class TestApiPages(PageTest):
         response = self.client.get('/api/v1/experiment/nonexisting.json')
         response_json = self._get_json(response)
 
+        self.assertEqual(response.status, '404 NOT FOUND')
         self.assertEqual(response_json['error'], '404 Not found')
 
     def test_non_published_experiment(self):
@@ -120,3 +122,57 @@ class TestApiPages(PageTest):
         response_json = self._get_json(response)
 
         self.assertEqual(response_json['error'], '404 Not found')
+
+    def test_measurement_csv(self):
+        study        = self.create_study(publishedAt=datetime.now(UTC))
+        experiment   = self.create_experiment(studyId=study.publicId)
+        bioreplicate = self.create_bioreplicate(experimentId=experiment.publicId)
+
+        measurement_context = self.create_measurement_context(
+            studyId=study.publicId,
+            bioreplicateId=bioreplicate.id,
+            subjectId=bioreplicate.id,
+            subjectType='bioreplicate',
+        )
+        for i in range(1, 4):
+            self.create_measurement(
+                contextId=measurement_context.id,
+                timeInSeconds=(i * 3600),
+                value=(i * 10),
+            )
+
+        self.db_session.commit()
+
+        response = self.client.get(f"/api/v1/measurement-context/{measurement_context.id}.csv")
+        self.assertEqual(response.status, '200 OK')
+
+        response_df = self._get_csv(response)
+
+        self.assertEqual(response_df.columns.tolist(), ['time', 'value', 'std'])
+        self.assertEqual(response_df['time'].tolist(), [1, 2, 3])
+        self.assertEqual(response_df['value'].tolist(), [10, 20, 30])
+        self.assertTrue(response_df['std'].isna().all())
+
+    def test_non_published_measurement_csv(self):
+        study        = self.create_study(publishedAt=None)
+        experiment   = self.create_experiment(studyId=study.publicId)
+        bioreplicate = self.create_bioreplicate(experimentId=experiment.publicId)
+
+        measurement_context = self.create_measurement_context(
+            bioreplicateId=bioreplicate.id,
+            subjectId=bioreplicate.id,
+            subjectType='bioreplicate',
+        )
+        self.create_measurement(
+            contextId=measurement_context.id,
+            timeInSeconds=3600,
+            value=10,
+        )
+
+        self.db_session.commit()
+
+        response = self.client.get(f"/api/v1/measurement-context/{measurement_context.id}.csv")
+
+        # No data is returned for an unpublished experiment
+        self.assertEqual(response.status, '404 NOT FOUND')
+        self.assertEqual(response.data, b'')
