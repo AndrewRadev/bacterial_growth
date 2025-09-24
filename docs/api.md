@@ -62,8 +62,8 @@ Output:
   "description": "we used an in vitro batch system containing mucin beads to emulate the dynamic host environment and to study its impact on the interactions between two abundant and prevalent human gut bacteria.",
   "url": "https://doi.org/10.1038/s41396-023-01501-1",
   "timeUnits": "h",
-  "uploadedAt": "2025-07-16T12:32:46+00:00",
-  "publishedAt": "2025-07-16T12:32:48+00:00",
+  "uploadedAt": "2025-06-05T16:52:49+00:00",
+  "publishedAt": "2025-06-05T16:52:53+00:00",
   "experiments": [
     {
       "id": "EMGDB000000019",
@@ -97,7 +97,7 @@ Example output:
   "cultivationMode": "batch",
   "communityStrains": [
     {
-      "id": 6,
+      "id": 60031,
       "NCBId": 818,
       "custom": false,
       "name": "Bacteroides thetaiotaomicron"
@@ -116,7 +116,7 @@ Example output:
       "N2": "80.00",
       "inoculumConcentration": "1960000.000",
       "inoculumVolume": "1.00",
-      "initialPh": "5.00",
+      "initialPh": "6.70",
       "initialTemperature": "37.00",
       "mediumName": "Wilkins-Chalgren Anaerobe Broth (WC)",
       "mediumUrl": "Wilkins-Chalgren Anaerobe Broth (WC)"
@@ -141,26 +141,26 @@ Example output:
   ],
   "bioreplicates": [
     {
-      "id": 26,
+      "id": 60111,
       "name": "Average(BT_MUCIN)",
       "biosampleUrl": null,
       "measurementContexts": [
         {
-          "id": 324,
+          "id": 1431,
           "techniqueType": "od",
           "techniqueUnits": "",
           "subject": {
-            "id": 26,
+            "id": 60111,
             "type": "bioreplicate",
             "name": "Average(BT_MUCIN)"
           }
         },
         {
-          "id": 325,
+          "id": 1432,
           "techniqueType": "ph",
           "techniqueUnits": "",
           "subject": {
-            "id": 26,
+            "id": 60111,
             "type": "bioreplicate",
             "name": "Average(BT_MUCIN)"
           }
