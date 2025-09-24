@@ -5,6 +5,7 @@ from app.model.orm import (
     Project,
     Study,
     Experiment,
+    MeasurementContext,
 )
 
 
@@ -113,6 +114,18 @@ def experiment_json(publicId):
             for b in experiment.bioreplicates
         ]
     }
+
+
+def measurement_context_csv(id):
+    measurement_context = g.db_session.get(MeasurementContext, id)
+
+    if not measurement_context.study.isPublished:
+        raise NotFound
+
+    df = measurement_context.get_df(g.db_session)
+
+    return df.to_csv(index=False)
+
 
 def _render_measurement_subject(measurement_context):
     subject = measurement_context.get_subject(g.db_session)
