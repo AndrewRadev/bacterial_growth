@@ -1,0 +1,32 @@
+name: Documentation
+
+# Controls when the workflow will run
+on:
+  push:
+    branches: ["api-1"]
+
+env:
+  PYTHONPATH: "."
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Install python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+          pip install -r requirements.txt
+
+      - name: Build docs
+        run: |
+          cd docs/
+          make html
