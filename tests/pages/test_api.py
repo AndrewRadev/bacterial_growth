@@ -153,7 +153,43 @@ class TestApiPages(PageTest):
         self.assertEqual(response_df['value'].tolist(), [10, 20, 30])
         self.assertTrue(response_df['std'].isna().all())
 
-    def test_non_published_measurement_csv(self):
+    def test_measurement_json(self):
+        study        = self.create_study(publishedAt=datetime.now(UTC))
+        experiment   = self.create_experiment(studyId=study.publicId)
+        bioreplicate = self.create_bioreplicate(name='B1', experimentId=experiment.publicId)
+
+        measurement_context = self.create_measurement_context(
+            studyId=study.publicId,
+            bioreplicateId=bioreplicate.id,
+            subjectId=bioreplicate.id,
+            subjectType='bioreplicate',
+        )
+        for i in range(1, 4):
+            self.create_measurement(
+                contextId=measurement_context.id,
+                timeInSeconds=(i * 3600),
+                value=(i * 10),
+            )
+
+        # Unrelated measurement, not included in the count
+        self.create_measurement()
+
+        self.db_session.commit()
+
+        response = self.client.get(f"/api/v1/measurement-context/{measurement_context.id}.json")
+        self.assertEqual(response.status, '200 OK')
+
+        response_json = self._get_json(response)
+
+        self.assertEqual(response_json['id'], measurement_context.id)
+        self.assertEqual(response_json['studyId'], study.publicId)
+        self.assertEqual(response_json['experimentId'], experiment.publicId)
+        self.assertEqual(response_json['techniqueType'], 'fc')
+        self.assertEqual(response_json['techniqueUnits'], '')
+        self.assertEqual(response_json['bioreplicateName'], 'B1')
+        self.assertEqual(response_json['measurementCount'], 3)
+
+    def test_non_published_measurement_endpoints(self):
         study        = self.create_study(publishedAt=None)
         experiment   = self.create_experiment(studyId=study.publicId)
         bioreplicate = self.create_bioreplicate(experimentId=experiment.publicId)
@@ -171,8 +207,9 @@ class TestApiPages(PageTest):
 
         self.db_session.commit()
 
-        response = self.client.get(f"/api/v1/measurement-context/{measurement_context.id}.csv")
+        response1 = self.client.get(f"/api/v1/measurement-context/{measurement_context.id}.json")
+        self.assertEqual(response1.status, '404 NOT FOUND')
 
-        # No data is returned for an unpublished experiment
-        self.assertEqual(response.status, '404 NOT FOUND')
-        self.assertEqual(response.data, b'')
+        response2 = self.client.get(f"/api/v1/measurement-context/{measurement_context.id}.csv")
+        self.assertEqual(response2.status, '404 NOT FOUND')
+        self.assertEqual(response2.data, b'')

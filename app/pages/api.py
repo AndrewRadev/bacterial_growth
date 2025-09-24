@@ -1,11 +1,13 @@
 from flask import g
 from werkzeug.exceptions import NotFound
+import sqlalchemy as sql
 
 from app.model.orm import (
     Project,
     Study,
     Experiment,
     MeasurementContext,
+    Measurement,
 )
 
 
@@ -116,9 +118,29 @@ def experiment_json(publicId):
     }
 
 
+def measurement_context_json(id):
+    measurement_context = g.db_session.get(MeasurementContext, id)
+    if not measurement_context.study.isPublished:
+        raise NotFound
+
+    measurement_count = g.db_session.scalars(
+        sql.select(sql.func.count(Measurement.id))
+        .where(Measurement.contextId == measurement_context.id)
+    ).one()
+
+    return {
+        'id':               measurement_context.id,
+        'experimentId':     measurement_context.bioreplicate.experimentId,
+        'studyId':          measurement_context.studyId,
+        'bioreplicateName': measurement_context.bioreplicate.name,
+        'techniqueType':    measurement_context.technique.type,
+        'techniqueUnits':   measurement_context.technique.units,
+        'subject':          _render_measurement_subject(measurement_context),
+        'measurementCount': measurement_count,
+    }
+
 def measurement_context_csv(id):
     measurement_context = g.db_session.get(MeasurementContext, id)
-
     if not measurement_context.study.isPublished:
         raise NotFound
 

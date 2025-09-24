@@ -132,7 +132,8 @@ def init_routes(app):
     app.add_url_rule("/api/v1/study/<string:publicId>.json",      view_func=api_pages.study_json)
     app.add_url_rule("/api/v1/experiment/<string:publicId>.json", view_func=api_pages.experiment_json)
 
-    app.add_url_rule("/api/v1/measurement-context/<int:id>.csv", view_func=api_pages.measurement_context_csv)
+    app.add_url_rule("/api/v1/measurement-context/<int:id>.json", view_func=api_pages.measurement_context_json)
+    app.add_url_rule("/api/v1/measurement-context/<int:id>.csv",  view_func=api_pages.measurement_context_csv)
 
     return app
 

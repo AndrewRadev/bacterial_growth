@@ -221,11 +221,15 @@ class DatabaseTest(unittest.TestCase):
         compartment_id  = self._get_or_create_dependency(params, 'compartmentId', ('compartment', 'id'))
         technique_id    = self._get_or_create_dependency(params, 'id', ('measurement_technique', 'id'))
 
+        subject_id = self._get_or_create_dependency(params, 'subjectId', ('bioreplicate', 'id'))
+
         params = {
             'studyId':        study_id,
             'bioreplicateId': bioreplicate_id,
             'compartmentId':  compartment_id,
             'techniqueId':    technique_id,
+            'subjectType':    'bioreplicate',
+            'subjectId':      subject_id,
             **params,
         }
 
