@@ -28,7 +28,7 @@ There are three major entities with stable public ids: projects, studies, and ex
 
 Example project: [PMGDB000001](https://mgrowthdb.gbiomed.kuleuven.be/project/PMGDB000001).
 
-```
+```bash
 curl -s "$ROOT_URL/api/v1/project/PMGDB000001.json"
 ```
 
@@ -52,7 +52,7 @@ Output:
 
 Example study: [SMGDB00000002](https://mgrowthdb.gbiomed.kuleuven.be/study/SMGDB00000002/).
 
-```
+```bash
 curl -s "$ROOT_URL/api/v1/study/SMGDB00000002.json"
 ```
 
@@ -86,7 +86,7 @@ Output:
 
 Example experiment: [EMGDB000000019](https://mgrowthdb.gbiomed.kuleuven.be/experiment/EMGDB000000019/)
 
-```
+```bash
 curl -s "$ROOT_URL/api/v1/experiment/EMGDB000000019.json"
 ```
 
@@ -181,7 +181,7 @@ Example output:
 
 From one of the above measurement context records, we can find the id of a particular collection of measurements and fetch its metadata as JSON and its specific measurements in CSV format. To fetch the metadata via curl:
 
-```
+```bash
 curl -s "$ROOT_URL/api/v1/measurement-context/1440.json"
 ```
 
@@ -207,7 +207,7 @@ Example output:
 
 This gives us information about the specifics of the measurement context like what its technique is, what units the value is measured in, and the public ids of its containing experiment and study. To fetch the full dataset for this measurement context with "time" measured in hours:
 
-```
+```bash
 curl -s "$ROOT_URL/api/v1/measurement-context/1440.csv"
 ```
 
@@ -232,7 +232,7 @@ time,value,std
 
 If the measurement context does not have standard deviation values, the "std" column will be present, but empty. Example measurement and its data:
 
-```
+```bash
 curl -s "$ROOT_URL/api/v1/measurement-context/1314.json"
 curl -s "$ROOT_URL/api/v1/measurement-context/1314.csv"
 ```
