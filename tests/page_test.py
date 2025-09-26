@@ -1,5 +1,9 @@
 import tests.init  # noqa: F401
 
+from io import BytesIO
+
+import simplejson as json
+import pandas as pd
 from bs4 import BeautifulSoup
 
 from main import create_app
@@ -61,3 +65,9 @@ class PageTest(DatabaseTest):
     def _get_text(self, response):
         soup = BeautifulSoup(response.data, 'html.parser')
         return soup.get_text(' ', strip=True)
+
+    def _get_json(self, response):
+        return json.loads(response.data)
+
+    def _get_csv(self, response):
+        return pd.read_csv(BytesIO(response.data))

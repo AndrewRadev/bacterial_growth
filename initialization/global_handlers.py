@@ -98,16 +98,36 @@ def _close_db_connection(response):
 
 
 def _render_not_found(_error):
-    return render_template('errors/404.html'), 404
+    if _is_json(request):
+        return {'error': '404 Not found'}, 404
+    if _is_csv(request):
+        return '', 404
+    else:
+        return render_template('errors/404.html'), 404
+
 
 
 def _render_forbidden(_error):
-    return render_template('errors/403.html'), 403
+    if _is_json(request):
+        return {'error': '403 Forbidden'}, 403
+    else:
+        return render_template('errors/403.html'), 403
 
 
 def _render_server_error(_error):
-    return render_template('errors/500.html'), 500
+    if _is_json(request):
+        return {'error': '500 Server error'}, 500
+    else:
+        return render_template('errors/500.html'), 500
 
 
 def _redirect_to_login(_error):
     return redirect(url_for('user_login_page'))
+
+
+def _is_json(request):
+    return request.path.endswith('.json')
+
+
+def _is_csv(request):
+    return request.path.endswith('.csv')

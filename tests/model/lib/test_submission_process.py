@@ -43,8 +43,8 @@ class TestSubmissionProcess(DatabaseTest):
         submission_form = SubmissionForm(submission_id=self.submission.id, db_session=self.db_session)
 
         # Creating a new project and study:
-        project = self.db_session.get(Project, self.submission.projectUniqueID)
-        study   = self.db_session.get(Study,   self.submission.studyUniqueID)
+        project = self._get_by_uuid(Project, self.submission.projectUniqueID)
+        study   = self._get_by_uuid(Study, self.submission.studyUniqueID)
         self.assertIsNone(project)
         self.assertIsNone(study)
 
@@ -52,8 +52,8 @@ class TestSubmissionProcess(DatabaseTest):
         _save_study(self.db_session, submission_form)
         self.db_session.commit()
 
-        project = self.db_session.get(Project, self.submission.projectUniqueID)
-        study   = self.db_session.get(Study,   self.submission.studyUniqueID)
+        project = self._get_by_uuid(Project, self.submission.projectUniqueID)
+        study   = self._get_by_uuid(Study, self.submission.studyUniqueID)
         self.assertIsNotNone(project)
         self.assertIsNotNone(study)
         self.assertEqual(project.name, 'Test project')
@@ -89,7 +89,7 @@ class TestSubmissionProcess(DatabaseTest):
             _save_study(self.db_session, submission_form)
             self.db_session.flush()
 
-            study = self.db_session.get(Study, self.submission.studyUniqueID)
+            study = self._get_by_uuid(Study, self.submission.studyUniqueID)
 
             # Initial study state: not published, can't be published
             self.assertFalse(study.isPublishable)
@@ -486,6 +486,12 @@ class TestSubmissionProcess(DatabaseTest):
         _create_average_measurements(self.db_session, study, experiment)
         self.db_session.refresh(experiment)
         self.assertEqual({b.name for b in experiment.bioreplicates}, {"b1", "b2", "b3"})
+
+    def _get_by_uuid(self, model_class, uuid):
+        return self.db_session.scalars(
+            sql.select(model_class)
+            .where(model_class.uuid == uuid),
+        ).one_or_none()
 
 
 if __name__ == '__main__':
