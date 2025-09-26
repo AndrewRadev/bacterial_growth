@@ -93,7 +93,7 @@ def experiment_json(publicId):
                 'initialPh':             c.initialPh,
                 'initialTemperature':    c.initialTemperature,
                 'mediumName':            c.mediumName,
-                'mediumUrl':             c.mediumName,
+                'mediumUrl':             c.mediumUrl,
             }
             for c in experiment.compartments
         ],
