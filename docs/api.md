@@ -123,7 +123,7 @@ Example output:
       "initialPh": "6.70",
       "initialTemperature": "37.00",
       "mediumName": "Wilkins-Chalgren Anaerobe Broth (WC)",
-      "mediumUrl": "Wilkins-Chalgren Anaerobe Broth (WC)"
+      "mediumUrl": "https://mediadive.dsmz.de/medium/339"
     },
     {
       "name": "MUCIN",
@@ -140,7 +140,7 @@ Example output:
       "initialPh": null,
       "initialTemperature": "37.00",
       "mediumName": "Mucin",
-      "mediumUrl": "Mucin"
+      "mediumUrl": null,
     }
   ],
   "bioreplicates": [
