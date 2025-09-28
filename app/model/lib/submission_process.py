@@ -521,6 +521,7 @@ def _create_average_measurement_context(
 
     # Create a parent context for the individual measurements:
     average_context = MeasurementContext(
+        study=study,
         bioreplicate=average_bioreplicate,
         compartment=compartment,
         subjectId=subject_id,
