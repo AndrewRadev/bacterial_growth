@@ -143,7 +143,15 @@ class Chart:
         return fig.to_html(
             full_html=False,
             include_plotlyjs=False,
-            default_width=(f"{self.width}px" if self.width is not None else None)
+            default_width=(f"{self.width}px" if self.width is not None else None),
+            config={
+                'toImageButtonOptions': {
+                    'format': 'svg', # one of png, svg, jpeg, webp
+                    'filename': 'mgrowth_chart',
+                    'height': 500,
+                    'width': 700,
+                },
+            },
         )
 
     def _convert_units(self, data):
