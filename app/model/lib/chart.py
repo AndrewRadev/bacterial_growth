@@ -1,5 +1,6 @@
 import math
 
+import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -176,7 +177,13 @@ class Chart:
                 # STD values were blank, don't draw error bars
                 error_y = None
             else:
-                error_y = go.scatter.ErrorY(array=df['std'])
+                positive_err = df['std']
+                negative_err = np.clip(df['std'], max=df['value'])
+
+                if (positive_err == negative_err).all():
+                    error_y = go.scatter.ErrorY(array=positive_err)
+                else:
+                    error_y = go.scatter.ErrorY(array=positive_err, arrayminus=negative_err)
         else:
             error_y = None
 
