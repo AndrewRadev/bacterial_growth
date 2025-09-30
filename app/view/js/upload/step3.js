@@ -28,7 +28,6 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
         let $typeSelect = $(this);
         updateUnitSelect($subform, $typeSelect);
       });
-      updateUnitSelect($subform, $subform.find('.js-type-select'));
 
       // When the type or unit of measurement change, generate preview:
       $subform.on('change', '.js-type-select,.js-unit-select,.js-include-std', function() {
