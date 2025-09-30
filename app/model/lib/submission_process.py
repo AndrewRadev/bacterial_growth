@@ -175,10 +175,11 @@ def _save_study(db_session, submission_form, user_uuid=None):
         'uuid':        submission.studyUniqueID,
         'projectUuid': submission.projectUniqueID,
         'timeUnits':   submission.studyDesign['timeUnits'],
-        'ownerUuid':   user_uuid,
     }
 
     if submission_form.type != 'update_study':
+        params['ownerUuid'] = user_uuid
+
         study = Study(**Study.filter_keys(params))
 
         study.publicId = Study.generate_public_id(db_session)
@@ -209,10 +210,11 @@ def _save_project(db_session, submission_form, user_uuid=None):
         'name':        submission.studyDesign['project']['name'].strip(),
         'description': submission.studyDesign['project'].get('description', '').strip(),
         'uuid':        submission.projectUniqueID,
-        'ownerUuid':   user_uuid,
     }
 
     if submission_form.type == 'new_project':
+        params['ownerUuid'] = user_uuid
+
         project = Project(**Project.filter_keys(params))
         project.publicId = Project.generate_public_id(db_session)
         db_session.add(ProjectUser(
