@@ -225,12 +225,25 @@ def init_admin(app):
     admin.add_view(AppView(StudyMetabolite,         db_session, category="Studies"))
     admin.add_view(ExcelFileView(ExcelFile,         db_session, category="Studies"))
 
-    admin.add_view(AppView(Experiment,            db_session, category="Experiments"))
-    admin.add_view(AppView(ExperimentCompartment, db_session, category="Experiments"))
-    admin.add_view(AppView(Compartment,           db_session, category="Experiments"))
-    admin.add_view(AppView(Bioreplicate,          db_session, category="Experiments"))
-    admin.add_view(AppView(Community,             db_session, category="Experiments"))
-    admin.add_view(AppView(Perturbation,          db_session, category="Experiments"))
+    class ExperimentEntityView(AppView):
+        # We ignore all of these "child" entities, because they can't
+        # practically be updated through the form.
+        form_excluded_columns = [
+            'bioreplicates',
+            'compartments',
+            'perturbations',
+            'experimentCompartments',
+            'experiments',
+            'measurementContexts',
+            'measurements',
+        ]
+
+    admin.add_view(ExperimentEntityView(Experiment,            db_session, category="Experiments"))
+    admin.add_view(ExperimentEntityView(ExperimentCompartment, db_session, category="Experiments"))
+    admin.add_view(ExperimentEntityView(Compartment,           db_session, category="Experiments"))
+    admin.add_view(ExperimentEntityView(Bioreplicate,          db_session, category="Experiments"))
+    admin.add_view(ExperimentEntityView(Community,             db_session, category="Experiments"))
+    admin.add_view(ExperimentEntityView(Perturbation,          db_session, category="Experiments"))
 
     class ModelingResultView(AppView):
         column_exclude_list = ['rSummary']
