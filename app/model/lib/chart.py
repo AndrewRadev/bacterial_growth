@@ -146,7 +146,7 @@ class Chart:
             default_width=(f"{self.width}px" if self.width is not None else None),
             config={
                 'toImageButtonOptions': {
-                    'format': 'svg', # one of png, svg, jpeg, webp
+                    'format': 'svg',
                     'filename': 'mgrowth_chart',
                     'height': 500,
                     'width': 700,
