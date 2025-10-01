@@ -77,6 +77,10 @@ def validate_data_file(submission_form, data_file=None):
     data_file = data_file or submission.dataFile
     errors = []
 
+    # TODO (2025-10-01) Show warnings that don't stop the upload
+    # process:
+    warnings = []
+
     if not data_file:
         return []
 
@@ -137,7 +141,7 @@ def validate_data_file(submission_form, data_file=None):
         missing_time_rows = []
         missing_values = {}
 
-        # Time must be present
+        # Check for missing Time values:
         if 'Time' in df:
             for index, time in enumerate(df['Time']):
                 if not is_non_negative_float(time, isnan_check=True):
@@ -145,7 +149,8 @@ def validate_data_file(submission_form, data_file=None):
 
         if missing_time_rows:
             row_description = _format_row_list_error(missing_time_rows)
-            errors.append(f"{sheet_name}: Missing or invalid time values on row(s) {row_description}")
+            # TODO (2025-10-01) Show warnings in UI
+            warnings.append(f"{sheet_name}: Missing or invalid time values on row(s) {row_description}")
 
         # For the other rows, we're looking for non-negative numbers or blanks
         value_columns = expected_value_columns[sheet_name].intersection(set(df.columns))

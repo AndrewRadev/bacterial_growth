@@ -12,7 +12,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.model.orm.orm_base import OrmBase
 from app.model.lib.conversion import convert_time
-from app.model.lib.util import group_by_unique_name
+from app.model.lib.util import group_by_unique_name, is_non_negative_float
 
 
 class Measurement(OrmBase):
@@ -83,6 +83,10 @@ class Measurement(OrmBase):
                 # Missing entry, skip
                 continue
 
+            if not is_non_negative_float(row['Time'], isnan_check=True):
+                # Missing time, skip
+                continue
+
             time_in_seconds = convert_time(row['Time'], source=study.timeUnits, target='s')
 
             for technique in study.measurementTechniques:
@@ -103,7 +107,7 @@ class Measurement(OrmBase):
 
                     value = row[value_column_name]
                     if value == '':
-                        continue
+                        value = None
 
                     std = row.get(f"{value_column_name} STD", None)
                     if std == '':
