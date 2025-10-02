@@ -4,8 +4,11 @@ from app.model.lib.db import execute_into_df
 from app.model.lib.chart import Chart
 from app.model.lib.log_transform import apply_log_transform
 from app.model.orm import (
+    Bioreplicate,
+    Experiment,
     Measurement,
     MeasurementContext,
+    Perturbation,
 )
 
 
@@ -18,7 +21,6 @@ class ComparativeChartForm:
         self.right_axis_ids = set(right_axis_ids)
 
         self.measurement_context_ids = list(self.left_axis_ids) + list(self.right_axis_ids)
-        self.measurement_contexts    = []
 
         self.cell_count_units = 'Cells/mL'
         self.cfu_count_units  = 'CFUs/mL'
@@ -39,12 +41,12 @@ class ComparativeChartForm:
             clamp_x_data=clamp_x_data,
         )
 
-        self.measurement_contexts = self.db_session.scalars(
+        measurement_contexts = self.db_session.scalars(
             sql.select(MeasurementContext)
             .where(MeasurementContext.id.in_(self.measurement_context_ids))
         ).all()
 
-        for measurement_context in self.measurement_contexts:
+        for measurement_context in measurement_contexts:
             technique = measurement_context.technique
             subject = measurement_context.get_subject(self.db_session)
 
@@ -77,6 +79,23 @@ class ComparativeChartForm:
                 label=label,
                 axis=axis,
                 metabolite_mass=metabolite_mass,
+            )
+
+        perturbations = self.db_session.scalars(
+            sql.select(Perturbation)
+            .distinct()
+            .join(Experiment)
+            .join(Bioreplicate)
+            .join(MeasurementContext)
+            .where(MeasurementContext.id.in_(self.measurement_context_ids))
+            .order_by(Perturbation.startTimeInSeconds)
+        ).all()
+
+        for i, perturbation in enumerate(perturbations):
+            chart.add_region(
+                start_time=perturbation.startTimeInHours,
+                end_time=perturbation.endTimeInHours,
+                label=f"P{i}",
             )
 
         return chart
