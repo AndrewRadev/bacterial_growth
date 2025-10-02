@@ -20,8 +20,16 @@ from app.model.orm import (
 # structure.
 #
 DEFAULT_STUDY_DESIGN = {
-    'project': {'name': None, 'description': None},
-    'study':   {'name': None, 'description': None, 'url': None},
+    'project': {
+        'name': None,
+        'description': None,
+    },
+    'study': {
+        'name':             None,
+        'description':      None,
+        'url':              None,
+        'embargoExpiresAt': None,
+    },
 
     'timeUnits': None,
 

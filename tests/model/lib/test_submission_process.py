@@ -82,9 +82,9 @@ class TestSubmissionProcess(DatabaseTest):
         self.assertEqual(study.name, 'Updated study name')
 
     def test_study_publication_state(self):
-        submission_form = SubmissionForm(submission_id=self.submission.id, db_session=self.db_session)
-
         with freeze_time(datetime.now(UTC)) as frozen_time:
+            submission_form = SubmissionForm(submission_id=self.submission.id, db_session=self.db_session)
+
             _save_project(self.db_session, submission_form)
             _save_study(self.db_session, submission_form)
             self.db_session.flush()
@@ -98,7 +98,40 @@ class TestSubmissionProcess(DatabaseTest):
 
             # After 24 hours, it can be published:
             frozen_time.tick(delta=timedelta(hours=24, seconds=1))
+            self.assertTrue(study.isPublishable)
+            self.assertFalse(study.isPublished)
 
+            # After explicitly publishing, it's published
+            self.assertTrue(study.publish())
+            self.db_session.add(study)
+            self.db_session.commit()
+
+            self.assertTrue(study.isPublishable)
+            self.assertTrue(study.isPublished)
+
+    def test_study_publication_state_with_embargo(self):
+        with freeze_time(datetime.now(UTC)) as frozen_time:
+            submission_form = SubmissionForm(submission_id=self.submission.id, db_session=self.db_session)
+
+            embargo_string = (datetime.now(UTC) + timedelta(days=15)).strftime("%Y-%m-%d")
+            submission_form.submission.studyDesign['study']['embargoExpiresAt'] = embargo_string
+            submission_form.save()
+
+            _save_project(self.db_session, submission_form)
+            _save_study(self.db_session, submission_form)
+            self.db_session.flush()
+
+            study = self._get_by_uuid(Study, self.submission.studyUniqueID)
+
+            print(study.embargoExpiresAt)
+
+            # After 15 days, it still can't be published:
+            frozen_time.tick(delta=timedelta(days=15, seconds=1))
+            self.assertFalse(study.isPublishable)
+            self.assertFalse(study.isPublished)
+
+            # After 1 more day, it's publishable:
+            frozen_time.tick(delta=timedelta(days=1))
             self.assertTrue(study.isPublishable)
             self.assertFalse(study.isPublished)
 
