@@ -30,6 +30,9 @@
 
       <p>
         A study is publishable <strong>24 hours</strong> after submission,
+        {% if submission.study.embargoExpiresAt: %}
+          or after the specified <strong>embargo date</strong>,
+        {% endif %}
         which {{ 'was' if submission.study.isPublishable else 'is' }}
         approximately
         <u>{{ time_tag(submission.study.publishableAt, relative=True) }}</u>.

@@ -139,6 +139,22 @@
                 class="form-input-full form-input-blue {{ "error" if submission_form.has_error('study_name') }}"
                 placeholder="Example: https://doi.org/10.1000/182" />
         </div>
+
+        <div class="form-row">
+          <label class="full">
+            <span>Embargo date (UTC):</span>
+            <input
+                type="date"
+                min="{{ g.now.strftime("%Y-%m-%d") }}"
+                name="embargo_expires_at"
+                value="{{ submission.studyDesign['study']['embargoExpiresAt'] or '' }}"
+                class="form-input-full form-input-blue {{ "error" if submission_form.has_error('embargo_expires_at') }}" />
+
+        <div class="help">
+          Once you upload your study, you will explicitly have to publish it
+          when you want it to be public. The embargo date simply communicates
+          to visitors when you expect that to happen.
+        </div>
       </div>
     </div>
 

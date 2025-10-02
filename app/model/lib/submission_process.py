@@ -1,7 +1,7 @@
 import io
 import copy
 import itertools
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, time, UTC
 from db import get_session, get_transaction
 
 import pandas as pd
@@ -172,23 +172,28 @@ def validate_data_file(submission_form, data_file=None):
 def _save_study(db_session, submission_form, user_uuid=None):
     submission = submission_form.submission
 
+    if embargo_string := submission.studyDesign['study'].get('embargoExpiresAt', None):
+        embargo_date     = datetime.fromisoformat(embargo_string)
+        embargo_datetime = datetime.combine(embargo_date, time(hour=23, minute=59, tzinfo=UTC))
+    else:
+        embargo_datetime = None
+
     params = {
-        'publicId':    submission_form.study_id,
-        'name':        submission.studyDesign['study']['name'].strip(),
-        'description': submission.studyDesign['study'].get('description', '').strip(),
-        'url':         submission.studyDesign['study'].get('url', '').strip(),
-        'uuid':        submission.studyUniqueID,
-        'projectUuid': submission.projectUniqueID,
-        'timeUnits':   submission.studyDesign['timeUnits'],
+        'publicId':         submission_form.study_id,
+        'name':             submission.studyDesign['study']['name'].strip(),
+        'description':      submission.studyDesign['study'].get('description', '').strip(),
+        'url':              submission.studyDesign['study'].get('url', '').strip(),
+        'uuid':             submission.studyUniqueID,
+        'projectUuid':      submission.projectUniqueID,
+        'timeUnits':        submission.studyDesign['timeUnits'],
+        'embargoExpiresAt': embargo_datetime,
     }
 
     if submission_form.type != 'update_study':
         params['ownerUuid'] = user_uuid
 
         study = Study(**Study.filter_keys(params))
-
         study.publicId = Study.generate_public_id(db_session)
-        study.publishableAt = datetime.now(UTC) + timedelta(hours=24)
 
         db_session.add(StudyUser(
             studyUniqueID=submission.studyUniqueID,
@@ -201,6 +206,12 @@ def _save_study(db_session, submission_form, user_uuid=None):
             .limit(1)
         ).one()
         study.update(**Study.filter_keys(params))
+
+    tomorrow = datetime.now(UTC) + timedelta(hours=24)
+    if embargo_datetime and embargo_datetime > tomorrow:
+        study.publishableAt = embargo_datetime
+    else:
+        study.publishableAt = tomorrow
 
     db_session.add(study)
 
