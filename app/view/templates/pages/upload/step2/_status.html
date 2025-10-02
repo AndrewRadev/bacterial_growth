@@ -20,7 +20,7 @@
       <li class="complete">
         {% if custom_strain_count > 0: %}
           <span class="icon"></span>
-          {{ custom_strain_count }} custom strain(s) added:
+          <span>{{ custom_strain_count }} custom strain(s) added:</span>
           <span class="truncate">
             {{ submission.studyDesign['custom_strains']|map(attribute='name')|join_tag('strong') }}
           </span>

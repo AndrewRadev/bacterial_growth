@@ -15,7 +15,8 @@
       margin: 0;
     }
     label {
-      word-break: break-all;
+      word-break: normal;
+      overflow-wrap: anywhere;
     }
   }
 
