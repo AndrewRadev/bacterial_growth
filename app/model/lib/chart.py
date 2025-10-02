@@ -60,6 +60,7 @@ class Chart:
         self.mixed_units_right = False
 
         self.model_df_indices = []
+        self.regions          = []
 
     def add_df(self, df, *, units, label=None, axis='left', metabolite_mass=None):
         entry = (df, units, label, metabolite_mass)
@@ -81,6 +82,9 @@ class Chart:
             self.data_right.append(entry)
         else:
             raise ValueError(f"Unexpected axis: {axis}")
+
+    def add_region(self, start_time, end_time, label):
+        self.regions.append((start_time, end_time, label))
 
     def to_html(self):
         fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -107,6 +111,21 @@ class Chart:
             scatter_params = dict(**scatter_params, line={'dash': 'dot'})
 
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=True)
+
+        # TODO (2025-10-02) Use shape instead of region https://plotly.com/python/shapes/
+
+        for (x0, x1, label) in self.regions:
+            fig.add_vrect(
+                x0=x0,
+                x1=x1,
+                opacity=0.15,
+                fillcolor='lightsalmon',
+                line_width=0,
+                label=dict(
+                    text=label,
+                    textposition="top right",
+                ),
+            )
 
         fig.update_yaxes(title_text=left_units_label,  secondary_y=False)
         fig.update_yaxes(title_text=right_units_label, secondary_y=True)
