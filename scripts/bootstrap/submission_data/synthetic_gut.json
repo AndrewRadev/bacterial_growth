@@ -21,15 +21,15 @@
       "type": "fc",
       "units": "Cells/mL",
       "includeStd": false,
-      "description": "",
+      "description": "Strain-specific FC counts determined by machine learning",
       "subjectType": "bioreplicate",
       "metaboliteIds": []
     },
     {
       "type": "16s",
-      "units": "reads",
+      "units": "Cells/mL",
       "includeStd": true,
-      "description": "",
+      "description": "Relative abundances from 16S reads multiplied with FC counts",
       "subjectType": "strain",
       "metaboliteIds": []
     },
@@ -137,7 +137,7 @@
       "volume": 10.0,
       "pressure": 1.0,
       "initialPh": 6.5,
-      "mediumUrl": "",
+      "mediumUrl": "https://mediadive.dsmz.de/medium/339",
       "mediumName": "Wilkins-Chalgren Anerobe Broth (WC)",
       "stirringMode": "",
       "stirringSpeed": null,
