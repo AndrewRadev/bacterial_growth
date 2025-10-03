@@ -150,10 +150,12 @@
                 value="{{ submission.studyDesign['study']['embargoExpiresAt'] or '' }}"
                 class="form-input-full form-input-blue {{ "error" if submission_form.has_error('embargo_expires_at') }}" />
 
-        <div class="help">
-          Once you upload your study, you will explicitly have to publish it
-          when you want it to be public. The embargo date simply communicates
-          to visitors when you expect that to happen.
+            <div class="help">
+              Once you upload your study, you will explicitly have to publish it
+              when you want it to be public. The embargo date simply communicates
+              to visitors when you expect that to happen.
+            </div>
+          </label>
         </div>
       </div>
     </div>
