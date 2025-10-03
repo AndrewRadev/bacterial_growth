@@ -128,7 +128,6 @@ class Measurement(OrmBase):
                             techniqueId=technique.id,
                         )
                         context_cache[context_key] = context
-                        db_session.add(context)
 
                     context = context_cache[context_key]
                     measurement = Measurement(
@@ -142,5 +141,17 @@ class Measurement(OrmBase):
 
         db_session.add_all(measurements)
         db_session.commit()
+
+        # Prune measurement contexts that only have empty values:
+        measurements = []
+
+        for _, context in context_cache.items():
+            if all([m.value is None for m in context.measurements]):
+                db_session.execute(
+                    sql.delete(MeasurementContext)
+                    .where(MeasurementContext.id == context.id)
+                )
+            else:
+                measurements.extend(context.measurements)
 
         return measurements

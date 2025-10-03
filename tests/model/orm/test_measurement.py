@@ -127,9 +127,12 @@ class TestMeasurement(DatabaseTest):
         self.assertEqual(
             [(m.timeInSeconds, m.subjectId, m.value) for m in measurements if m.subjectType == "metabolite"],
             [
-                (3600, glucose_id, Decimal('50.0')), (3600, trehalose_id, Decimal('70.0')),
-                (4500, glucose_id, Decimal('30.0')), (4500, trehalose_id, None),
-                (5400, glucose_id, Decimal('10.0')), (5400, trehalose_id, Decimal('10.0')),
+                (3600, glucose_id, Decimal('50.000')),
+                (4500, glucose_id, Decimal('30.000')),
+                (5400, glucose_id, Decimal('10.000')),
+                (3600, trehalose_id, Decimal('70.000')),
+                (4500, trehalose_id, None),
+                (5400, trehalose_id, Decimal('10.000')),
             ]
         )
 
@@ -213,6 +216,48 @@ class TestMeasurement(DatabaseTest):
                 (3600, s1.id, Decimal('100.00')), (3600, s2.id, Decimal('200.00')),
                 (4500, s1.id, Decimal('200.00')), (4500, s2.id, Decimal('400.00')),
                 (5400, s1.id, Decimal('300.00')), (5400, s2.id, Decimal('600.00')),
+            ]
+        )
+
+    def test_import_bioreplicate_csv_with_no_values(self):
+        study = self.create_study(timeUnits='h')
+        experiment = self.create_experiment(studyId=study.publicId)
+
+        b1 = self.create_bioreplicate(name='b1', experimentId=experiment.publicId)
+        b2 = self.create_bioreplicate(name='b2', experimentId=experiment.publicId)
+        b3 = self.create_bioreplicate(name='b3', experimentId=experiment.publicId)
+        self.create_compartment(studyId=study.publicId, name='c1')
+        t_fc = self.create_measurement_technique(studyId=study.publicId, subjectType='bioreplicate', type='fc')
+
+        growth_data = util.trim_lines("""
+            Biological Replicate,Compartment,Time,Community FC
+            b1,c1,2,1234567890.0
+            b1,c1,4,
+            b2,c1,2,
+            b2,c1,4,
+            b3,c1,2,
+            b3,c1,4,1234567890.0
+        """)
+
+        measurements = Measurement.insert_from_csv_string(
+            self.db_session,
+            study,
+            growth_data,
+            subject_type='bioreplicate',
+        )
+
+        self.assertEqual(
+            [(m.timeInHours, m.bioreplicate.name, m.value) for m in measurements if m.technique.id == t_fc.id],
+            [
+                # Second point is present with a None value, because the previous one is present as well:
+                (2.0, 'b1', Decimal('1234567890.000')),
+                (4.0, 'b1', None),
+                # Both are missing, because the entire context is blank:
+                # (2.0, 'b2', None),
+                # (4.0, 'b2', None),
+                # First point is present with a None value, because the second one is present:
+                (2.0, 'b3', None),
+                (4.0, 'b3', Decimal('1234567890.000')),
             ]
         )
 
