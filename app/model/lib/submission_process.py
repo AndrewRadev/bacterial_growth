@@ -294,16 +294,17 @@ def _save_communities(db_session, submission_form, study, user_uuid):
 
         for identifier in strain_identifiers:
             if identifier not in identifier_cache:
-                strain = _build_strain(db_session, identifier, submission, study, user_uuid)
-                identifier_cache[identifier] = strain
-                db_session.add(strain)
-                db_session.flush()
+                if strain := _build_strain(db_session, identifier, submission, study, user_uuid):
+                    identifier_cache[identifier] = strain
+                    db_session.add(strain)
+                    db_session.flush()
 
-            community_strain = CommunityStrain(
-                community=community,
-                strain=identifier_cache[identifier],
-            )
-            db_session.add(community_strain)
+            if identifier in identifier_cache:
+                community_strain = CommunityStrain(
+                    community=community,
+                    strain=identifier_cache[identifier],
+                )
+                db_session.add(community_strain)
 
         communities.append(community)
 
@@ -566,7 +567,7 @@ def _find_custom_strain(submission, identifier):
         if custom_strain_data['name'] == identifier:
             return custom_strain_data
     else:
-        raise IndexError(f"New strain with name {repr(identifier)} not found in submission")
+        return None
 
 
 def _get_expected_column_names(submission_form):
@@ -641,6 +642,10 @@ def _build_strain(db_session, identifier, submission, study, user_uuid):
     elif identifier.startswith('custom|'):
         identifier = identifier.removeprefix('custom|')
         custom_strain_data = _find_custom_strain(submission, identifier)
+
+        if custom_strain_data is None:
+            # Missing strain due to renames
+            return None
 
         strain_params = {
             'name':        custom_strain_data['name'],
