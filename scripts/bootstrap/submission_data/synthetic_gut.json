@@ -9,11 +9,10 @@
     "description": "Six biological replicates for a community initially consisting of five common gut bacterial species that fill different metabolic niches. After an initial 12 hours in batch mode, we switched to chemostat mode and observed the community to stabilize after 2-3 days."
   },
   "strains": [
-    "166486",
-    "476272",
+    "536231",
     "537011",
-    "74426",
-    "818"
+    "226186",
+    "476272"
   ],
   "timeUnits": "h",
   "techniques": [
@@ -58,11 +57,11 @@
     {
       "name": "Full",
       "strainIdentifiers": [
-        "existing|166486",
+        "existing|226186",
         "existing|476272",
+        "existing|536231",
         "existing|537011",
-        "existing|74426",
-        "existing|818"
+        "custom|Collinsella aerofaciens RCC 1377"
       ]
     },
     {
@@ -146,5 +145,12 @@
       "inoculumConcentration": 1000000.0
     }
   ],
-  "custom_strains": []
+  "custom_strains": [
+    {
+      "name": "Collinsella aerofaciens RCC 1377",
+      "species": "74426",
+      "description": "",
+      "species_name": "Collinsella aerofaciens"
+    }
+  ]
 }

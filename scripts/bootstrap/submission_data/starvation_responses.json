@@ -9,8 +9,8 @@
     "description": "in vitro batch system containing mucin beads to emulate the dynamic host environment and to study its impact on the interactions between two abundant and prevalent human gut bacteria."
   },
   "strains": [
-    "166486",
-    "818"
+    "226186",
+    "536231"
   ],
   "timeUnits": "h",
   "techniques": [
@@ -34,7 +34,7 @@
       "type": "fc",
       "units": "Cells/μL",
       "includeStd": false,
-      "description": "",
+      "description": "DNA-based staining using SYBR Green I (SG; Invitrogen) in combination with propidium iodide (PI; Invitrogen) was applied to quantify and differentiate bacterial cells with intact and damaged cytoplasmic membranes.",
       "subjectType": "strain",
       "metaboliteIds": []
     },
@@ -42,7 +42,7 @@
       "type": "metabolite",
       "units": "mM",
       "includeStd": false,
-      "description": "",
+      "description": "The concentrations of trehalose, glucose, pyruvate, succinate, formate, acetate, lactate, n-butyrate and Neu5Ac were determined by high-performance liquid chromatography (HPLC). Propionate was also measured but not detected in our tests since B. thetaiotaomicron requires vitamin B12 (absent in our medium) to produce propionate via the succinate pathway.\r\n\r\nConcentrations of mucin monomeric sugars galactose, fucose and mannose were relatively quantified by using gas chromatography. Their measurements are shown in mM, but the actual values are in unitless AUC. This should be fixed in a future version of μGrowthDB.",
       "subjectType": "metabolite",
       "metaboliteIds": [
         "CHEBI:15361",
@@ -64,20 +64,20 @@
     {
       "name": "BT",
       "strainIdentifiers": [
-        "existing|818"
+        "existing|226186"
       ]
     },
     {
       "name": "RI",
       "strainIdentifiers": [
-        "existing|166486"
+        "existing|536231"
       ]
     },
     {
       "name": "BT_RI",
       "strainIdentifiers": [
-        "existing|166486",
-        "existing|818"
+        "existing|226186",
+        "existing|536231"
       ]
     }
   ],
@@ -177,7 +177,7 @@
           "biosampleUrl": ""
         }
       ],
-      "communityName": "BT",
+      "communityName": "RI",
       "perturbations": [],
       "timepointCount": 16,
       "cultivationMode": "batch",
@@ -212,7 +212,7 @@
           "biosampleUrl": ""
         }
       ],
-      "communityName": "BT",
+      "communityName": "RI",
       "perturbations": [],
       "timepointCount": 14,
       "cultivationMode": "batch",
