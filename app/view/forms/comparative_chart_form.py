@@ -21,6 +21,7 @@ class ComparativeChartForm:
         self.right_axis_ids = set(right_axis_ids)
 
         self.measurement_context_ids = list(self.left_axis_ids) + list(self.right_axis_ids)
+        self.measurement_contexts = []
 
         self.cell_count_units = 'Cells/mL'
         self.cfu_count_units  = 'CFUs/mL'
@@ -41,12 +42,12 @@ class ComparativeChartForm:
             clamp_x_data=clamp_x_data,
         )
 
-        measurement_contexts = self.db_session.scalars(
+        self.measurement_contexts = self.db_session.scalars(
             sql.select(MeasurementContext)
             .where(MeasurementContext.id.in_(self.measurement_context_ids))
         ).all()
 
-        for measurement_context in measurement_contexts:
+        for measurement_context in self.measurement_contexts:
             technique = measurement_context.technique
             subject = measurement_context.get_subject(self.db_session)
 
