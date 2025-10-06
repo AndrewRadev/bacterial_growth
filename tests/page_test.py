@@ -17,6 +17,7 @@ TAXON_NAMES = {
     "537011": "Prevotella copri DSM 18205",
     "74426":  "Collinsella aerofaciens",
     "818":    "Bacteroides thetaiotaomicron",
+    "226186": "Bacteroides thetaiotaomicron VPI-5482",
 }
 
 METABOLITE_NAMES = {
