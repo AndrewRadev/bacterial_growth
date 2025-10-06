@@ -142,7 +142,7 @@ class Chart:
             title = dict(x=0)
 
         if self.legend_position == 'top':
-            legend = dict(yanchor="bottom", y=1, xanchor="left", x=0)
+            legend = dict(yanchor="bottom", y=1, xanchor="left", x=0, orientation='h')
         else:
             legend = None
 
@@ -152,6 +152,8 @@ class Chart:
             title=title,
             hovermode='x unified',
             legend=legend,
+            modebar=dict(orientation='v'),
+            font_family="Public Sans",
             yaxis=dict(
                 exponentformat="power",
                 side="left",
@@ -176,8 +178,8 @@ class Chart:
                 'toImageButtonOptions': {
                     'format': 'svg',
                     'filename': 'mgrowth_chart',
-                    'height': 500,
-                    'width': 700,
+                    'height': None,
+                    'width': None,
                 },
             },
         )
