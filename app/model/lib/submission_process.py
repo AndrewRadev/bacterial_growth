@@ -189,7 +189,11 @@ def _save_study(db_session, submission_form, user_uuid=None):
             userUniqueID=submission.userUniqueID,
         ))
     else:
-        study = db_session.get(Study, submission.studyUniqueID)
+        study = db_session.scalars(
+            sql.select(Study)
+            .where(Study.uuid == submission.studyUniqueID)
+            .limit(1)
+        ).one()
         study.update(**Study.filter_keys(params))
 
     db_session.add(study)
@@ -216,7 +220,11 @@ def _save_project(db_session, submission_form, user_uuid=None):
             userUniqueID=submission.userUniqueID,
         ))
     else:
-        project = db_session.get(Project, submission.projectUniqueID)
+        project = db_session.scalars(
+            sql.select(Project)
+            .where(Project.uuid == submission.projectUniqueID)
+            .limit(1)
+        ).one()
         project.update(**Project.filter_keys(params))
 
     db_session.add(project)
@@ -513,6 +521,7 @@ def _create_average_measurement_context(
 
     # Create a parent context for the individual measurements:
     average_context = MeasurementContext(
+        study=study,
         bioreplicate=average_bioreplicate,
         compartment=compartment,
         subjectId=subject_id,
