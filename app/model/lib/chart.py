@@ -2,6 +2,7 @@ import math
 
 import numpy as np
 import plotly.graph_objects as go
+import plotly.express as px
 from plotly.subplots import make_subplots
 
 from app.model.lib.conversion import convert_measurement_units
@@ -83,8 +84,8 @@ class Chart:
         else:
             raise ValueError(f"Unexpected axis: {axis}")
 
-    def add_region(self, start_time, end_time, label):
-        self.regions.append((start_time, end_time, label))
+    def add_region(self, start_time, end_time, label, text):
+        self.regions.append((start_time, end_time, label, text))
 
     def to_html(self):
         fig = make_subplots(specs=[[{"secondary_y": True}]])
@@ -112,18 +113,23 @@ class Chart:
 
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=True)
 
-        # TODO (2025-10-02) Use shape instead of region https://plotly.com/python/shapes/
+        converted_data_combined = converted_data_left + converted_data_right
+        xaxis_range = self._calculate_x_range(converted_data_combined)
+        yaxis_range = self._calculate_y_range(converted_data_combined)
 
-        for (x0, x1, label) in self.regions:
-            fig.add_vrect(
-                x0=x0,
-                x1=x1,
-                opacity=0.15,
-                fillcolor='lightsalmon',
-                line_width=0,
-                label=dict(
-                    text=label,
-                    textposition="top right",
+        for index, (x0, x1, label, text) in enumerate(self.regions):
+            y0, y1 = yaxis_range
+
+            fig.add_trace(
+                go.Scatter(
+                    name=label,
+                    x=[x0, x0, x1, x1, x0],
+                    y=[y0, y0, y0, y1, y1],
+                    opacity=0.15,
+                    line_width=0,
+                    fill="toself",
+                    hovertemplate=text,
+                    mode="text",
                 ),
             )
 
@@ -139,9 +145,6 @@ class Chart:
             legend = dict(yanchor="bottom", y=1, xanchor="left", x=0)
         else:
             legend = None
-
-        xaxis_range = self._calculate_x_range(converted_data_left + converted_data_right)
-        yaxis_range = self._calculate_y_range(converted_data_left)
 
         fig.update_layout(
             template=PLOTLY_TEMPLATE,
@@ -243,9 +246,6 @@ class Chart:
             return source_units
 
     def _calculate_x_range(self, data):
-        if not self.clamp_x_data:
-            return None
-
         # With multiple charts, fit the x-axis of the shortest one:
         global_max_x = math.inf
         global_min_x = 0
@@ -259,15 +259,13 @@ class Chart:
             if min_x > global_min_x:
                 global_min_x = min_x
 
-        return [global_min_x, global_max_x]
+        return [-global_max_x * 0.05, global_max_x]
 
     def _calculate_y_range(self, data):
-        if len(self.model_df_indices) == 0:
-            return None
-
-        # If we have added models, let's limit the y axis to avoid exponentials
-        # shooting up
-        # TODO (2025-05-20) Hack, only works on the left side
+        """
+        Find the limit for the y axis, ignoring model dataframes, since they
+        might have exponentials that shoot up.
+        """
         global_max_y = 0
         global_min_y = math.inf
 
@@ -275,13 +273,19 @@ class Chart:
             if i in self.model_df_indices:
                 continue
 
-            std_y = df['value'].std()
-            max_y = df['value'].max() + std_y / 2
-            min_y = df['value'].min() - std_y / 2
+            min_value = df['value'].min()
+            max_value = df['value'].max()
+            std_y     = df['std'].max()
+
+            if math.isnan(std_y):
+                std_y = 0
+
+            max_y = max_value + std_y
+            min_y = min_value - np.clip(std_y, max=min_value)
 
             if max_y > global_max_y:
                 global_max_y = max_y
             if min_y < global_min_y:
                 global_min_y = min_y
 
-        return [global_min_y, global_max_y]
+        return [-global_max_y * 0.1, global_max_y]

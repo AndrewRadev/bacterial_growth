@@ -96,7 +96,8 @@ class ComparativeChartForm:
             chart.add_region(
                 start_time=perturbation.startTimeInHours,
                 end_time=perturbation.endTimeInHours,
-                label=f"P{i}",
+                label=f"P{i + 1}",
+                text=perturbation.description,
             )
 
         return chart
