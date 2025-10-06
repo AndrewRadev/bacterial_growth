@@ -104,21 +104,21 @@ class Chart:
             right_units_label = f"ln({right_units_label})"
 
         for (df, label) in converted_data_left:
-            scatter_params = self._get_scatter_params(df, label)
+            scatter_params = self._get_scatter_params(df, label, log=self.log_left)
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=False)
 
         for (df, label) in converted_data_right:
-            scatter_params = self._get_scatter_params(df, label)
+            scatter_params = self._get_scatter_params(df, label, log=self.log_right)
             scatter_params = dict(**scatter_params, line={'dash': 'dot'})
 
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=True)
 
-        converted_data_combined = converted_data_left + converted_data_right
-        xaxis_range = self._calculate_x_range(converted_data_combined)
-        yaxis_range = self._calculate_y_range(converted_data_combined)
+        xaxis_range       = self._calculate_x_range(converted_data_left + converted_data_right)
+        left_yaxis_range  = self._calculate_y_range(converted_data_left)
+        right_yaxis_range = self._calculate_y_range(converted_data_right)
 
         for index, (x0, x1, label, text) in enumerate(self.regions):
-            y0, y1 = yaxis_range
+            y0, y1 = left_yaxis_range
 
             fig.add_trace(
                 go.Scatter(
@@ -152,13 +152,19 @@ class Chart:
             title=title,
             hovermode='x unified',
             legend=legend,
-            xaxis_range=xaxis_range,
-            yaxis_range=yaxis_range,
             yaxis=dict(
                 exponentformat="power",
+                side="left",
+                range=left_yaxis_range,
+            ),
+            yaxis2=dict(
+                exponentformat="power",
+                side="right",
+                range=right_yaxis_range,
             ),
             xaxis=dict(
                 title=dict(text='Time (h)'),
+                range=xaxis_range,
             )
         )
 
@@ -201,16 +207,17 @@ class Chart:
 
         return converted_data, tuple(converted_units)[0]
 
-    def _get_scatter_params(self, df, label):
+    def _get_scatter_params(self, df, label, log=False):
         if 'std' in df:
             if df['std'].isnull().all():
                 # STD values were blank, don't draw error bars
                 error_y = None
             else:
+                # We want to clip negative error bars to 0, except in log-view:
                 positive_err = df['std']
                 negative_err = np.clip(df['std'], max=df['value'])
 
-                if (positive_err == negative_err).all():
+                if log or (positive_err == negative_err).all():
                     error_y = go.scatter.ErrorY(array=positive_err)
                 else:
                     error_y = go.scatter.ErrorY(array=positive_err, arrayminus=negative_err)
@@ -251,15 +258,18 @@ class Chart:
         global_min_x = 0
 
         for (i, (df, _)) in enumerate(data):
-            max_x = df['time'].max() + 10
-            min_x = df['time'].min() - 10
+            max_x = df['time'].max()
+            min_x = df['time'].min()
 
             if max_x < global_max_x:
                 global_max_x = max_x
             if min_x > global_min_x:
                 global_min_x = min_x
 
-        return [-global_max_x * 0.05, global_max_x]
+        # The range of the chart is given a padding depending on the data range
+        # to make sure the content is visible:
+        padding = (global_max_x - global_min_x) * 0.05
+        return [global_min_x - padding, global_max_x + padding]
 
     def _calculate_y_range(self, data):
         """
@@ -271,21 +281,37 @@ class Chart:
 
         for (i, (df, _)) in enumerate(data):
             if i in self.model_df_indices:
+                # A model's data might shoot up exponentially, so we don't
+                # consider it for the chart range
                 continue
 
+            # We look for the min and max values in the dataframe and their
+            # corresponding standard deviation:
             min_value = df['value'].min()
             max_value = df['value'].max()
-            std_y     = df['std'].max()
 
-            if math.isnan(std_y):
-                std_y = 0
+            min_row = df[df['value'] == min_value]
+            max_row = df[df['value'] == max_value]
 
-            max_y = max_value + std_y
-            min_y = min_value - np.clip(std_y, max=min_value)
+            min_std = min_row['std'].iloc[0]
+            max_std = max_row['std'].iloc[0]
+
+            # For some reason, pandas might give us a None here, or it might
+            # give us a NaN
+            if min_std is None or math.isnan(min_std):
+                min_std = 0
+            if max_std is None or math.isnan(max_std):
+                max_std = 0
+
+            max_y = max_value + max_std
+            min_y = min_value - min_std
 
             if max_y > global_max_y:
                 global_max_y = max_y
             if min_y < global_min_y:
                 global_min_y = min_y
 
-        return [-global_max_y * 0.1, global_max_y]
+        # The range of the chart is given a padding depending on the data range
+        # to make sure the content is visible:
+        padding = (global_max_y - global_min_y) * 0.05
+        return [global_min_y - padding, global_max_y + padding]
