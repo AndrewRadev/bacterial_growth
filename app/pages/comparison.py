@@ -38,7 +38,12 @@ def comparison_show_page():
     }
 
     # TODO (2025-05-18) Convert time units between studies
-    chart_form = ComparativeChartForm(g.db_session, 'h', left_axis_ids, right_axis_ids)
+    chart_form = ComparativeChartForm(
+        g.db_session,
+        'h',
+        left_axis_ids=left_axis_ids,
+        right_axis_ids=right_axis_ids,
+    )
 
     return render_template(
         "pages/comparison/show.html",
@@ -79,7 +84,12 @@ def comparison_chart_fragment():
     width = request.args.get('width', None)
 
     # TODO (2025-05-18) Convert time units between studies
-    chart_form = ComparativeChartForm(g.db_session, time_units='h')
+    chart_form = ComparativeChartForm(
+        g.db_session,
+        time_units='h',
+        show_std=args.get('showStd', None) is not None,
+        show_perturbations=args.get('showPerturbations', None) is not None,
+    )
     chart = chart_form.build_chart(args, width, legend_position='top', clamp_x_data=True)
 
     return render_template(

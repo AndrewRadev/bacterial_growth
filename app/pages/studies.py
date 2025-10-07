@@ -187,7 +187,12 @@ def study_chart_fragment(publicId):
 
     width = request.args.get('width', None)
 
-    chart_form = ComparativeChartForm(g.db_session, time_units=study.timeUnits)
+    chart_form = ComparativeChartForm(
+        g.db_session,
+        time_units=study.timeUnits,
+        show_std=args.get('showStd', None) is not None,
+        show_perturbations=args.get('showPerturbations', None) is not None,
+    )
     chart = chart_form.build_chart(args, width)
 
     return render_template(
