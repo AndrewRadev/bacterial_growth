@@ -15,11 +15,20 @@ from app.view.forms.comparative_chart_form import ComparativeChartForm
 
 
 def comparison_show_page():
-    compare_data = _init_compare_data()
+    left_axis_ids  = _parse_comma_separated_request_ids('l')
+    right_axis_ids = _parse_comma_separated_request_ids('r')
+
+    if len(left_axis_ids) or len(right_axis_ids):
+        context_ids = left_axis_ids + right_axis_ids
+        data_source = "link"
+    else:
+        compare_data = _init_compare_data()
+        context_ids = compare_data['contexts']
+        data_source = "session"
 
     measurement_contexts = g.db_session.scalars(
         sql.select(MeasurementContext)
-        .where(MeasurementContext.id.in_(compare_data['contexts']))
+        .where(MeasurementContext.id.in_(context_ids))
     ).all()
 
     measurement_contexts_by_study = {
@@ -29,12 +38,13 @@ def comparison_show_page():
     }
 
     # TODO (2025-05-18) Convert time units between studies
-    chart_form = ComparativeChartForm(g.db_session, 'h')
+    chart_form = ComparativeChartForm(g.db_session, 'h', left_axis_ids, right_axis_ids)
 
     return render_template(
         "pages/comparison/show.html",
         measurement_contexts_by_study=measurement_contexts_by_study,
         chart_form=chart_form,
+        data_source=data_source,
     )
 
 
@@ -86,3 +96,7 @@ def _init_compare_data():
         data['contexts'] = []
 
     return data
+
+
+def _parse_comma_separated_request_ids(key):
+    return [int(s) for s in request.args.get(key, '').split(',') if s != '']

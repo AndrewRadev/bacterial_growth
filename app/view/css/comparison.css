@@ -56,6 +56,11 @@
     }
   }
 
+  .permalink-container {
+    margin: 10px 0;
+    padding: 0 20px;
+  }
+
   .data-controls {
     border-bottom: 2px solid var(--border-color);
     padding: 4px 20px;
