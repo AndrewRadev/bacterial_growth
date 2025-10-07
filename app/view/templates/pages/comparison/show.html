@@ -18,10 +18,18 @@
         the checkbox to add them to the chart and compare values.
       </p>
 
-      <div style="float: right;">
-        {{ post_button("Clear collected comparisons", url_for("comparison_clear_action")) }}
-      </div>
-      <div style="clear: both;"></div>
+      {% if data_source == 'session': %}
+        <div style="float: right;">
+          {{ post_button("Clear collected comparisons", url_for("comparison_clear_action")) }}
+        </div>
+        <div style="clear: both;"></div>
+      {% else: %}
+        <p class="notice-message">
+          Currently showing a comparison encoded in the URL. Click on the
+          "Compare" button in the side menu to show your collected measurements
+          instead.
+        </p>
+      {% endif %}
 
       <form class="js-chart-form">
         {% for (study, measurement_contexts) in measurement_contexts_by_study.items(): %}
@@ -42,7 +50,14 @@
                 data-technique-id="{{ measurement_context.techniqueId }}"
                 data-bioreplicate-id="{{ measurement_context.bioreplicateId }}"
                 data-compartment-id="{{ measurement_context.compartmentId }}">
-              <input type="checkbox" name="{{ key }}" id="{{ key }}" class="js-measurement-toggle" />
+              <input
+                  type="checkbox"
+                  name="{{ key }}"
+                  id="{{ key }}"
+                  {{ "checked" if measurement_context.id in chart_form.measurement_context_ids }}
+                  {{ "data-axis-left" if measurement_context.id in chart_form.left_axis_ids }}
+                  {{ "data-axis-right" if measurement_context.id in chart_form.right_axis_ids }}
+                  class="js-measurement-toggle" />
               <label for="{{ key }}">
                 {{ experiment.name }}: {{ measurement_context.get_chart_label(g.db_session)|safe }}
               </label>

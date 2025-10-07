@@ -119,6 +119,14 @@ hr {
   border-left: 4px solid #ffeeba;
 }
 
+.notice-message,
+.flash-notice {
+  display: block;
+  background: #d1ecf1;
+  padding: 10px;
+  border-left: 4px solid #bee5eb;
+}
+
 .error-message-list {
   background: pink;
   border-left: 4px solid #d02631;
