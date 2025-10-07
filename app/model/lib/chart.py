@@ -220,9 +220,9 @@ class Chart:
                 negative_err = np.clip(df['std'], max=df['value'])
 
                 if log or (positive_err == negative_err).all():
-                    error_y = go.scatter.ErrorY(array=positive_err, thickness=1)
+                    error_y = go.scatter.ErrorY(array=positive_err)
                 else:
-                    error_y = go.scatter.ErrorY(array=positive_err, thickness=1, arrayminus=negative_err)
+                    error_y = go.scatter.ErrorY(array=positive_err, arrayminus=negative_err)
         else:
             error_y = None
 
