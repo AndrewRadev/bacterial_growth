@@ -143,17 +143,12 @@ class Chart:
         else:
             title = dict(x=0)
 
-        if self.legend_position == 'top':
-            legend = dict(yanchor="bottom", y=1, xanchor="left", x=0, orientation='h')
-        else:
-            legend = None
-
         fig.update_layout(
             template=PLOTLY_TEMPLATE,
             margin=dict(l=0, r=0, t=60, b=40),
             title=title,
             hovermode='x unified',
-            legend=legend,
+            legend=dict(yanchor="bottom", y=1, xanchor="left", x=0, orientation='h'),
             modebar=dict(orientation='v'),
             font_family="Public Sans",
             yaxis=dict(
@@ -180,6 +175,8 @@ class Chart:
                 'toImageButtonOptions': {
                     'format': 'svg',
                     'filename': 'mgrowth_chart',
+                    # Force width and height to be the same as the visible dimensions on screen
+                    # Reference: https://github.com/plotly/plotly.js/pull/3746
                     'height': None,
                     'width': None,
                 },
