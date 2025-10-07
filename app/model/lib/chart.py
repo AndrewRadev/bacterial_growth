@@ -38,6 +38,7 @@ class Chart:
         title=None,
         legend_position='top',
         clamp_x_data=False,
+        show_std=True,
     ):
         # TODO (2025-06-25) Unused, should consider conversion, but handle
         # units during modeling:
@@ -50,6 +51,7 @@ class Chart:
         self.title            = title
         self.legend_position  = legend_position
         self.clamp_x_data     = clamp_x_data
+        self.show_std         = show_std
 
         self.log_left  = log_left
         self.log_right = log_right
@@ -210,7 +212,7 @@ class Chart:
         return converted_data, tuple(converted_units)[0]
 
     def _get_scatter_params(self, df, label, log=False):
-        if 'std' in df:
+        if self.show_std and 'std' in df:
             if df['std'].isnull().all():
                 # STD values were blank, don't draw error bars
                 error_y = None

@@ -67,9 +67,20 @@
 
         <div class="form-row margin-top-10">
           <div class="columns">
-            <div>
+            <div class="flex-row flex-gap-6 flex-end">
               <a href="#" class="white-button js-select-all">Select all</a>
               <a href="#" class="white-button flex-right js-clear-chart">Clear</a>
+            </div>
+
+            <div class="flex-column flex-right flex-end">
+              <label>
+                <input type="checkbox" name="showStd" {{ "checked" if chart_form.show_std }}>
+                Show standard deviation
+              </label>
+              <label>
+                <input type="checkbox" name="showPerturbations" {{ "checked" if chart_form.show_perturbations }}>
+                Show perturbations
+              </label>
             </div>
 
             <label class="flex-column flex-right">
