@@ -11,9 +11,6 @@ _TIME_UNITS = {
     's': 'seconds',
 }
 
-_RED   = 'D02631'
-_WHITE = 'FFFFFF'
-
 _TECHNIQUE_DESCRIPTIONS = {
     'fc':          "Flow-cytometry values per time-point in {units}, use a period (.) as the decimal separator",
     'fc_ps':       "FC counts values per time-point for strain {strain} in {units}, use a period (.) as the decimal separator",
