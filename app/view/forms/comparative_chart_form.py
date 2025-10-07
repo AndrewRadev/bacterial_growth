@@ -27,8 +27,6 @@ class ComparativeChartForm:
         self.show_std           = show_std
         self.show_perturbations = show_perturbations
 
-        print(self.show_std)
-
         self.left_axis_ids  = set(left_axis_ids)
         self.right_axis_ids = set(right_axis_ids)
 
