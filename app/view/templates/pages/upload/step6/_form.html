@@ -113,7 +113,15 @@
     <p>
       When you click "Next", your file will be validated and your study will
       be created. You will get a link to see the processed data and you'll be
-      able to publish it after a period of 24 hours.
+      able to publish it
+
+      {% set embargo = submission_form.submission.studyDesign['study']['embargoExpiresAt'] %}
+
+      {% if embargo: %}
+        after the embargo date you specified of <strong>{{ embargo }}</strong> ({{ embargo|relative_date }}).
+      {% else: %}
+        after a period of 24 hours.
+      {% endif  %}
     </p>
   {% endif %}
 

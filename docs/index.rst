@@ -13,6 +13,7 @@
 
    about/introduction
    about/installation
+   about/deployment
    about/known-issues
    about/history
 

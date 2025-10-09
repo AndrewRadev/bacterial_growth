@@ -1,4 +1,5 @@
 {% from 'utils/_dataframe.html' import render_dataframe %}
+{% from 'utils/_time_tag.html' import time_tag %}
 
 {% extends '_layout.html' %}
 
@@ -18,6 +19,12 @@
       <p>
         <em>This study is not published yet, so its data is not available at this time.</em>
       </p>
+
+      {% if study.embargoExpiresAt: %}
+        <p>
+          <em>The study is expected to be published after the embargo date provided by the authors: <strong>{{ time_tag(study.embargoExpiresAt, format="%Y-%m-%d") }}</strong></em>.
+        </p>
+      {% endif %}
     </article>
   </div>
 {% endblock %}

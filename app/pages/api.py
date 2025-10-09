@@ -139,6 +139,7 @@ def measurement_context_json(id):
         'measurementCount': measurement_count,
     }
 
+
 def measurement_context_csv(id):
     measurement_context = g.db_session.get(MeasurementContext, id)
     if not measurement_context.study.isPublished:

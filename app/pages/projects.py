@@ -2,7 +2,6 @@ from flask import (
     g,
     render_template,
 )
-import sqlalchemy as sql
 
 from app.model.orm import Project
 

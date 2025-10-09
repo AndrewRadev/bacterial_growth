@@ -12,7 +12,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.model.orm.orm_base import OrmBase
 from app.model.lib.conversion import convert_time
-from app.model.lib.util import group_by_unique_name
+from app.model.lib.util import group_by_unique_name, is_non_negative_float
 
 
 class Measurement(OrmBase):
@@ -83,6 +83,10 @@ class Measurement(OrmBase):
                 # Missing entry, skip
                 continue
 
+            if not is_non_negative_float(row['Time'], isnan_check=True):
+                # Missing time, skip
+                continue
+
             time_in_seconds = convert_time(row['Time'], source=study.timeUnits, target='s')
 
             for technique in study.measurementTechniques:
@@ -103,7 +107,7 @@ class Measurement(OrmBase):
 
                     value = row[value_column_name]
                     if value == '':
-                        continue
+                        value = None
 
                     std = row.get(f"{value_column_name} STD", None)
                     if std == '':
@@ -124,7 +128,6 @@ class Measurement(OrmBase):
                             techniqueId=technique.id,
                         )
                         context_cache[context_key] = context
-                        db_session.add(context)
 
                     context = context_cache[context_key]
                     measurement = Measurement(
@@ -138,5 +141,17 @@ class Measurement(OrmBase):
 
         db_session.add_all(measurements)
         db_session.commit()
+
+        # Prune measurement contexts that only have empty values:
+        measurements = []
+
+        for _, context in context_cache.items():
+            if all([m.value is None for m in context.measurements]):
+                db_session.execute(
+                    sql.delete(MeasurementContext)
+                    .where(MeasurementContext.id == context.id)
+                )
+            else:
+                measurements.extend(context.measurements)
 
         return measurements

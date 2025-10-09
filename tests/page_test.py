@@ -10,12 +10,14 @@ from main import create_app
 from tests.database_test import DatabaseTest
 
 TAXON_NAMES = {
-    "818":    "Bacteroides thetaiotaomicron",
-    "53443":  "Blautia hydrogenotrophica",
-    "74426":  "Collinsella aerofaciens",
     "166486": "Roseburia intestinalis",
     "476272": "Blautia hydrogenotrophica DSM 10507",
+    "53443":  "Blautia hydrogenotrophica",
+    "536231": "Roseburia intestinalis L1-82",
     "537011": "Prevotella copri DSM 18205",
+    "74426":  "Collinsella aerofaciens",
+    "818":    "Bacteroides thetaiotaomicron",
+    "226186": "Bacteroides thetaiotaomicron VPI-5482",
 }
 
 METABOLITE_NAMES = {

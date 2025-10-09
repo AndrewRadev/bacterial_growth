@@ -7,7 +7,8 @@
     margin-top: 20px;
 
     label {
-      word-break: break-all;
+      word-break: normal;
+      overflow-wrap: anywhere;
     }
   }
 

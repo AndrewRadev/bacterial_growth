@@ -139,6 +139,25 @@
                 class="form-input-full form-input-blue {{ "error" if submission_form.has_error('study_name') }}"
                 placeholder="Example: https://doi.org/10.1000/182" />
         </div>
+
+        <div class="form-row">
+          <label class="full">
+            <span>Embargo date (UTC):</span>
+            <input
+                type="date"
+                min="{{ g.now.strftime("%Y-%m-%d") }}"
+                name="embargo_expires_at"
+                value="{{ submission.studyDesign['study']['embargoExpiresAt'] or '' }}"
+                class="form-input-full form-input-blue {{ "error" if submission_form.has_error('embargo_expires_at') }}" />
+
+            <div class="help">
+              Once you upload your study, a record will appear on μGrowthDB but
+              not your data. You must <strong>explicitly</strong> publish it to make it
+              publicly available. If you set an embargo date, a short message
+              will inform visitors of the expected publication date.
+            </div>
+          </label>
+        </div>
       </div>
     </div>
 

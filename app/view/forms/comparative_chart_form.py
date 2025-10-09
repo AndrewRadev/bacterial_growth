@@ -4,21 +4,34 @@ from app.model.lib.db import execute_into_df
 from app.model.lib.chart import Chart
 from app.model.lib.log_transform import apply_log_transform
 from app.model.orm import (
+    Bioreplicate,
+    Experiment,
     Measurement,
     MeasurementContext,
+    Perturbation,
 )
 
 
 class ComparativeChartForm:
-    def __init__(self, db_session, time_units, left_axis_ids=[], right_axis_ids=[]):
-        self.db_session = db_session
-        self.time_units = time_units
+    def __init__(
+        self,
+        db_session,
+        time_units,
+        left_axis_ids=[],
+        right_axis_ids=[],
+        show_std=True,
+        show_perturbations=True,
+    ):
+        self.db_session         = db_session
+        self.time_units         = time_units
+        self.show_std           = show_std
+        self.show_perturbations = show_perturbations
 
         self.left_axis_ids  = set(left_axis_ids)
         self.right_axis_ids = set(right_axis_ids)
 
         self.measurement_context_ids = list(self.left_axis_ids) + list(self.right_axis_ids)
-        self.measurement_contexts    = []
+        self.measurement_contexts = []
 
         self.cell_count_units = 'Cells/mL'
         self.cfu_count_units  = 'CFUs/mL'
@@ -37,6 +50,7 @@ class ComparativeChartForm:
             width=width,
             legend_position=legend_position,
             clamp_x_data=clamp_x_data,
+            show_std=self.show_std,
         )
 
         self.measurement_contexts = self.db_session.scalars(
@@ -78,6 +92,25 @@ class ComparativeChartForm:
                 axis=axis,
                 metabolite_mass=metabolite_mass,
             )
+
+        if self.show_perturbations:
+            perturbations = self.db_session.scalars(
+                sql.select(Perturbation)
+                .distinct()
+                .join(Experiment)
+                .join(Bioreplicate)
+                .join(MeasurementContext)
+                .where(MeasurementContext.id.in_(self.measurement_context_ids))
+                .order_by(Perturbation.startTimeInSeconds)
+            ).all()
+
+            for i, perturbation in enumerate(perturbations):
+                chart.add_region(
+                    start_time=perturbation.startTimeInHours,
+                    end_time=perturbation.endTimeInHours,
+                    label=f"Perturbation {i + 1} (<b>{perturbation.experiment.name}</b>)",
+                    text=perturbation.description,
+                )
 
         return chart
 

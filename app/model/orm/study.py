@@ -91,9 +91,16 @@ class Study(OrmBase):
     def isPublished(self):
         return self.publishedAt != None
 
-    @hybrid_property
+    @property
     def isPublishable(self):
-        return self.publishableAt and self.publishableAt <= datetime.now(UTC)
+        now = datetime.now(UTC)
+
+        if self.embargoExpiresAt:
+            return self.embargoExpiresAt <= now
+        elif self.publishableAt:
+            return self.publishableAt <= now
+        else:
+            return False
 
     def visible_to_user(self, user):
         if self.isPublished:

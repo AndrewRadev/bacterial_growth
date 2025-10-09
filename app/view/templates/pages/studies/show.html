@@ -187,6 +187,15 @@
                             </a>
 
                             {{ measurement_context.get_chart_label(g.db_session)|safe }}
+
+                            <a
+                                href="{{ url_for('measurement_context_csv', id=measurement_context.id) }}"
+                                class="white-button no-border small-button"
+                                style="vertical-align: top"
+                                download="measurement_context_{{ measurement_context.id }}.csv"
+                                data-tooltip="Download data">
+                              <span class="flex-row icon icon-download-black"></span>
+                            </a>
                           </div>
                         </li>
                       {% endfor %}

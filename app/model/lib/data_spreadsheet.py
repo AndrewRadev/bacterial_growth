@@ -11,9 +11,6 @@ _TIME_UNITS = {
     's': 'seconds',
 }
 
-_RED   = 'D02631'
-_WHITE = 'FFFFFF'
-
 _TECHNIQUE_DESCRIPTIONS = {
     'fc':          "Flow-cytometry values per time-point in {units}, use a period (.) as the decimal separator",
     'fc_ps':       "FC counts values per time-point for strain {strain} in {units}, use a period (.) as the decimal separator",
@@ -54,19 +51,19 @@ def create_excel(submission, metabolite_names, strain_names):
 
         if subject_type == 'bioreplicate':
             technique_name = technique.csv_column_name()
-            description = TECHNIQUE_DESCRIPTIONS[technique_type].format(units=technique.units)
+            description = _TECHNIQUE_DESCRIPTIONS[technique_type].format(units=technique.units)
 
             headers_bioreplicates[technique_name] = description
 
             if technique.includeStd:
                 title = ' '.join([technique_name, 'STD'])
-                headers_bioreplicates[title] = TECHNIQUE_DESCRIPTIONS['STD']
+                headers_bioreplicates[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
         elif subject_type == 'strain':
             for strain_name in strain_names:
                 title = technique.csv_column_name(strain_name)
 
-                description = TECHNIQUE_DESCRIPTIONS[f"{technique_type}_ps"].format(
+                description = _TECHNIQUE_DESCRIPTIONS[f"{technique_type}_ps"].format(
                     strain=strain_name,
                     units=units,
                 )
@@ -74,12 +71,12 @@ def create_excel(submission, metabolite_names, strain_names):
 
                 if technique.includeStd:
                     title = ' '.join([title, 'STD'])
-                    headers_strains[title] = TECHNIQUE_DESCRIPTIONS['STD']
+                    headers_strains[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
         elif subject_type == 'metabolite':
             for metabolite in metabolite_names:
                 title = technique.csv_column_name(metabolite)
-                description = TECHNIQUE_DESCRIPTIONS['metabolites'].format(
+                description = _TECHNIQUE_DESCRIPTIONS['metabolites'].format(
                     metabolite=metabolite,
                     units=units,
                 )
@@ -87,7 +84,7 @@ def create_excel(submission, metabolite_names, strain_names):
 
                 if technique.includeStd:
                     title = ' '.join([metabolite, 'STD'])
-                    headers_metabolites[title] = TECHNIQUE_DESCRIPTIONS['STD']
+                    headers_metabolites[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
         else:
             raise ValueError(f"Invalid technique subject_type: {subject_type}")
@@ -105,7 +102,7 @@ def create_excel(submission, metabolite_names, strain_names):
     return export_to_xlsx(workbook)
 
 
-def _add_header(sheet, index, title, description, fill_color):
+def _add_header(sheet, index, title, description):
     cell         = sheet.cell(row=1, column=index, value=title)
     cell.comment = Comment(description, author="μGrowthDB")
 
@@ -130,12 +127,7 @@ def _fill_sheet(workbook, sheet_title, headers, submission):
 
     # Add headers and descriptions to the first row and modify the width of each columns
     for index, (title, description) in enumerate(headers.items(), start=1):
-        if title.endswith(' STD'):
-            fill_color = WHITE
-        else:
-            fill_color = RED
-
-        _add_header(sheet, index, title, description, fill_color=fill_color)
+        _add_header(sheet, index, title, description)
 
     bottom_border = Border(bottom=Side(style="thin", color="000000"))
 

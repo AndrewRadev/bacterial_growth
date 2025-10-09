@@ -9,7 +9,8 @@
     "description": "We established a synthetic community composed of three representative human gut isolates (Roseburia intestinalis L1-82, Faecalibacterium prausnitzii A2-165 and Blautia hydrogenotrophica S5a33) and explored their interactions under well-controlled conditions in vitro."
   },
   "strains": [
-    "536231"
+    "536231",
+    "476272"
   ],
   "timeUnits": "m",
   "techniques": [
@@ -58,7 +59,7 @@
     {
       "name": "BH",
       "strainIdentifiers": [
-        "custom|Blautia hydrogenotrophica S5a33"
+        "existing|476272"
       ]
     },
     {
@@ -76,15 +77,15 @@
     {
       "name": "FP_BH",
       "strainIdentifiers": [
-        "custom|Faecalibacterium prausnitzii A2-165",
-        "custom|Blautia hydrogenotrophica S5a33"
+        "existing|476272",
+        "custom|Faecalibacterium prausnitzii A2-165"
       ]
     },
     {
       "name": "RI_BH",
       "strainIdentifiers": [
-        "existing|536231",
-        "custom|Blautia hydrogenotrophica S5a33"
+        "existing|476272",
+        "existing|536231"
       ]
     },
     {
@@ -97,9 +98,9 @@
     {
       "name": "RI_FP_BH",
       "strainIdentifiers": [
+        "existing|476272",
         "existing|536231",
-        "custom|Faecalibacterium prausnitzii A2-165",
-        "custom|Blautia hydrogenotrophica S5a33"
+        "custom|Faecalibacterium prausnitzii A2-165"
       ]
     }
   ],
@@ -110,22 +111,30 @@
       "bioreplicates": [
         {
           "name": "RI_8",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_14",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_15",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_16",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
@@ -143,17 +152,23 @@
       "bioreplicates": [
         {
           "name": "FP_4",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "FP_14",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "FP_15",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
@@ -171,17 +186,23 @@
       "bioreplicates": [
         {
           "name": "BH_14",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "BH_15",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "BH_16",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
@@ -199,16 +220,20 @@
       "bioreplicates": [
         {
           "name": "RI_FP_8",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_FP_9",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
-      "communityName": "BH",
+      "communityName": "RI_FP",
       "perturbations": [],
       "timepointCount": 17,
       "cultivationMode": "batch",
@@ -222,12 +247,16 @@
       "bioreplicates": [
         {
           "name": "RI_BH_4",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_BH_6",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
@@ -245,16 +274,20 @@
       "bioreplicates": [
         {
           "name": "RI_BH_5",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_BH_7",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
-      "communityName": "BH",
+      "communityName": "RI_BH",
       "perturbations": [],
       "timepointCount": 17,
       "cultivationMode": "batch",
@@ -268,12 +301,16 @@
       "bioreplicates": [
         {
           "name": "FP_BH_1",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "FP_BH_2",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
@@ -291,7 +328,9 @@
       "bioreplicates": [
         {
           "name": "FP_BH_3",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
@@ -309,32 +348,44 @@
       "bioreplicates": [
         {
           "name": "RI_FP_BH_10",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_FP_BH_11",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_FP_BH_12",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_FP_BH_13",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_FP_BH_14",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         },
         {
           "name": "RI_FP_BH_15",
+          "isBlank": false,
           "position": "",
+          "isControl": false,
           "biosampleUrl": ""
         }
       ],
@@ -372,12 +423,6 @@
       "species": "411483",
       "description": "The strain F. prausnitzii A2-165 was classified into F. duncaniae in Sakamoto et al: https://doi.org/10.1099/ijsem.0.005995",
       "species_name": "Faecalibacterium duncaniae"
-    },
-    {
-      "name": "Blautia hydrogenotrophica S5a33",
-      "species": "53443",
-      "description": "",
-      "species_name": "Blautia hydrogenotrophica"
     }
   ]
 }

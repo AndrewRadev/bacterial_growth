@@ -1,7 +1,7 @@
 import io
 import copy
 import itertools
-from datetime import datetime, timedelta, UTC
+from datetime import datetime, timedelta, time, UTC
 from db import get_session, get_transaction
 
 import pandas as pd
@@ -77,6 +77,10 @@ def validate_data_file(submission_form, data_file=None):
     data_file = data_file or submission.dataFile
     errors = []
 
+    # TODO (2025-10-01) Show warnings that don't stop the upload
+    # process:
+    warnings = []
+
     if not data_file:
         return []
 
@@ -137,7 +141,7 @@ def validate_data_file(submission_form, data_file=None):
         missing_time_rows = []
         missing_values = {}
 
-        # Time must be present
+        # Check for missing Time values:
         if 'Time' in df:
             for index, time in enumerate(df['Time']):
                 if not is_non_negative_float(time, isnan_check=True):
@@ -145,7 +149,8 @@ def validate_data_file(submission_form, data_file=None):
 
         if missing_time_rows:
             row_description = _format_row_list_error(missing_time_rows)
-            errors.append(f"{sheet_name}: Missing or invalid time values on row(s) {row_description}")
+            # TODO (2025-10-01) Show warnings in UI
+            warnings.append(f"{sheet_name}: Missing or invalid time values on row(s) {row_description}")
 
         # For the other rows, we're looking for non-negative numbers or blanks
         value_columns = expected_value_columns[sheet_name].intersection(set(df.columns))
@@ -167,22 +172,28 @@ def validate_data_file(submission_form, data_file=None):
 def _save_study(db_session, submission_form, user_uuid=None):
     submission = submission_form.submission
 
+    if embargo_string := submission.studyDesign['study'].get('embargoExpiresAt', None):
+        embargo_date     = datetime.fromisoformat(embargo_string)
+        embargo_datetime = datetime.combine(embargo_date, time(hour=23, minute=59, tzinfo=UTC))
+    else:
+        embargo_datetime = None
+
     params = {
-        'publicId':    submission_form.study_id,
-        'name':        submission.studyDesign['study']['name'].strip(),
-        'description': submission.studyDesign['study'].get('description', '').strip(),
-        'url':         submission.studyDesign['study'].get('url', '').strip(),
-        'uuid':        submission.studyUniqueID,
-        'projectUuid': submission.projectUniqueID,
-        'timeUnits':   submission.studyDesign['timeUnits'],
-        'ownerUuid':   user_uuid,
+        'publicId':         submission_form.study_id,
+        'name':             submission.studyDesign['study']['name'].strip(),
+        'description':      submission.studyDesign['study'].get('description', '').strip(),
+        'url':              submission.studyDesign['study'].get('url', '').strip(),
+        'uuid':             submission.studyUniqueID,
+        'projectUuid':      submission.projectUniqueID,
+        'timeUnits':        submission.studyDesign['timeUnits'],
+        'embargoExpiresAt': embargo_datetime,
     }
 
     if submission_form.type != 'update_study':
-        study = Study(**Study.filter_keys(params))
+        params['ownerUuid'] = user_uuid
 
+        study = Study(**Study.filter_keys(params))
         study.publicId = Study.generate_public_id(db_session)
-        study.publishableAt = datetime.now(UTC) + timedelta(hours=24)
 
         db_session.add(StudyUser(
             studyUniqueID=submission.studyUniqueID,
@@ -195,6 +206,12 @@ def _save_study(db_session, submission_form, user_uuid=None):
             .limit(1)
         ).one()
         study.update(**Study.filter_keys(params))
+
+    tomorrow = datetime.now(UTC) + timedelta(hours=24)
+    if embargo_datetime and embargo_datetime > tomorrow:
+        study.publishableAt = embargo_datetime
+    else:
+        study.publishableAt = tomorrow
 
     db_session.add(study)
 
@@ -209,10 +226,11 @@ def _save_project(db_session, submission_form, user_uuid=None):
         'name':        submission.studyDesign['project']['name'].strip(),
         'description': submission.studyDesign['project'].get('description', '').strip(),
         'uuid':        submission.projectUniqueID,
-        'ownerUuid':   user_uuid,
     }
 
     if submission_form.type == 'new_project':
+        params['ownerUuid'] = user_uuid
+
         project = Project(**Project.filter_keys(params))
         project.publicId = Project.generate_public_id(db_session)
         db_session.add(ProjectUser(
@@ -276,16 +294,17 @@ def _save_communities(db_session, submission_form, study, user_uuid):
 
         for identifier in strain_identifiers:
             if identifier not in identifier_cache:
-                strain = _build_strain(db_session, identifier, submission, study, user_uuid)
-                identifier_cache[identifier] = strain
-                db_session.add(strain)
-                db_session.flush()
+                if strain := _build_strain(db_session, identifier, submission, study, user_uuid):
+                    identifier_cache[identifier] = strain
+                    db_session.add(strain)
+                    db_session.flush()
 
-            community_strain = CommunityStrain(
-                community=community,
-                strain=identifier_cache[identifier],
-            )
-            db_session.add(community_strain)
+            if identifier in identifier_cache:
+                community_strain = CommunityStrain(
+                    community=community,
+                    strain=identifier_cache[identifier],
+                )
+                db_session.add(community_strain)
 
         communities.append(community)
 
@@ -548,7 +567,7 @@ def _find_custom_strain(submission, identifier):
         if custom_strain_data['name'] == identifier:
             return custom_strain_data
     else:
-        raise IndexError(f"New strain with name {repr(identifier)} not found in submission")
+        return None
 
 
 def _get_expected_column_names(submission_form):
@@ -623,6 +642,10 @@ def _build_strain(db_session, identifier, submission, study, user_uuid):
     elif identifier.startswith('custom|'):
         identifier = identifier.removeprefix('custom|')
         custom_strain_data = _find_custom_strain(submission, identifier)
+
+        if custom_strain_data is None:
+            # Missing strain due to renames
+            return None
 
         strain_params = {
             'name':        custom_strain_data['name'],

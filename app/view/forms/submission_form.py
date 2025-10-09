@@ -20,8 +20,16 @@ from app.model.orm import (
 # structure.
 #
 DEFAULT_STUDY_DESIGN = {
-    'project': {'name': None, 'description': None},
-    'study':   {'name': None, 'description': None, 'url': None},
+    'project': {
+        'name': None,
+        'description': None,
+    },
+    'study': {
+        'name':             None,
+        'description':      None,
+        'url':              None,
+        'embargoExpiresAt': None,
+    },
 
     'timeUnits': None,
 
@@ -98,9 +106,10 @@ class SubmissionForm:
             'description': data.get('project_description', ''),
         }
         self.submission.studyDesign['study'] = {
-            'name':        data['study_name'],
-            'description': data.get('study_description', ''),
-            'url':         data.get('study_url', ''),
+            'name':             data['study_name'],
+            'description':      data.get('study_description', ''),
+            'url':              data.get('study_url', ''),
+            'embargoExpiresAt': data.get('embargo_expires_at', None)
         }
 
         # Validate uniqueness:
