@@ -53,7 +53,7 @@ You can move individual measurement traces between the left and right axis using
 
 The software allows you to add multiple incompatible types of measurements on the same axis. Its label is set to "[mixed units]" and the user is free to decide how to organize their data. In some cases, values may be at the right orders of magnitude to provide useful information even when mixed. For instance, the pH level and metabolite concentrations might both be readable on the same axis. You can use the "Log view" checkboxes to apply a natural logarithm to either one of the axes.
 
-From this page, you can copy the "Permalink to this page" hyperlink and send it to other researchers for the purposes of collaboration. You could also add the charts to the "Compare" view by clicking on the bottom-right "Compare across studies" button seen in that same figure.
+From this page, you can copy the "Link to this page" hyperlink and send it to other researchers for the purposes of collaboration. You could also add the charts to the "Compare" view by clicking on the bottom-right "Compare across studies" button seen in that same figure.
 
 ## Cross-study comparison
 
