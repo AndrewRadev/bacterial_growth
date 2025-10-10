@@ -73,5 +73,5 @@ def search_index_page():
         "pages/search/index.html",
         form=form,
         template_clause=template_clause,
-        results=results
+        results=results,
     )
