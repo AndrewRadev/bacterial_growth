@@ -1,13 +1,19 @@
-from flask import g
+from flask import (
+    g,
+    request,
+)
 from werkzeug.exceptions import NotFound
 import sqlalchemy as sql
 
 from app.model.orm import (
-    Project,
-    Study,
+    Bioreplicate,
     Experiment,
-    MeasurementContext,
     Measurement,
+    MeasurementContext,
+    Metabolite,
+    Project,
+    Strain,
+    Study,
 )
 
 
@@ -150,6 +156,51 @@ def measurement_context_csv(id):
     return df.to_csv(index=False)
 
 
+def search_json():
+    request_args = request.args.to_dict()
+    if len(request_args) == 0:
+        return {"error": "No search query parameters"}, 401
+
+    results = set()
+
+    for (key, value) in request_args.items():
+        if key == 'strainNcbiId':
+            study_strain_ids = g.db_session.scalars(
+                sql.select(Strain.id)
+                .where(Strain.NCBId == value),
+            ).all()
+            results.update(_contexts_by_subject('strain', study_strain_ids))
+
+        elif key == 'metaboliteChebiId':
+            metabolite = g.db_session.scalars(
+                sql.select(Metabolite)
+                .where(Metabolite.chebiId == f"CHEBI:{value}"),
+            ).one()
+            results.update(_contexts_by_subject('metabolite', metabolite.id))
+
+    measurement_contexts    = list(results)
+    measurement_context_ids = [mc.id for mc in measurement_contexts]
+
+    experiment_ids = sorted({mc.experiment.publicId for mc in measurement_contexts})
+    study_ids      = sorted({mc.experiment.studyId for mc in measurement_contexts})
+
+    return {
+        'studies':             study_ids,
+        'experiments':         experiment_ids,
+        'measurementContexts': [
+            {
+                'id':             mc.id,
+                'experimentId':   mc.experiment.publicId,
+                'studyId':        mc.studyId,
+                'techniqueType':  mc.technique.type,
+                'techniqueUnits': mc.technique.units,
+                'subject':        _render_measurement_subject(mc),
+            }
+            for mc in measurement_contexts
+        ]
+    }
+
+
 def _render_measurement_subject(measurement_context):
     subject = measurement_context.get_subject(g.db_session)
     subject_type = measurement_context.subjectType
@@ -162,8 +213,33 @@ def _render_measurement_subject(measurement_context):
         extra_data = {}
 
     return {
-        'id':   subject.id,
         'type': subject_type,
         'name': subject.name,
         **extra_data,
     }
+
+
+def _contexts_by_subject(subject_type, subject_id):
+    sql_options = (
+        sql.orm.joinedload(MeasurementContext.technique),
+        sql.orm.joinedload(MeasurementContext.experiment),
+    )
+
+    if isinstance(subject_id, list):
+        return g.db_session.scalars(
+            sql.select(MeasurementContext)
+            .where(
+                MeasurementContext.subjectType == subject_type,
+                MeasurementContext.subjectId.in_(subject_id),
+            )
+            .options(*sql_options)
+        ).all()
+    else:
+        return g.db_session.scalars(
+            sql.select(MeasurementContext)
+            .where(
+                MeasurementContext.subjectType == subject_type,
+                MeasurementContext.subjectId == subject_id,
+            )
+            .options(*sql_options)
+        ).all()

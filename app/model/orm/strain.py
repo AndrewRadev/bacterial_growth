@@ -10,6 +10,7 @@ from sqlalchemy.orm import (
 from app.model.orm.orm_base import OrmBase
 
 
+# TODO (2025-10-09) Rename to StudyStrain or something
 class Strain(OrmBase):
     "A microbial strain used in a particular study"
 

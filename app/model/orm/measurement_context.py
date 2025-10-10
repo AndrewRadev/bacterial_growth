@@ -27,6 +27,11 @@ class MeasurementContext(OrmBase):
     bioreplicateId: Mapped[int] = mapped_column(sql.ForeignKey('Bioreplicates.id'))
     bioreplicate: Mapped['Bioreplicate'] = relationship(back_populates='measurementContexts')
 
+    experiment: Mapped['Experiment'] = relationship(
+        secondary='Bioreplicates',
+        viewonly=True,
+    )
+
     compartmentId: Mapped[int] = mapped_column(sql.ForeignKey('Compartments.id'))
     compartment: Mapped['Compartment'] = relationship(back_populates='measurementContexts')
 
