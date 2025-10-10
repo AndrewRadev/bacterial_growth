@@ -43,16 +43,16 @@
             name="{{ prefix }}units"
             class="form-input-full form-input-blue js-unit-select" />
           <optgroup label="Molar concentration">
-            <option value="mM">Milimolars (mM)</option>
-            <option value="μM">Micromolars (μM)</option>
-            <option value="nM">Nanomolars (nM)</option>
-            <option value="pM">Picomolars (pM)</option>
+            <option value="mM" {{ "selected" if data['units'] == 'mM' }}>Milimolars (mM)</option>
+            <option value="μM" {{ "selected" if data['units'] == 'μM' }}>Micromolars (μM)</option>
+            <option value="nM" {{ "selected" if data['units'] == 'nM' }}>Nanomolars (nM)</option>
+            <option value="pM" {{ "selected" if data['units'] == 'pM' }}>Picomolars (pM)</option>
           </optgroup>
           <optgroup label="Mass concentration">
-            <option value="g/L">Grams per Liter (g/L)</option>
+            <option value="g/L" {{ "selected" if data['units'] == 'g/L' }}>Grams per Liter (g/L)</option>
           </optgroup>
           <optgroup label="Other">
-            <option value="AUC">AUC</option>
+            <option value="AUC" {{ "selected" if data['units'] == 'AUC' }}>AUC</option>
           </optgroup>
         </select>
       </label>
