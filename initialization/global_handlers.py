@@ -104,7 +104,7 @@ def _render_not_found(_error):
     if _is_json(request):
         return {'error': '404 Not found'}, 404
     if _is_csv(request):
-        return '', 404
+        return '404 Not found', 404
     else:
         return render_template('errors/404.html'), 404
 

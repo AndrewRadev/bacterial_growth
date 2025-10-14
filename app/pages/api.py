@@ -148,10 +148,43 @@ def measurement_context_json(id):
 
 def measurement_context_csv(id):
     measurement_context = g.db_session.get(MeasurementContext, id)
-    if not measurement_context.study.isPublished:
+    if not measurement_context or not measurement_context.study.isPublished:
         raise NotFound
 
     df = measurement_context.get_df(g.db_session)
+
+    return df.to_csv(index=False)
+
+
+def bioreplicate_json(id):
+    bioreplicate = g.db_session.get(Bioreplicate, id)
+    if not bioreplicate or not bioreplicate.study.isPublished:
+        raise NotFound
+
+    return {
+        'id':                  bioreplicate.id,
+        'experimentId':        bioreplicate.experiment.publicId,
+        'studyId':             bioreplicate.experiment.studyId,
+        'name':                bioreplicate.name,
+        'biosampleUrl':        bioreplicate.biosampleUrl,
+        'measurementContexts': [
+            {
+                'id':             mc.id,
+                'techniqueType':  mc.technique.type,
+                'techniqueUnits': mc.technique.units,
+                'subject':        _render_measurement_subject(mc),
+            }
+            for mc in bioreplicate.measurementContexts
+        ]
+    }
+
+
+def bioreplicate_csv(id):
+    bioreplicate = g.db_session.get(Bioreplicate, id)
+    if not bioreplicate.study.isPublished:
+        raise NotFound
+
+    df = bioreplicate.get_df(g.db_session)
 
     return df.to_csv(index=False)
 

@@ -8,6 +8,7 @@ from sqlalchemy.orm import (
 )
 
 from app.model.orm.orm_base import OrmBase
+from app.model.lib.db import execute_into_df
 
 
 class Bioreplicate(OrmBase):
@@ -37,6 +38,11 @@ class Bioreplicate(OrmBase):
     experimentId: Mapped[str] = mapped_column(sql.ForeignKey('Experiments.publicId'), nullable=False)
     experiment: Mapped['Experiment'] = relationship(back_populates='bioreplicates')
 
+    study: Mapped['Study'] = relationship(
+        secondary='Experiments',
+        viewonly=True,
+    )
+
     measurementContexts: Mapped[List['MeasurementContext']] = relationship(
         back_populates='bioreplicate',
         cascade='all, delete-orphan'
@@ -46,3 +52,27 @@ class Bioreplicate(OrmBase):
         secondary='MeasurementContexts',
         viewonly=True,
     )
+
+    def get_df(self, db_session):
+        from app.model.orm import Measurement, MeasurementContext
+
+        query = (
+            sql.select(
+                MeasurementContext.id.label("measurementContextId"),
+                Measurement.timeInHours.label("time"),
+                Measurement.value,
+                Measurement.std,
+            )
+            .join(MeasurementContext)
+            .join(Bioreplicate)
+            .where(
+                Bioreplicate.id == self.id,
+                Measurement.value.is_not(None),
+            )
+            .order_by(
+                MeasurementContext.id,
+                Measurement.timeInSeconds,
+            )
+        )
+
+        return execute_into_df(db_session, query)
