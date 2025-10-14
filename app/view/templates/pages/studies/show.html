@@ -156,6 +156,15 @@
                       📈
                     </a>
 
+                    <a
+                        href="{{ url_for('bioreplicate_csv', id=bioreplicate.id) }}"
+                        class="white-button no-border small-button"
+                        style="vertical-align: top"
+                        download="bioreplicate_{{ bioreplicate.id }}.csv"
+                        data-tooltip="Download data">
+                      <span class="flex-row icon icon-download-black"></span>
+                    </a>
+
                     <br>
 
                     <strong>Measurements</strong>:
