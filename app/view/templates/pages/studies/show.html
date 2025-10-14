@@ -133,7 +133,7 @@
 
               <ol class="bioreplicates-list">
                 {% for bioreplicate in experiment.bioreplicates %}
-                  {% set measurement_context_ids = bioreplicate.measurementContexts|map(attribute="id") %}
+                  {% set measurement_context_ids = bioreplicate.measurementContexts|map(attribute="id")|list %}
 
                   <li>
                     <strong>{{ bioreplicate.name }}</strong>
