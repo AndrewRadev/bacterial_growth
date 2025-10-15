@@ -212,4 +212,63 @@ class TestApiPages(PageTest):
 
         response2 = self.client.get(f"/api/v1/measurement-context/{measurement_context.id}.csv")
         self.assertEqual(response2.status, '404 NOT FOUND')
-        self.assertEqual(response2.data, b'')
+        self.assertEqual(response2.data, b'404 Not found')
+
+    def test_bioreplicate_csv(self):
+        study        = self.create_study(publishedAt=datetime.now(UTC))
+        experiment   = self.create_experiment(studyId=study.publicId)
+        bioreplicate = self.create_bioreplicate(experimentId=experiment.publicId)
+        strain       = self.create_strain(studyId=study.publicId)
+
+        for subject, subject_type in ((bioreplicate, 'bioreplicate'), (strain, 'strain')):
+            measurement_context = self.create_measurement_context(
+                studyId=study.publicId,
+                bioreplicateId=bioreplicate.id,
+                subjectId=subject.id,
+                subjectType=subject_type,
+            )
+            for i in range(1, 4):
+                self.create_measurement(
+                    contextId=measurement_context.id,
+                    timeInSeconds=(i * 3600),
+                    value=(i * 10),
+                )
+
+        self.db_session.commit()
+
+        response = self.client.get(f"/api/v1/bioreplicate/{bioreplicate.id}.csv")
+        self.assertEqual(response.status, '200 OK')
+
+        response_df = self._get_csv(response)
+
+        self.assertEqual(response_df.columns.tolist(), ['measurementContextId', 'time', 'value', 'std'])
+        self.assertEqual(response_df['time'].tolist(), [1, 2, 3, 1, 2, 3])
+        self.assertEqual(response_df['value'].tolist(), [10, 20, 30, 10, 20, 30])
+        self.assertTrue(response_df['std'].isna().all())
+
+    def test_bioreplicate_json(self):
+        study        = self.create_study(publishedAt=datetime.now(UTC))
+        experiment   = self.create_experiment(studyId=study.publicId)
+        bioreplicate = self.create_bioreplicate(name='B1', experimentId=experiment.publicId)
+
+        measurement_context = self.create_measurement_context(
+            studyId=study.publicId,
+            bioreplicateId=bioreplicate.id,
+            subjectId=bioreplicate.id,
+            subjectType='bioreplicate',
+        )
+
+        self.db_session.commit()
+
+        response = self.client.get(f"/api/v1/bioreplicate/{bioreplicate.id}.json")
+        self.assertEqual(response.status, '200 OK')
+
+        response_json = self._get_json(response)
+
+        self.assertEqual(response_json['id'], bioreplicate.id)
+        self.assertEqual(response_json['studyId'], study.publicId)
+        self.assertEqual(response_json['experimentId'], experiment.publicId)
+        self.assertEqual(response_json['name'], 'B1')
+        self.assertEqual(len(response_json['measurementContexts']), 1)
+        self.assertEqual(response_json['measurementContexts'][0]['id'], measurement_context.id)
+
