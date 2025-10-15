@@ -21,16 +21,20 @@ def convert_measurement_units(
     if source_units == target_units:
         return value
 
-    if source_units == 'g/L':
+    if source_units in ('g/L', 'mg/L'):
         if mass is None:
             return None
-        value = (value * 1_000) / float(mass)
+        value /= float(mass)
+        if source_units == 'g/L':
+            value *= 1000
         source_units = 'mM'
 
-    if target_units == 'g/L':
+    if target_units in ('g/L', 'mg/L'):
         if mass is None:
             return None
-        value = (value * float(mass)) / 1_000.0
+        value *= float(mass)
+        if target_units == 'g/L':
+            value /= 1_000.0
         target_units = 'mM'
 
     if source_units == target_units:
