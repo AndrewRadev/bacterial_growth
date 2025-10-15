@@ -42,7 +42,7 @@
     },
     {
       "type": "metabolite",
-      "units": "g/L",
+      "units": "mg/L",
       "includeStd": false,
       "description": "",
       "subjectType": "metabolite",

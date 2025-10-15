@@ -16,7 +16,7 @@ CELL_COUNT_UNITS = ('Cells/mL', 'Cells/μL')
 CFU_COUNT_UNITS  = ('CFUs/mL', 'CFUs/μL')
 "Units that measure number of CFUs per volume"
 
-METABOLITE_UNITS = ('mM', 'μM', 'nM', 'pM', 'g/L')
+METABOLITE_UNITS = ('mM', 'μM', 'nM', 'pM', 'g/L', 'mg/L')
 "Units for metabolites, both molar and mass concentration"
 
 
