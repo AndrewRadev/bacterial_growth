@@ -17,6 +17,8 @@ from app.model.orm import (
     StudyUser,
 )
 
+_PER_PAGE = 10
+
 
 def search_index_page():
     form = SearchForm(request.args)
@@ -59,7 +61,7 @@ def search_index_page():
             .where(publish_clause)
             .group_by(Study)
             .order_by(Study.publishedAt.desc())
-            .limit(5)
+            .limit(_PER_PAGE)
         ).all()
 
     if studyIds:
