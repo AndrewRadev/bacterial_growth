@@ -5,7 +5,7 @@ set -e
 export APP_ENV=production
 export PYTHONPATH=.
 
-gunicorn --log-level DEBUG -w 4 --bind "0.0.0.0:8081" "main:create_app()" &
-celery -A scripts.run_celery worker --loglevel INFO &
+gunicorn --log-level DEBUG -w 3 --bind "0.0.0.0:8081" "main:create_app()" &
+celery -A scripts.run_celery worker --concurrency=3 --loglevel INFO &
 
 wait
