@@ -286,26 +286,21 @@ class Chart:
                 # consider it for the chart range
                 continue
 
-            # We look for the min and max values in the dataframe and their
-            # corresponding standard deviation:
-            min_value = df['value'].min()
-            max_value = df['value'].max()
+            # We look for the min and max values + std in the dataframe:
+            lowers = []
+            uppers = []
 
-            min_row = df[df['value'] == min_value]
-            max_row = df[df['value'] == max_value]
+            for value, std in zip(df['value'], df['std']):
+                # For some reason, pandas might give us a None here, or it might
+                # give us a NaN
+                if std is None or math.isnan(std):
+                    std = 0
 
-            min_std = min_row['std'].iloc[0]
-            max_std = max_row['std'].iloc[0]
+                uppers.append(value + std)
+                lowers.append(value - std)
 
-            # For some reason, pandas might give us a None here, or it might
-            # give us a NaN
-            if min_std is None or math.isnan(min_std):
-                min_std = 0
-            if max_std is None or math.isnan(max_std):
-                max_std = 0
-
-            max_y = max_value + max_std
-            min_y = min_value - min_std
+            max_y = max(uppers)
+            min_y = min(lowers)
 
             if max_y > global_max_y:
                 global_max_y = max_y
