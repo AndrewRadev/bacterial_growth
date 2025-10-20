@@ -121,8 +121,8 @@ class Chart:
         else:
             xaxis_range = None
 
-        left_yaxis_range  = self._calculate_y_range(converted_data_left)
-        right_yaxis_range = self._calculate_y_range(converted_data_right)
+        left_yaxis_range  = self._calculate_y_range(converted_data_left, log=self.log_left)
+        right_yaxis_range = self._calculate_y_range(converted_data_right, log=self.log_right)
 
         for index, (x0, x1, label, text) in enumerate(self.regions):
             y0, y1 = left_yaxis_range
@@ -277,7 +277,7 @@ class Chart:
         padding = (global_max_x - global_min_x) * 0.05
         return [global_min_x - padding, global_max_x + padding]
 
-    def _calculate_y_range(self, data):
+    def _calculate_y_range(self, data, log=False):
         """
         Find the limit for the y axis, ignoring model dataframes, since they
         might have exponentials that shoot up.
@@ -302,7 +302,10 @@ class Chart:
                     std = 0
 
                 uppers.append(value + std)
-                lowers.append(value - std)
+                if log:
+                    lowers.append(value - std)
+                else:
+                    lowers.append(np.clip(value - std, min=0))
 
             max_y = max(uppers)
             min_y = min(lowers)
