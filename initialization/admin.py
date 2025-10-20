@@ -189,7 +189,12 @@ def init_admin(app):
     class StudyView(AppView):
         column_searchable_list = ['name']
         column_exclude_list = ['description']
-        form_excluded_columns = ['measurements', 'measurementContexts', 'measurementTechniques']
+        form_excluded_columns = [
+            'measurements', 'measurementContexts', 'measurementTechniques',
+            'studyUsers', 'experiments', 'strains', 'communities', 'compartments',
+            'modelingRequests', 'modelingResults', 'bioreplicates',
+            'studyMetabolites', 'metabolites',
+        ]
 
     class SubmissionView(AppView):
         column_exclude_list = ['studyDesign', 'dataFile']
@@ -267,6 +272,7 @@ def init_admin(app):
     class UserView(AppView):
         form_excluded_columns = [
             'createdAt', 'lastLoginAt', 'updatedAt', 'submissions',
+            'orcidToken',
             'managedProjects', 'managedStudies',
             'ownedProjects', 'ownedStudies',
             'projectUsers', 'studyUsers',
