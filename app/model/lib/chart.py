@@ -115,7 +115,12 @@ class Chart:
 
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=True)
 
-        xaxis_range       = self._calculate_x_range(converted_data_left + converted_data_right)
+        if self.clamp_x_data:
+            # Fit the x-axis of the shortest chart:
+            xaxis_range = self._calculate_x_range(converted_data_left + converted_data_right)
+        else:
+            xaxis_range = None
+
         left_yaxis_range  = self._calculate_y_range(converted_data_left)
         right_yaxis_range = self._calculate_y_range(converted_data_right)
 
