@@ -60,7 +60,6 @@ def search_index_page():
             .join(StudyUser, isouter=True)
             .where(publish_clause)
             .group_by(Study)
-            .order_by(Study.publishedAt.desc())
             .limit(_PER_PAGE)
         ).all()
 
@@ -68,7 +67,7 @@ def search_index_page():
         results = g.db_session.scalars(
             sql.select(Study)
             .where(Study.publicId.in_(studyIds))
-            .order_by(Study.publishedAt.desc())
+            .order_by(Study.createdAt.desc())
         )
 
     return render_template(
