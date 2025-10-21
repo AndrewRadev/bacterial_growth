@@ -97,6 +97,7 @@ def experiment_json(publicId):
                 'inoculumConcentration': c.inoculumConcentration,
                 'inoculumVolume':        c.inoculumVolume,
                 'initialPh':             c.initialPh,
+                'dilutionRate':          c.dilutionRate,
                 'initialTemperature':    c.initialTemperature,
                 'mediumName':            c.mediumName,
                 'mediumUrl':             c.mediumUrl,

@@ -135,6 +135,7 @@
       "volume": 10,
       "pressure": null,
       "initialPh": 6.4,
+      "dilutionRate": 0.04,
       "mediumUrl": "https://mediadive.dsmz.de/medium/339",
       "mediumName": "Wilkins-Chalgren Anaerobe Broth (WC)",
       "stirringMode": "",

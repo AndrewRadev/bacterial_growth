@@ -15,6 +15,7 @@ PROPERTY_NAMES = {
     'pressure':              'pressure',
     'stirringMode':          'stirring mode',
     'stirringSpeed':         'stirring speed',
+    'dilutionRate':          'dilution rate',
     'O2':                    'O<sub>2</sub>',
     'CO2':                   'CO<sub>2</sub>',
     'H2':                    'H<sub>2</sub>',
@@ -31,6 +32,7 @@ PROPERTY_UNITS = {
     'pressure':              'atm',
     'stirringMode':          '',
     'stirringSpeed':         'rpm',
+    'dilutionRate':          'h<sup>-1</sup>',
     'O2':                    '%',
     'CO2':                   '%',
     'H2':                    '%',
@@ -80,6 +82,8 @@ class Compartment(OrmBase):
     inoculumVolume:        Mapped[Decimal] = mapped_column(sql.Numeric(7, 2), nullable=True)
     initialPh:             Mapped[Decimal] = mapped_column(sql.Numeric(7, 2), nullable=True)
     initialTemperature:    Mapped[Decimal] = mapped_column(sql.Numeric(7, 2), nullable=True)
+
+    dilutionRate: Mapped[Decimal] = mapped_column(sql.Numeric(7, 3), nullable=True)
 
     mediumName: Mapped[str]  = mapped_column(sql.String(100), nullable=True)
     mediumUrl:  Mapped[str]  = mapped_column(sql.String(100), nullable=True)

@@ -45,6 +45,8 @@ class UploadStep4Form(BaseForm):
         initialPh          = DecimalField('initialPh',          validators=[Optional()])
         initialTemperature = DecimalField('initialTemperature', validators=[Optional()])
 
+        dilutionRate = DecimalField('dilutionRate', validators=[Optional()])
+
     class CommunityForm(BaseForm):
         class Meta:
             csrf = False
