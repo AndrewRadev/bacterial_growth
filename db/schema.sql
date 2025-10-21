@@ -101,6 +101,7 @@ CREATE TABLE Compartments (
   carbonSource tinyint(1) DEFAULT '0',
   mediumName varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   mediumUrl varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  dilutionRate decimal(7,3) DEFAULT NULL,
   PRIMARY KEY (id),
   KEY fk_1 (studyId),
   CONSTRAINT Compartments_fk_1 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
@@ -631,5 +632,6 @@ INSERT INTO MigrationVersions VALUES
 (62,'2025_07_09_124639_remove_deprecated_experiment_id','2025-08-20 12:11:25'),
 (63,'2025_07_10_183310_make_subject_id_not_null','2025-08-20 12:11:25'),
 (64,'2025_07_13_121621_make_orcid_token_nullable','2025-08-20 12:11:25'),
-(66,'2025_10_20_124103_make_last_login_at_nullable','2025-10-20 10:44:00');
+(65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-21 14:36:17'),
+(67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22');
 
