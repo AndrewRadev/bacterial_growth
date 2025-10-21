@@ -127,7 +127,7 @@ def experiment_json(publicId):
 
 def measurement_context_json(id):
     measurement_context = g.db_session.get(MeasurementContext, id)
-    if not measurement_context.study.isPublished:
+    if not measurement_context or not measurement_context.study.isPublished:
         raise NotFound
 
     measurement_count = g.db_session.scalars(
@@ -182,7 +182,7 @@ def bioreplicate_json(id):
 
 def bioreplicate_csv(id):
     bioreplicate = g.db_session.get(Bioreplicate, id)
-    if not bioreplicate.study.isPublished:
+    if not bioreplicate or bioreplicate.study.isPublished:
         raise NotFound
 
     df = bioreplicate.get_df(g.db_session)
