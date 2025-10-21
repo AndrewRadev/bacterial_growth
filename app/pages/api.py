@@ -183,7 +183,7 @@ def bioreplicate_json(id):
 
 def bioreplicate_csv(id):
     bioreplicate = g.db_session.get(Bioreplicate, id)
-    if not bioreplicate or bioreplicate.study.isPublished:
+    if not bioreplicate or not bioreplicate.study.isPublished:
         raise NotFound
 
     df = bioreplicate.get_df(g.db_session)
@@ -194,7 +194,7 @@ def bioreplicate_csv(id):
 def search_json():
     request_args = request.args.to_dict()
     if len(request_args) == 0:
-        return {"error": "No search query parameters"}, 401
+        return {"error": "No search query parameters"}, 400
 
     results = set()
 
@@ -207,11 +207,17 @@ def search_json():
             results.update(_contexts_by_subject('strain', study_strain_ids))
 
         elif key == 'metaboliteChebiId':
+            if not value.startswith('CHEBI:'):
+                value = f"CHEBI:{value}"
+
             metabolite = g.db_session.scalars(
                 sql.select(Metabolite)
-                .where(Metabolite.chebiId == f"CHEBI:{value}"),
+                .where(Metabolite.chebiId == value),
             ).one()
             results.update(_contexts_by_subject('metabolite', metabolite.id))
+
+        else:
+            return {"error": f"Unknown search parameter: {key}"}, 400
 
     measurement_contexts    = list(results)
     measurement_context_ids = [mc.id for mc in measurement_contexts]

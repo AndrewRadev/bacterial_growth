@@ -272,3 +272,104 @@ class TestApiPages(PageTest):
         self.assertEqual(len(response_json['measurementContexts']), 1)
         self.assertEqual(response_json['measurementContexts'][0]['id'], measurement_context.id)
 
+    def test_search(self):
+        s1 = self.create_study(publishedAt=datetime.now(UTC))
+        s2 = self.create_study(publishedAt=datetime.now(UTC))
+
+        b1 = self.create_bioreplicate(experimentId=self.create_experiment(studyId=s1.publicId).publicId)
+        b2 = self.create_bioreplicate(experimentId=self.create_experiment(studyId=s1.publicId).publicId)
+        b3 = self.create_bioreplicate(experimentId=self.create_experiment(studyId=s2.publicId).publicId)
+        b4 = self.create_bioreplicate(experimentId=self.create_experiment(studyId=s2.publicId).publicId)
+
+        roseburia = self.create_strain(name='Roseburia')
+        blautia   = self.create_strain(name='Blautia')
+
+        trehalose = self.create_metabolite(name="trehalose")
+
+        mc1 = self.create_measurement_context(
+            studyId=s1.publicId,
+            bioreplicateId=b1.id,
+            subjectId=roseburia.id,
+            subjectType='strain',
+        )
+        mc2 = self.create_measurement_context(
+            studyId=s1.publicId,
+            bioreplicateId=b2.id,
+            subjectId=blautia.id,
+            subjectType='strain',
+        )
+        mc3 = self.create_measurement_context(
+            studyId=s2.publicId,
+            bioreplicateId=b3.id,
+            subjectId=roseburia.id,
+            subjectType='strain',
+        )
+        mc4 = self.create_measurement_context(
+            studyId=s2.publicId,
+            bioreplicateId=b4.id,
+            subjectId=trehalose.id,
+            subjectType='metabolite',
+        )
+
+        self.db_session.commit()
+
+        # Searching by strain:
+        response = self.client.get(f"/api/v1/search.json?strainNcbiId={roseburia.NCBId}")
+        self.assertEqual(response.status, '200 OK')
+        response_json = self._get_json(response)
+
+        self.assertEqual(sorted(response_json['studies']), sorted([s1.publicId, s2.publicId]))
+        self.assertEqual(sorted(response_json['experiments']), sorted([b1.experimentId, b3.experimentId]))
+        mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
+        self.assertEqual(mc_ids, sorted([mc1.id, mc3.id]))
+
+        response = self.client.get(f"/api/v1/search.json?strainNcbiId={blautia.NCBId}")
+        self.assertEqual(response.status, '200 OK')
+        response_json = self._get_json(response)
+
+        self.assertEqual(response_json['studies'], [s1.publicId])
+        self.assertEqual(sorted(response_json['experiments']), sorted([b2.experimentId]))
+        mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
+        self.assertEqual(mc_ids, sorted([mc2.id]))
+
+        # Searching by metabolite:
+        response = self.client.get(f"/api/v1/search.json?metaboliteChebiId={trehalose.chebiId}")
+        self.assertEqual(response.status, '200 OK')
+        response_json = self._get_json(response)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response_json['studies'], [s2.publicId])
+        self.assertEqual(sorted(response_json['experiments']), sorted([b4.experimentId]))
+        mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
+        self.assertEqual(mc_ids, sorted([mc4.id]))
+
+        # Searching by both strain and metabolite returns both matches (strain OR metabolite):
+        response = self.client.get(f"/api/v1/search.json?strainNcbiId={blautia.NCBId}&metaboliteChebiId={trehalose.chebiId}")
+        self.assertEqual(response.status, '200 OK')
+        response_json = self._get_json(response)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(sorted(response_json['studies']), sorted([s1.publicId, s2.publicId]))
+        self.assertEqual(sorted(response_json['experiments']), sorted([b2.experimentId, b4.experimentId]))
+        mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
+        self.assertEqual(mc_ids, sorted([mc2.id, mc4.id]))
+
+        # No results:
+        response = self.client.get(f"/api/v1/search.json?strainNcbiId=nonexistent")
+        self.assertEqual(response.status, '200 OK')
+        response_json = self._get_json(response)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response_json['studies'], [])
+        self.assertEqual(response_json['experiments'], [])
+        self.assertEqual(response_json['measurementContexts'], [])
+
+        # No search parameters:
+        response = self.client.get(f"/api/v1/search.json")
+        self.assertEqual(response.status, '400 BAD REQUEST')
+        self.assertTrue('error' in self._get_json(response))
+
+        # Unknown search parameter:
+        response = self.client.get(f"/api/v1/search.json?unknownSearchTerm=mistake")
+        self.assertEqual(response.status, '400 BAD REQUEST')
+        self.assertTrue('error' in self._get_json(response))
