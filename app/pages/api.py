@@ -44,7 +44,6 @@ def study_json(publicId):
         data.update({
             'description': study.description,
             'url':         study.url,
-            'timeUnits':   study.timeUnits,
             'uploadedAt':  study.createdAt.isoformat(),
             'publishedAt': study.publishedAt.isoformat(),
             'experiments': [
@@ -136,14 +135,15 @@ def measurement_context_json(id):
     ).one()
 
     return {
-        'id':               measurement_context.id,
-        'experimentId':     measurement_context.bioreplicate.experimentId,
-        'studyId':          measurement_context.studyId,
-        'bioreplicateName': measurement_context.bioreplicate.name,
-        'techniqueType':    measurement_context.technique.type,
-        'techniqueUnits':   measurement_context.technique.units,
-        'subject':          _render_measurement_subject(measurement_context),
-        'measurementCount': measurement_count,
+        'id':                   measurement_context.id,
+        'experimentId':         measurement_context.bioreplicate.experimentId,
+        'studyId':              measurement_context.studyId,
+        'bioreplicateName':     measurement_context.bioreplicate.name,
+        'techniqueType':        measurement_context.technique.type,
+        'techniqueUnits':       measurement_context.technique.units,
+        'subject':              _render_measurement_subject(measurement_context),
+        'measurementCount':     measurement_count,
+        'measurementTimeUnits': 'h',
     }
 
 
@@ -163,11 +163,12 @@ def bioreplicate_json(id):
         raise NotFound
 
     return {
-        'id':                  bioreplicate.id,
-        'experimentId':        bioreplicate.experiment.publicId,
-        'studyId':             bioreplicate.experiment.studyId,
-        'name':                bioreplicate.name,
-        'biosampleUrl':        bioreplicate.biosampleUrl,
+        'id':                   bioreplicate.id,
+        'experimentId':         bioreplicate.experiment.publicId,
+        'studyId':              bioreplicate.experiment.studyId,
+        'name':                 bioreplicate.name,
+        'biosampleUrl':         bioreplicate.biosampleUrl,
+        'measurementTimeUnits': 'h',
         'measurementContexts': [
             {
                 'id':             mc.id,
@@ -219,8 +220,9 @@ def search_json():
     study_ids      = sorted({mc.experiment.studyId for mc in measurement_contexts})
 
     return {
-        'studies':             study_ids,
-        'experiments':         experiment_ids,
+        'studies':              study_ids,
+        'experiments':          experiment_ids,
+        'measurementTimeUnits': 'h',
         'measurementContexts': [
             {
                 'id':             mc.id,
