@@ -18,7 +18,7 @@ The JSON output will be formatted for readability and in some places, truncated 
 
 Requests for specific global identifiers like `SMGDB00000001` or `EMGDB000000026` should work for you as well, so you should be able to replicate them by running them in the console. NCBI IDs and ChEBI IDs should also work for you. However, other numeric ids may be different, since updates to the underlying data might force them to be recreated. Try these out by fetching a specific study or experiment and picking bioreplicate ID or measurement context ID from the public entity's metadata.
 
-## Global considerations
+## General principles
 
 There are two types of results from the API:
 
@@ -175,7 +175,6 @@ Output:
   "projectId": "PMGDB000002",
   "description": "we used an in vitro batch system containing mucin beads to emulate the dynamic host environment and to study its impact on the interactions between two abundant and prevalent human gut bacteria.",
   "url": "https://doi.org/10.1038/s41396-023-01501-1",
-  "timeUnits": "h",
   "uploadedAt": "2025-06-05T16:52:49+00:00",
   "publishedAt": "2025-06-05T16:52:53+00:00",
   "experiments": [
@@ -231,6 +230,7 @@ Example output:
       "inoculumConcentration": "1960000.000",
       "inoculumVolume": "1.00",
       "initialPh": "6.70",
+      "dilutionRate": null,
       "initialTemperature": "37.00",
       "mediumName": "Wilkins-Chalgren Anaerobe Broth (WC)",
       "mediumUrl": "https://mediadive.dsmz.de/medium/339"
@@ -248,6 +248,7 @@ Example output:
       "inoculumConcentration": null,
       "inoculumVolume": null,
       "initialPh": null,
+      "dilutionRate": null,
       "initialTemperature": "37.00",
       "mediumName": "Mucin",
       "mediumUrl": null,
@@ -304,16 +305,17 @@ Example output:
   "id": 1440,
   "experimentId": "EMGDB000000020",
   "studyId": "SMGDB00000002",
+  "bioreplicateId": 60329,
   "bioreplicateName": "Average(BT_WC)",
   "techniqueType": "fc",
   "techniqueUnits": "Cells/μL",
   "subject": {
-    "id": 60031,
     "type": "strain",
-    "name": "Bacteroides thetaiotaomicron",
-    "NCBId": 818
+    "name": "Bacteroides thetaiotaomicron VPI-5482",
+    "NCBId": 226186
   },
-  "measurementCount": 13
+  "measurementCount": 14,
+  "measurementTimeUnits": "h"
 }
 ```
 
@@ -354,16 +356,17 @@ curl -s "$ROOT_URL/api/v1/measurement-context/1314.csv"
   "id": 1314,
   "experimentId": "EMGDB000000020",
   "studyId": "SMGDB00000002",
+  "bioreplicateId": 60315,
   "bioreplicateName": "BT_WC_3",
   "techniqueType": "metabolite",
   "techniqueUnits": "mM",
   "subject": {
-    "id": 710,
     "type": "metabolite",
     "name": "succinate",
     "chebiId": 26806
   },
-  "measurementCount": 14
+  "measurementCount": 14,
+  "measurementTimeUnits": "h"
 }
 ```
 
