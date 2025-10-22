@@ -138,6 +138,7 @@ def measurement_context_json(id):
         'id':                   measurement_context.id,
         'experimentId':         measurement_context.bioreplicate.experimentId,
         'studyId':              measurement_context.studyId,
+        'bioreplicateId':       measurement_context.bioreplicate.id,
         'bioreplicateName':     measurement_context.bioreplicate.name,
         'techniqueType':        measurement_context.technique.type,
         'techniqueUnits':       measurement_context.technique.units,
@@ -231,12 +232,14 @@ def search_json():
         'measurementTimeUnits': 'h',
         'measurementContexts': [
             {
-                'id':             mc.id,
-                'experimentId':   mc.experiment.publicId,
-                'studyId':        mc.studyId,
-                'techniqueType':  mc.technique.type,
-                'techniqueUnits': mc.technique.units,
-                'subject':        _render_measurement_subject(mc),
+                'id':               mc.id,
+                'experimentId':     mc.experiment.publicId,
+                'studyId':          mc.studyId,
+                'bioreplicateId':   mc.bioreplicate.id,
+                'bioreplicateName': mc.bioreplicate.name,
+                'techniqueType':    mc.technique.type,
+                'techniqueUnits':   mc.technique.units,
+                'subject':          _render_measurement_subject(mc),
             }
             for mc in measurement_contexts
         ]
