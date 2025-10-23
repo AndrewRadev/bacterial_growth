@@ -60,68 +60,17 @@ class ExperimentExportForm:
                         measurement_context.technique,
                     ))
 
-            # Strain-level measurements:
-            for (subject, technique) in sorted(measurement_targets['strain']):
-                condition = (
-                    MeasurementContext.subjectType == 'strain',
-                    MeasurementContext.subjectId == subject.id,
-                    MeasurementContext.techniqueId == technique.id,
-                )
-
-                query = self._base_bioreplicate_query(experiment).where(*condition)
-                df = execute_into_df(self.db_session, query)
-
-                if technique.units in CELL_COUNT_UNITS:
-                    units = convert_df_units(df, technique.units, self.cell_count_units)
-                elif technique.units in CFU_COUNT_UNITS:
-                    units = convert_df_units(df, technique.units, self.cfu_count_units)
-                else:
-                    units = technique.units
-
-                value_label = f"{subject.name} {technique.short_name} ({units})"
-
-                df.rename(inplace=True, columns={'value': value_label})
-                measurement_dfs.append(df)
-
             # Bioreplicate-level measurements:
             for technique in measurement_targets['bioreplicate']:
-                condition = (
-                    MeasurementContext.subjectType == 'bioreplicate',
-                    MeasurementContext.techniqueId == technique.id,
-                )
+                measurement_dfs.append(self._get_bioreplicate_df(experiment, technique))
 
-                query = self._base_bioreplicate_query(experiment).where(*condition)
-                df = execute_into_df(self.db_session, query)
-
-                if technique.units in CELL_COUNT_UNITS:
-                    units = convert_df_units(df, technique.units, self.cell_count_units)
-                elif technique.units in CFU_COUNT_UNITS:
-                    units = convert_df_units(df, technique.units, self.cfu_count_units)
-                else:
-                    units = technique.units
-
-                value_label = f"Community {technique.short_name}"
-                if units is not None and units != '':
-                    value_label += f" ({units})"
-
-                df.rename(inplace=True, columns={'value': value_label})
-                measurement_dfs.append(df)
+            # Strain-level measurements:
+            for (strain, technique) in sorted(measurement_targets['strain']):
+                measurement_dfs.append(self._get_strain_df(experiment, strain, technique))
 
             # Metabolite measurements:
-            for (subject, technique) in sorted(measurement_targets['metabolite']):
-                condition = (
-                    MeasurementContext.subjectType == 'metabolite',
-                    MeasurementContext.subjectId == subject.id,
-                )
-
-                query = self._base_bioreplicate_query(experiment).where(*condition)
-                df = execute_into_df(self.db_session, query)
-
-                units = convert_df_units(df, technique.units, self.metabolite_units, subject.averageMass)
-                value_label = f"{subject.name} ({units})"
-
-                df.rename(inplace=True, columns={'value': value_label})
-                measurement_dfs.append(df)
+            for (metabolite, technique) in sorted(measurement_targets['metabolite']):
+                measurement_dfs.append(self._get_metabolite_df(experiment, metabolite, technique))
 
             if len(measurement_dfs) == 0:
                 continue
@@ -143,6 +92,63 @@ class ExperimentExportForm:
             experiment_data[experiment] = experiment_df
 
         return experiment_data
+
+    def _get_bioreplicate_df(self, experiment, technique):
+        condition = (
+            MeasurementContext.subjectType == 'bioreplicate',
+            MeasurementContext.techniqueId == technique.id,
+        )
+
+        query = self._base_bioreplicate_query(experiment).where(*condition)
+        df = execute_into_df(self.db_session, query)
+
+        if technique.units in CELL_COUNT_UNITS:
+            units = convert_df_units(df, technique.units, self.cell_count_units)
+        elif technique.units in CFU_COUNT_UNITS:
+            units = convert_df_units(df, technique.units, self.cfu_count_units)
+        else:
+            units = technique.units
+
+        value_label = f"Community {technique.short_name}"
+        if units is not None and units != '':
+            value_label += f" ({units})"
+
+        return df.rename(columns={'value': value_label})
+
+    def _get_strain_df(self, experiment, metabolite, technique):
+        condition = (
+            MeasurementContext.subjectType == 'strain',
+            MeasurementContext.subjectId == metabolite.id,
+            MeasurementContext.techniqueId == technique.id,
+        )
+
+        query = self._base_bioreplicate_query(experiment).where(*condition)
+        df = execute_into_df(self.db_session, query)
+
+        if technique.units in CELL_COUNT_UNITS:
+            units = convert_df_units(df, technique.units, self.cell_count_units)
+        elif technique.units in CFU_COUNT_UNITS:
+            units = convert_df_units(df, technique.units, self.cfu_count_units)
+        else:
+            units = technique.units
+
+        value_label = f"{metabolite.name} {technique.short_name} ({units})"
+
+        return df.rename(columns={'value': value_label})
+
+    def _get_metabolite_df(self, experiment, metabolite, technique):
+        condition = (
+            MeasurementContext.subjectType == 'metabolite',
+            MeasurementContext.subjectId == metabolite.id,
+        )
+
+        query = self._base_bioreplicate_query(experiment).where(*condition)
+        df = execute_into_df(self.db_session, query)
+
+        units = convert_df_units(df, technique.units, self.metabolite_units, metabolite.averageMass)
+        value_label = f"{metabolite.name} ({units})"
+
+        return df.rename(columns={'value': value_label})
 
     def _base_bioreplicate_query(self, experiment):
         return (
