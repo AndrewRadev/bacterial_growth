@@ -111,11 +111,7 @@
                 <div class="section-bioreplicates box">
                   {% for bioreplicate in experiment.bioreplicates: %}
                     <label>
-                      <input
-                          type="checkbox"
-                          name="bioreplicates"
-                          value="{{ bioreplicate.id }}"
-                          checked />
+                      <input type="checkbox" name="bioreplicates" value="{{ bioreplicate.id }}" checked />
                       {{ bioreplicate.name }}
                     </label>
                   {% endfor %}
