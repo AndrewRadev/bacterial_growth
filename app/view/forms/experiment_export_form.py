@@ -8,6 +8,11 @@ from app.model.orm import (
     MeasurementContext,
 )
 from app.model.lib.db import execute_into_df
+from app.model.lib.conversion import (
+    convert_df_units,
+    CELL_COUNT_UNITS,
+    CFU_COUNT_UNITS,
+)
 
 
 class ExperimentExportForm:
@@ -19,6 +24,11 @@ class ExperimentExportForm:
 
         self.csv_separator = ','
         self._extract_csv_args(args)
+
+        self.cell_count_units = 'Cells/mL'
+        self.cfu_count_units  = 'CFUs/mL'
+        self.metabolite_units = 'mM'
+        self._extract_measurement_unit_args(args)
 
         self.experiments = self.db_session.scalars(
             sql.select(Experiment)
@@ -52,51 +62,66 @@ class ExperimentExportForm:
 
             # Strain-level measurements:
             for (subject, technique) in sorted(measurement_targets['strain']):
-                if technique.type == '16s':
-                    value_label = f"{subject.name} reads"
-                elif technique.type == 'fc':
-                    value_label = f"{subject.name} counts"
-                elif technique.type == 'plates':
-                    value_label = f"{subject.name} plate counts"
-                elif technique.type == 'qpcr':
-                    value_label = f"{subject.name} qPCR counts"
-                else:
-                    raise ValueError(f"Unknown technique type: {technique.type}")
-
                 condition = (
                     MeasurementContext.subjectType == 'strain',
                     MeasurementContext.subjectId == subject.id,
                     MeasurementContext.techniqueId == technique.id,
                 )
 
-                query = self._base_bioreplicate_query(experiment, value_label).where(*condition)
-                measurement_dfs.append(execute_into_df(self.db_session, query))
+                query = self._base_bioreplicate_query(experiment).where(*condition)
+                df = execute_into_df(self.db_session, query)
+
+                if technique.units in CELL_COUNT_UNITS:
+                    units = convert_df_units(df, technique.units, self.cell_count_units)
+                elif technique.units in CFU_COUNT_UNITS:
+                    units = convert_df_units(df, technique.units, self.cfu_count_units)
+                else:
+                    units = technique.units
+
+                value_label = f"{subject.name} {technique.short_name} ({units})"
+
+                df.rename(inplace=True, columns={'value': value_label})
+                measurement_dfs.append(df)
 
             # Bioreplicate-level measurements:
             for technique in measurement_targets['bioreplicate']:
-                if technique.units is None or technique.units == '':
-                    value_label = technique.short_name
-                else:
-                    value_label = f"{technique.short_name} ({technique.units})"
-
                 condition = (
                     MeasurementContext.subjectType == 'bioreplicate',
                     MeasurementContext.techniqueId == technique.id,
                 )
 
-                query = self._base_bioreplicate_query(experiment, value_label).where(*condition)
-                measurement_dfs.append(execute_into_df(self.db_session, query))
+                query = self._base_bioreplicate_query(experiment).where(*condition)
+                df = execute_into_df(self.db_session, query)
+
+                if technique.units in CELL_COUNT_UNITS:
+                    units = convert_df_units(df, technique.units, self.cell_count_units)
+                elif technique.units in CFU_COUNT_UNITS:
+                    units = convert_df_units(df, technique.units, self.cfu_count_units)
+                else:
+                    units = technique.units
+
+                value_label = f"Community {technique.short_name}"
+                if units is not None and units != '':
+                    value_label += f" ({units})"
+
+                df.rename(inplace=True, columns={'value': value_label})
+                measurement_dfs.append(df)
 
             # Metabolite measurements:
             for (subject, technique) in sorted(measurement_targets['metabolite']):
-                value_label = f"{subject.name} ({technique.units})"
                 condition = (
                     MeasurementContext.subjectType == 'metabolite',
                     MeasurementContext.subjectId == subject.id,
                 )
 
-                query = self._base_bioreplicate_query(experiment, value_label).where(*condition)
-                measurement_dfs.append(execute_into_df(self.db_session, query))
+                query = self._base_bioreplicate_query(experiment).where(*condition)
+                df = execute_into_df(self.db_session, query)
+
+                units = convert_df_units(df, technique.units, self.metabolite_units, subject.averageMass)
+                value_label = f"{subject.name} ({units})"
+
+                df.rename(inplace=True, columns={'value': value_label})
+                measurement_dfs.append(df)
 
             if len(measurement_dfs) == 0:
                 continue
@@ -119,13 +144,13 @@ class ExperimentExportForm:
 
         return experiment_data
 
-    def _base_bioreplicate_query(self, experiment, value_label):
+    def _base_bioreplicate_query(self, experiment):
         return (
             sql.select(
                 Measurement.timeInHours.label("Time (hours)"),
                 Bioreplicate.name.label("Biological Replicate"),
                 Compartment.name.label("Compartment"),
-                Measurement.value.label(value_label),
+                Measurement.value.label("value"),
             )
             .select_from(Measurement)
             .join(MeasurementContext)
@@ -160,3 +185,8 @@ class ExperimentExportForm:
                 self.csv_separator = ' '
         else:
             raise Exception(f"Unknown delimiter requested: {delimiter}")
+
+    def _extract_measurement_unit_args(self, args):
+        self.cell_count_units = args.get('cellCountUnits', self.cell_count_units)
+        self.cfu_count_units  = args.get('cfuCountUnits', self.cfu_count_units)
+        self.metabolite_units = args.get('metaboliteUnits', self.metabolite_units)

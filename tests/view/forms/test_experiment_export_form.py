@@ -43,18 +43,26 @@ class TestExperimentExportForm(DatabaseTest):
 
         self.create_experiment_compartment(compartmentId=c1.id, experimentId=e1.publicId)
 
-        m1 = self.create_metabolite(name='glucose')
+        m1 = self.create_metabolite(name='glucose', averageMass=7)
         self.create_study_metabolite(chebiId=m1.chebiId, studyId=e1.study.publicId)
 
         s1 = self.create_strain(name="Roseburia", studyId=e1.study.publicId)
 
         pd.set_option('display.max_columns', None)
 
-        for subject_type, subject in [('bioreplicate', b1), ('metabolite', m1), ('strain', s1)]:
+        targets = [
+            ('bioreplicate', b1, 'CFUs/μL'),
+            ('metabolite',   m1, 'g/L'),
+            ('strain',       s1, 'Cells/μL'),
+        ]
+
+        for subject_type, subject, units in targets:
+            technique = self.create_measurement_technique(units=units)
             mc = self.create_measurement_context(
                 bioreplicateId=b1.id,
                 compartmentId=c1.id,
                 subjectId=subject.id,
+                techniqueId=technique.id,
                 subjectType=subject_type,
             )
             for i, v in enumerate(range(1, 10)):
@@ -71,7 +79,14 @@ class TestExperimentExportForm(DatabaseTest):
         self.assertTrue(e1 in data)
         self.assertEqual(
             data[e1].columns.tolist(),
-            ['Time (hours)', 'Biological Replicate', 'Compartment', 'Roseburia counts', 'FC', 'glucose ()'],
+            [
+                'Time (hours)',
+                'Biological Replicate',
+                'Compartment',
+                'Roseburia FC (Cells/mL)',
+                'Community FC (CFUs/mL)',
+                'glucose (mM)',
+            ],
         )
         self.assertEqual(data[e1].shape[0], 9)
 
