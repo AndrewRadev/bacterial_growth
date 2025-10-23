@@ -51,13 +51,18 @@ class TestExperimentExportForm(DatabaseTest):
         pd.set_option('display.max_columns', None)
 
         targets = [
-            ('bioreplicate', b1, 'CFUs/μL'),
-            ('metabolite',   m1, 'g/L'),
-            ('strain',       s1, 'Cells/μL'),
+            ('bioreplicate', b1, 'od',         'CFUs/μL'),
+            ('bioreplicate', b1, 'ph',         ''),
+            ('metabolite',   m1, 'Metabolite', 'g/L'),
+            ('strain',       s1, 'fc',         'Cells/μL'),
         ]
 
-        for subject_type, subject, units in targets:
-            technique = self.create_measurement_technique(units=units)
+        for subject_type, subject, technique_type, units in targets:
+            technique = self.create_measurement_technique(
+                type=technique_type,
+                units=units,
+            )
+
             mc = self.create_measurement_context(
                 bioreplicateId=b1.id,
                 compartmentId=c1.id,
@@ -78,15 +83,16 @@ class TestExperimentExportForm(DatabaseTest):
 
         self.assertTrue(e1 in data)
         self.assertEqual(
-            data[e1].columns.tolist(),
-            [
+            sorted(data[e1].columns.tolist()),
+            sorted([
                 'Time (hours)',
                 'Biological Replicate',
                 'Compartment',
                 'Roseburia FC (Cells/mL)',
-                'Community FC (CFUs/mL)',
+                'Community OD (CFUs/mL)',
+                'Community pH',
                 'glucose (mM)',
-            ],
+            ]),
         )
         self.assertEqual(data[e1].shape[0], 9)
 
