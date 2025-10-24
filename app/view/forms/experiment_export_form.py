@@ -62,15 +62,18 @@ class ExperimentExportForm:
 
             # Bioreplicate-level measurements:
             for technique in measurement_targets['bioreplicate']:
-                measurement_dfs.append(self._get_bioreplicate_df(experiment, technique))
+                df = self._get_bioreplicate_df(experiment, technique)
+                measurement_dfs.append(df)
 
             # Strain-level measurements:
             for (strain, technique) in sorted(measurement_targets['strain']):
-                measurement_dfs.append(self._get_strain_df(experiment, strain, technique))
+                df = self._get_strain_df(experiment, strain, technique)
+                measurement_dfs.append(df)
 
             # Metabolite measurements:
             for (metabolite, technique) in sorted(measurement_targets['metabolite']):
-                measurement_dfs.append(self._get_metabolite_df(experiment, metabolite, technique))
+                df = self._get_metabolite_df(experiment, metabolite, technique)
+                measurement_dfs.append(df)
 
             if len(measurement_dfs) == 0:
                 continue
@@ -80,7 +83,7 @@ class ExperimentExportForm:
             for df in measurement_dfs[1:]:
                 experiment_df = experiment_df.merge(
                     df,
-                    how='left',
+                    how='outer',
                     on=['Time (hours)', 'Biological Replicate', 'Compartment'],
                     validate='one_to_one',
                     suffixes=(None, None),
