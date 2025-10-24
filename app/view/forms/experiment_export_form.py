@@ -92,6 +92,8 @@ class ExperimentExportForm:
             if len(experiment_df) == 0:
                 continue
 
+            experiment_df.sort_values(inplace=True, by=['Biological Replicate', 'Compartment', 'Time (hours)'])
+
             experiment_data[experiment] = experiment_df
 
         return experiment_data
