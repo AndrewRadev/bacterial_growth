@@ -34,7 +34,7 @@
             </a>
 
             <p>
-              {{ study.description }}
+              {{ study.description|urlize(target="_blank", nofollow=true) }}
             </p>
           </li>
         {% endfor %}
