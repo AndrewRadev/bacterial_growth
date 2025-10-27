@@ -141,34 +141,3 @@ def init_routes(app):
     app.add_url_rule("/api/v1/search.json",  view_func=api_pages.search_json)
 
     return app
-
-
-def dump_routes(rules, filename):
-    """
-    A custom function useful for development purposes.
-
-    This dumps all active routes into a JSON file that can be used by a text
-    editor (e.g. Vim) to provide navigation from a URL to the python function
-    that handles it.
-    """
-
-    import json
-
-    mapping = {}
-
-    for rule in rules:
-        # Taken from werkzeug:
-        # https://github.com/pallets/werkzeug/blob/7868bef5d978093a8baa0784464ebe5d775ae92a/src/werkzeug/routing/rules.py#L920-L926
-        #
-        parts = []
-        for is_dynamic, data in rule._trace:
-            if is_dynamic:
-                parts.append(f"<{data}>")
-            else:
-                parts.append(data)
-        parts_str = "".join(parts).lstrip("|")
-
-        mapping[parts_str] = rule.endpoint
-
-    with open(filename, 'w') as f:
-        json.dump(mapping, f, indent=4)
