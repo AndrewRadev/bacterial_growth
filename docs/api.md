@@ -33,12 +33,12 @@ Successful results will be returned with an HTTP status code of `200`. A request
 
 ## Search
 
-You can use the "search" endpoint to locate studies with specific properties. At this time, you can only look for studies that measure a specific **microbial strain** or measure a specific **metabolite**.
+You can use the "search" endpoint to locate studies with specific properties. At this time, you can only look for studies that measure specific **microbial strains** or measure specific **metabolites**.
 
 Example search query that looks for the strain with NCBI Taxonomy ID 411483, [Faecalibacterium duncaniae](https://www.ncbi.nlm.nih.gov/datasets/taxonomy/411483/):
 
 ```bash
-curl -s "$ROOT_URL/api/v1/search.json?strainNcbiId=411483"
+curl -s "$ROOT_URL/api/v1/search.json?strainNcbiIds=411483"
 ```
 
 Output:
@@ -97,7 +97,7 @@ The `measurementContexts` array includes the metadata of the measurement context
 Example 2: Searching by metabolite, in this case [N-acetylneuraminic acid](https://www.ebi.ac.uk/chebi/CHEBI:17012) with ChEBI ID 17012:
 
 ```bash
-curl -s "$ROOT_URL/api/v1/search.json?metaboliteChebiId=17012"
+curl -s "$ROOT_URL/api/v1/search.json?metaboliteChebiIds=17012"
 ```
 
 ```json
@@ -129,6 +129,14 @@ curl -s "$ROOT_URL/api/v1/search.json?metaboliteChebiId=17012"
 ```
 
 If you make a request for both strain and metabolite, the results will be the combination of both. In other words, the query will end up creating an `OR` operation. In practice, it might be best to make individual queries and process the results after downloading.
+
+Note that the query terms are plural, `strainNcbiIds` and `metaboliteChebiIds`. You can make requests for multiple strains or metabolites by separating them with commas, for example:
+
+```bash
+curl -s "$ROOT_URL/api/v1/search.json?strainNcbiIds=411483,536231&metaboliteChebiIds=17234,17012"
+```
+
+Again, the result will be an OR operation, where records associated with any of the given search queries will be included. In this case, any measurements of [Faecalibacterium prausnitzii](https://www.ncbi.nlm.nih.gov/datasets/taxonomy/411483/), [Roseburia intestinalis L1-82](https://www.ncbi.nlm.nih.gov/datasets/taxonomy/536231/), [glucose](https://www.ebi.ac.uk/chebi/CHEBI:17234), or [trehalose](https://www.ebi.ac.uk/chebi/CHEBI:27082).
 
 ## Public entity metadata
 

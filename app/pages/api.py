@@ -200,22 +200,22 @@ def search_json():
     results = set()
 
     for (key, value) in request_args.items():
-        if key == 'strainNcbiId':
+        if key == 'strainNcbiIds':
+            values = value.split(',')
             study_strain_ids = g.db_session.scalars(
                 sql.select(Strain.id)
-                .where(Strain.NCBId == value),
+                .where(Strain.NCBId.in_(values)),
             ).all()
             results.update(_contexts_by_subject('strain', study_strain_ids))
 
-        elif key == 'metaboliteChebiId':
-            if not value.startswith('CHEBI:'):
-                value = f"CHEBI:{value}"
+        elif key == 'metaboliteChebiIds':
+            values = [f"CHEBI:{v}" for v in value.split(',')]
 
-            metabolite = g.db_session.scalars(
-                sql.select(Metabolite)
-                .where(Metabolite.chebiId == value),
-            ).one()
-            results.update(_contexts_by_subject('metabolite', metabolite.id))
+            metabolite_ids = g.db_session.scalars(
+                sql.select(Metabolite.id)
+                .where(Metabolite.chebiId.in_(values)),
+            ).all()
+            results.update(_contexts_by_subject('metabolite', metabolite_ids))
 
         else:
             return {"error": f"Unknown search parameter: {key}"}, 400
