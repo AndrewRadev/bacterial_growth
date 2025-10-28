@@ -284,6 +284,7 @@ class TestApiPages(PageTest):
         roseburia = self.create_strain(name='Roseburia')
         blautia   = self.create_strain(name='Blautia')
 
+        glucose   = self.create_metabolite(name="glucose")
         trehalose = self.create_metabolite(name="trehalose")
 
         mc1 = self.create_measurement_context(
@@ -307,6 +308,12 @@ class TestApiPages(PageTest):
         mc4 = self.create_measurement_context(
             studyId=s2.publicId,
             bioreplicateId=b4.id,
+            subjectId=glucose.id,
+            subjectType='metabolite',
+        )
+        mc5 = self.create_measurement_context(
+            studyId=s2.publicId,
+            bioreplicateId=b4.id,
             subjectId=trehalose.id,
             subjectType='metabolite',
         )
@@ -314,7 +321,7 @@ class TestApiPages(PageTest):
         self.db_session.commit()
 
         # Searching by strain:
-        response = self.client.get(f"/api/v1/search.json?strainNcbiId={roseburia.NCBId}")
+        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={roseburia.NCBId}")
         self.assertEqual(response.status, '200 OK')
         response_json = self._get_json(response)
 
@@ -323,7 +330,7 @@ class TestApiPages(PageTest):
         mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
         self.assertEqual(mc_ids, sorted([mc1.id, mc3.id]))
 
-        response = self.client.get(f"/api/v1/search.json?strainNcbiId={blautia.NCBId}")
+        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={blautia.NCBId}")
         self.assertEqual(response.status, '200 OK')
         response_json = self._get_json(response)
 
@@ -333,7 +340,8 @@ class TestApiPages(PageTest):
         self.assertEqual(mc_ids, sorted([mc2.id]))
 
         # Searching by metabolite:
-        response = self.client.get(f"/api/v1/search.json?metaboliteChebiId={trehalose.chebiId}")
+        query = trehalose.chebiId.removeprefix("CHEBI:")
+        response = self.client.get(f"/api/v1/search.json?metaboliteChebiIds={query}")
         self.assertEqual(response.status, '200 OK')
         response_json = self._get_json(response)
 
@@ -341,10 +349,13 @@ class TestApiPages(PageTest):
         self.assertEqual(response_json['studies'], [s2.publicId])
         self.assertEqual(sorted(response_json['experiments']), sorted([b4.experimentId]))
         mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
-        self.assertEqual(mc_ids, sorted([mc4.id]))
+        self.assertEqual(mc_ids, sorted([mc5.id]))
 
         # Searching by both strain and metabolite returns both matches (strain OR metabolite):
-        response = self.client.get(f"/api/v1/search.json?strainNcbiId={blautia.NCBId}&metaboliteChebiId={trehalose.chebiId}")
+        strain_query = blautia.NCBId
+        metabolite_query = trehalose.chebiId.removeprefix("CHEBI:")
+
+        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={strain_query}&metaboliteChebiIds={metabolite_query}")
         self.assertEqual(response.status, '200 OK')
         response_json = self._get_json(response)
 
@@ -352,10 +363,35 @@ class TestApiPages(PageTest):
         self.assertEqual(sorted(response_json['studies']), sorted([s1.publicId, s2.publicId]))
         self.assertEqual(sorted(response_json['experiments']), sorted([b2.experimentId, b4.experimentId]))
         mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
-        self.assertEqual(mc_ids, sorted([mc2.id, mc4.id]))
+        self.assertEqual(mc_ids, sorted([mc2.id, mc5.id]))
+
+        # Searching by multiple strains and metabolites returns all matches:
+        strain_query = f"{blautia.NCBId},{roseburia.NCBId}"
+        metabolite_query = ','.join([
+            glucose.chebiId.removeprefix("CHEBI:"),
+            trehalose.chebiId.removeprefix("CHEBI:"),
+        ])
+
+        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={strain_query}&metaboliteChebiIds={metabolite_query}")
+        self.assertEqual(response.status, '200 OK')
+        response_json = self._get_json(response)
+
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(sorted(response_json['studies']), sorted([s1.publicId, s2.publicId]))
+        self.assertEqual(
+            sorted(response_json['experiments']),
+            sorted([
+                b1.experimentId,
+                b2.experimentId,
+                b3.experimentId,
+                b4.experimentId,
+            ]),
+        )
+        mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
+        self.assertEqual(mc_ids, sorted([mc1.id, mc2.id, mc3.id, mc4.id, mc5.id]))
 
         # No results:
-        response = self.client.get(f"/api/v1/search.json?strainNcbiId=nonexistent")
+        response = self.client.get(f"/api/v1/search.json?strainNcbiIds=nonexistent")
         self.assertEqual(response.status, '200 OK')
         response_json = self._get_json(response)
 
