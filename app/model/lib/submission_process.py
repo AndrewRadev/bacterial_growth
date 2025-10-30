@@ -99,9 +99,8 @@ def validate_data_file(submission_form, data_file=None):
         found_columns |= set(df.columns)
 
     missing_columns = expected_columns.difference(found_columns)
-
-    if len(missing_columns):
-        errors.append(f"Missing columns: {', '.join(missing_columns)}")
+    for missing_column in missing_columns:
+        errors.append(f"Missing column {missing_column}")
 
     # Validate row keys:
     expected_bioreplicates = {
