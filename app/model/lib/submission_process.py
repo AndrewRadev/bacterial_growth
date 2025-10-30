@@ -138,8 +138,8 @@ def validate_data_file(submission_form, data_file=None):
 
         # Check for missing Time values:
         if 'Time' in df:
-            for index, time in enumerate(df['Time']):
-                if not is_non_negative_float(time, isnan_check=True):
+            for index, value in enumerate(df['Time']):
+                if not is_non_negative_float(value, isnan_check=True):
                     missing_time_rows.append(str(index + 1))
 
         if missing_time_rows:
@@ -541,9 +541,9 @@ def _create_average_measurement_context(
     db_session.add(average_context)
 
     # Create individual measurements
-    for (time, value, std) in measurement_rows:
+    for (t, value, std) in measurement_rows:
         measurement = Measurement(
-            timeInSeconds=time,
+            timeInSeconds=t,
             value=value,
             std=std,
             context=average_context,
