@@ -54,7 +54,7 @@ def persist_submission_to_database(submission_form):
         _save_measurement_techniques(db_trans_session, submission_form, study)
 
         db_trans_session.flush()
-        _save_measurements(db_trans_session, study, submission)
+        _save_measurements(db_trans_session, study, submission_form)
 
         for experiment in study.experiments:
             _create_average_measurements(db_trans_session, study, experiment)
@@ -88,18 +88,20 @@ def validate_data_file(submission_form, data_file=None):
     sheets = pd.read_excel(io.BytesIO(data_xls), sheet_name=None)
 
     # Validate columns:
-    expected_value_columns = _get_expected_column_names(submission_form)
+    community_columns, strain_columns, metabolite_columns = _get_expected_column_names(submission_form)
+    expected_value_columns = {*community_columns, *strain_columns, *metabolite_columns}
 
-    for sheet_name, column_set in expected_value_columns.items():
-        if sheet_name in sheets:
-            df = sheets[sheet_name]
+    expected_columns = {'Biological Replicate', 'Compartment', 'Time', *expected_value_columns}
+    found_columns = set()
 
-            column_set = {*column_set, 'Biological Replicate', 'Compartment', 'Time'}
+    for sheet_name in sheets:
+        df = sheets[sheet_name]
+        found_columns |= set(df.columns)
 
-            for missing_column in column_set.difference(set(df.columns)):
-                errors.append(f"{sheet_name}: Missing column {missing_column}")
-        else:
-            errors.append(f"Missing data sheet: {sheet_name}")
+    missing_columns = expected_columns.difference(found_columns)
+
+    if len(missing_columns):
+        errors.append(f"Missing column {missing_column}")
 
     # Validate row keys:
     expected_bioreplicates = {
@@ -109,10 +111,7 @@ def validate_data_file(submission_form, data_file=None):
     }
     expected_compartments = {c['name'] for c in submission.studyDesign['compartments']}
 
-    for sheet_name in expected_value_columns.keys():
-        if sheet_name not in sheets:
-            continue
-
+    for sheet_name in sheets:
         df = sheets[sheet_name]
 
         if 'Biological Replicate' in df:
@@ -135,9 +134,6 @@ def validate_data_file(submission_form, data_file=None):
 
     # Validate values:
     for sheet_name, df in sheets.items():
-        if sheet_name not in expected_value_columns.keys():
-            continue
-
         missing_time_rows = []
         missing_values = {}
 
@@ -153,7 +149,7 @@ def validate_data_file(submission_form, data_file=None):
             warnings.append(f"{sheet_name}: Missing or invalid time values on row(s) {row_description}")
 
         # For the other rows, we're looking for non-negative numbers or blanks
-        value_columns = expected_value_columns[sheet_name].intersection(set(df.columns))
+        value_columns = expected_value_columns.intersection(set(df.columns))
 
         for column in value_columns:
             for index, value in enumerate(df[column]):
@@ -423,21 +419,16 @@ def _save_measurement_techniques(db_session, submission_form, study):
     return techniques
 
 
-def _save_measurements(db_session, study, submission):
+def _save_measurements(db_session, study, submission_form):
+    submission = submission_form.submission
+
     data_xls = submission.dataFile.content
     sheets = pd.read_excel(io.BytesIO(data_xls), sheet_name=None)
 
-    if 'Growth data per community' in sheets:
-        df = sheets['Growth data per community']
-        Measurement.insert_from_csv_string(db_session, study, df.to_csv(index=False), subject_type='bioreplicate')
+    community_columns, strain_columns, metabolite_columns = _get_expected_column_names(submission_form)
 
-    if 'Growth data per strain' in sheets:
-        df = sheets['Growth data per strain']
-        Measurement.insert_from_csv_string(db_session, study, df.to_csv(index=False), subject_type='strain')
-
-    if 'Growth data per metabolite' in sheets:
-        df = sheets['Growth data per metabolite']
-        Measurement.insert_from_csv_string(db_session, study, df.to_csv(index=False), subject_type='metabolite')
+    for _, df in sheets.items():
+        Measurement.insert_from_csv_string(db_session, study, df.to_csv(index=False))
 
 
 def _create_average_measurements(db_session, study, experiment):
@@ -608,17 +599,7 @@ def _get_expected_column_names(submission_form):
         else:
             raise ValueError(f"Unexpected technique subjectType: {technique.subjectType}")
 
-    expected_sheets = {
-        'Growth data per community':  community_columns,
-        'Growth data per strain':     strain_columns,
-        'Growth data per metabolite': metabolite_columns,
-    }
-
-    for key in list(expected_sheets.keys()):
-        if len(expected_sheets[key]) == 0:
-            del expected_sheets[key]
-
-    return expected_sheets
+    return community_columns, strain_columns, metabolite_columns
 
 
 def _build_strain(db_session, identifier, submission, study, user_uuid):
