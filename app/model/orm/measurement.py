@@ -64,7 +64,7 @@ class Measurement(OrmBase):
         return self.context.subjectType
 
     @classmethod
-    def insert_from_csv_string(Self, db_session, study, csv_string, subject_type):
+    def insert_from_csv_string(Self, db_session, study, csv_string):
         from app.model.orm import MeasurementContext
 
         reader = csv.DictReader(StringIO(csv_string), dialect='unix')
@@ -90,20 +90,19 @@ class Measurement(OrmBase):
             time_in_seconds = convert_time(row['Time'], source=study.timeUnits, target='s')
 
             for technique in study.measurementTechniques:
-                if technique.subjectType != subject_type:
-                    continue
-
-                if subject_type == 'bioreplicate':
+                if technique.subjectType == 'bioreplicate':
                     subjects = [bioreplicate]
-                elif subject_type == 'strain':
+                elif technique.subjectType == 'strain':
                     subjects = study.strains
-                elif subject_type == 'metabolite':
+                elif technique.subjectType == 'metabolite':
                     subjects = study.metabolites
                 else:
                     raise KeyError(f"Unexpected subject type: {subject_type}")
 
                 for subject in subjects:
                     value_column_name = technique.csv_column_name(subject.name)
+                    if value_column_name not in row:
+                        continue
 
                     value = row[value_column_name]
                     if value == '':
@@ -114,7 +113,7 @@ class Measurement(OrmBase):
                         std = None
 
                     # Create a measurement context only if it doesn't already exist:
-                    context_key = (bioreplicate.id, compartment.id, technique.id, subject.id, subject_type)
+                    context_key = (bioreplicate.id, compartment.id, technique.id, subject.id, technique.subjectType)
                     if context_key not in context_cache:
                         context = MeasurementContext(
                             # Relationships:
@@ -123,7 +122,7 @@ class Measurement(OrmBase):
                             compartment=compartment,
                             # Subject:
                             subjectId=subject.id,
-                            subjectType=subject_type,
+                            subjectType=technique.subjectType,
                             # Technique:
                             techniqueId=technique.id,
                         )
