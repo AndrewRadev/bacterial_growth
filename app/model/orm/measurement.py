@@ -73,8 +73,6 @@ class Measurement(OrmBase):
         compartments_by_name  = group_by_unique_name(study.compartments)
         context_cache = {}
 
-        measurements = []
-
         for row in reader:
             bioreplicate = bioreplicates_by_name[row['Biological Replicate'].strip()]
             compartment  = compartments_by_name[row['Compartment'].strip()]
@@ -126,6 +124,7 @@ class Measurement(OrmBase):
                             # Technique:
                             techniqueId=technique.id,
                         )
+                        db_session.add(context)
                         context_cache[context_key] = context
 
                     context = context_cache[context_key]
@@ -136,9 +135,8 @@ class Measurement(OrmBase):
                         value=value,
                         std=std,
                     )
-                    measurements.append(measurement)
+                    db_session.add(measurement)
 
-        db_session.add_all(measurements)
         db_session.commit()
 
         # Prune measurement contexts that only have empty values:

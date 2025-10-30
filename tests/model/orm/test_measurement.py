@@ -49,12 +49,7 @@ class TestMeasurement(DatabaseTest):
             b2,c1,4,4567890.0,0.7,7.6
         """)
 
-        measurements = Measurement.insert_from_csv_string(
-            self.db_session,
-            study,
-            growth_data,
-            subject_type='bioreplicate',
-        )
+        measurements = Measurement.insert_from_csv_string(self.db_session, study, growth_data)
 
         # FC measurement
         self.assertEqual(
@@ -116,12 +111,7 @@ class TestMeasurement(DatabaseTest):
             b1,c1,90,10.0,10.0
         """)
 
-        measurements = Measurement.insert_from_csv_string(
-            self.db_session,
-            study,
-            metabolite_data,
-            subject_type='metabolite',
-        )
+        measurements = Measurement.insert_from_csv_string(self.db_session, study, metabolite_data)
 
         # Metabolite measurements
         self.assertEqual(
@@ -184,12 +174,7 @@ class TestMeasurement(DatabaseTest):
         # fetch the new data:
         self.db_session.refresh(study)
 
-        measurements = Measurement.insert_from_csv_string(
-            self.db_session,
-            study,
-            strain_data,
-            subject_type='strain',
-        )
+        measurements = Measurement.insert_from_csv_string(self.db_session, study, strain_data)
 
         # 16s reads
         self.assertEqual(
@@ -239,12 +224,7 @@ class TestMeasurement(DatabaseTest):
             b3,c1,4,1234567890.0
         """)
 
-        measurements = Measurement.insert_from_csv_string(
-            self.db_session,
-            study,
-            growth_data,
-            subject_type='bioreplicate',
-        )
+        measurements = Measurement.insert_from_csv_string(self.db_session, study, growth_data)
 
         self.assertEqual(
             [(m.timeInHours, m.bioreplicate.name, m.value) for m in measurements if m.technique.id == t_fc.id],
@@ -258,6 +238,72 @@ class TestMeasurement(DatabaseTest):
                 # First point is present with a None value, because the second one is present:
                 (2.0, 'b3', None),
                 (4.0, 'b3', Decimal('1234567890.000')),
+            ]
+        )
+
+    def test_import_mixed_csv(self):
+        study = self.create_study(timeUnits='m')
+        experiment = self.create_experiment(studyId=study.publicId)
+
+        self.create_bioreplicate(name='b1', experimentId=experiment.publicId)
+        self.create_compartment(name='c1', studyId=study.publicId)
+
+        glucose_id = self.create_study_metabolite(
+            studyId=study.publicId,
+            metabolite={'name': 'glucose'},
+        ).metabolite.id
+        trehalose_id = self.create_study_metabolite(
+            studyId=study.publicId,
+            metabolite={'name': 'trehalose'},
+        ).metabolite.id
+        s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study.publicId)
+
+        self.create_measurement_technique(
+            studyId=study.publicId,
+            subjectType='metabolite',
+            type='Metabolite',
+            metaboliteIds=[glucose_id, trehalose_id],
+            units='mM',
+        )
+        self.create_measurement_technique(
+            studyId=study.publicId,
+            subjectType='strain',
+            type='16s',
+            units='reads',
+            includeStd=True,
+        )
+
+        self.db_session.commit()
+
+        mixed_data = util.trim_lines("""
+            Biological Replicate,Compartment,Time,glucose,trehalose,B. thetaiotaomicron rRNA reads
+            b1,c1,60,50.0,70.0,1234567890.0
+            b1,c1,75,30.0,40.0,1234567890.0
+            b1,c1,90,10.0,10.0,1234567890.0
+        """)
+
+        measurements = Measurement.insert_from_csv_string(self.db_session, study, mixed_data)
+
+        # Metabolite measurements
+        self.assertEqual(
+            [(m.timeInSeconds, m.subjectId, m.value) for m in measurements if m.subjectType == "metabolite"],
+            [
+                (3600, glucose_id, Decimal('50.000')),
+                (4500, glucose_id, Decimal('30.000')),
+                (5400, glucose_id, Decimal('10.000')),
+                (3600, trehalose_id, Decimal('70.000')),
+                (4500, trehalose_id, Decimal('40.000')),
+                (5400, trehalose_id, Decimal('10.000')),
+            ]
+        )
+
+        # Strain measurements
+        self.assertEqual(
+            [(m.timeInSeconds, m.subjectId, m.value) for m in measurements if m.subjectType == "strain"],
+            [
+                (3600, s1.id, Decimal('1234567890.0')),
+                (4500, s1.id, Decimal('1234567890.0')),
+                (5400, s1.id, Decimal('1234567890.0')),
             ]
         )
 
