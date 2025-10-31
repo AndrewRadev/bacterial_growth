@@ -2,12 +2,16 @@ import numpy as np
 
 
 def apply_log_transform(df):
-    if 'std' in df and not df['std'].isnull().all():
-        # Transform std values by summing them and transforming the results:
-        with np.errstate(divide='ignore'):
-            upper_log = np.log(df['value'] + df['std'])
-            lower_log = np.log(df['value'] - df['std'])
-            df['std'] = (upper_log - lower_log) / 2.0
+    with np.errstate(divide='ignore', invalid='ignore'):
+        df['log_value'] = np.log(df['value'])
 
-    with np.errstate(divide='ignore'):
-        df['value'] = np.log(df['value'])
+    if 'std' in df:
+        # Transform std values by summing them and transforming the results:
+        with np.errstate(divide='ignore', invalid='ignore'):
+            df['log_std_upper'] = np.log(df['value'] + df['std']) - df['log_value']
+            df['log_std_lower'] = np.abs(df['log_value'] - np.log(np.clip(df['value'] - df['std'], min=1)))
+
+    # If the results produced infinities, remove them:
+    df = df.replace([np.inf, -np.inf], np.nan)
+
+    return df

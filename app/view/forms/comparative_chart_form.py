@@ -71,7 +71,7 @@ class ComparativeChartForm:
 
             df = self.get_df(measurement_context.id)
             if log_transform:
-                apply_log_transform(df)
+                df = apply_log_transform(df)
 
             label = measurement_context.get_chart_label(self.db_session)
 
