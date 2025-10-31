@@ -273,7 +273,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         units = measurement_context.technique.short_name
 
     if log_transform:
-        apply_log_transform(measurement_df)
+        measurement_df = apply_log_transform(measurement_df)
 
     chart.add_df(
         measurement_df,
@@ -294,7 +294,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
     if modeling_result:
         df = modeling_result.generate_chart_df(measurement_df)
         if log_transform:
-            apply_log_transform(df)
+            df = apply_log_transform(df)
 
         label = modeling_result.model_name
         chart.add_model_df(df, units=units, label=label)
