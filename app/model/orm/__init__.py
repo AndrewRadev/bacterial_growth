@@ -17,6 +17,7 @@ from .project_user import ProjectUser
 from .strain import Strain
 from .study import Study
 from .study_metabolite import StudyMetabolite
+from .study_technique import StudyTechnique
 from .study_user import StudyUser
 from .submission import Submission
 from .submission_backup import SubmissionBackup
