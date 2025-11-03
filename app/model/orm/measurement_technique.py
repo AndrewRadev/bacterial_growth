@@ -43,11 +43,13 @@ class MeasurementTechnique(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    type:  Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    units: Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    type:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    subtype: Mapped[str] = mapped_column(sql.String(100), nullable=True)
+    units:   Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
+    label:       Mapped[str]  = mapped_column(sql.String)
     description: Mapped[str]  = mapped_column(sql.String)
     includeStd:  Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
 
@@ -58,6 +60,11 @@ class MeasurementTechnique(OrmBase):
 
     createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
+
+    studyTechniqueId: Mapped[int] = mapped_column(sql.ForeignKey('StudyTechniques.id'))
+    studyTechnique: Mapped['StudyTechnique'] = relationship(
+        back_populates="measurementTechniques"
+    )
 
     measurementContexts: Mapped[List['MeasurementContext']] = relationship(
         back_populates="technique",
