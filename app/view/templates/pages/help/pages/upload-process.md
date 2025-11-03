@@ -1,4 +1,4 @@
-To upload a study, first you need to log in using an {{ "https://orcid.org/"|external_link("ORCID iD") }}. After that, you can follow the step-by-step process in the "Upload data" section of the navigation sidebar.
+To upload a study, first you need to log in using an {{ "https://orcid.org/"|external_link("ORCID") }}. After that, you can follow the step-by-step process in the "Upload data" section of the navigation sidebar.
 
 ## Form components
 
