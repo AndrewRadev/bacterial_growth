@@ -18,6 +18,7 @@ _TECHNIQUE_DESCRIPTIONS = {
     'plates':      "Plate count values per time-point, use a period (.) as the decimal separator",
     'plates_ps':   "Plate count values per time-point for strain {strain}, use a period (.) as the decimal separator.",
     '16s_ps':      "Abundances values per time-point for strain {strain}, use a period (.) as the decimal separator.",
+    'qpcr':        "Abundances values per time-point, use a period (.) as the decimal separator.",
     'qpcr_ps':     "Abundances values per time-point for strain {strain}, use a period (.) as the decimal separator.",
     'ph':          "pH values per time-point, use a period (.) as the decimal separator",
     'metabolites': "Concentration values per time-point for metabolite {metabolite} in {units}, use a period (.) as the decimal separator",
