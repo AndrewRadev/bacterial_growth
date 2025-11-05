@@ -1,13 +1,19 @@
-from flask import g
+from flask import (
+    g,
+    request,
+)
 from werkzeug.exceptions import NotFound
 import sqlalchemy as sql
 
 from app.model.orm import (
-    Project,
-    Study,
+    Bioreplicate,
     Experiment,
-    MeasurementContext,
     Measurement,
+    MeasurementContext,
+    Metabolite,
+    Project,
+    Strain,
+    Study,
 )
 
 
@@ -38,7 +44,6 @@ def study_json(publicId):
         data.update({
             'description': study.description,
             'url':         study.url,
-            'timeUnits':   study.timeUnits,
             'uploadedAt':  study.createdAt.isoformat(),
             'publishedAt': study.publishedAt.isoformat(),
             'experiments': [
@@ -91,6 +96,7 @@ def experiment_json(publicId):
                 'inoculumConcentration': c.inoculumConcentration,
                 'inoculumVolume':        c.inoculumVolume,
                 'initialPh':             c.initialPh,
+                'dilutionRate':          c.dilutionRate,
                 'initialTemperature':    c.initialTemperature,
                 'mediumName':            c.mediumName,
                 'mediumUrl':             c.mediumUrl,
@@ -120,7 +126,7 @@ def experiment_json(publicId):
 
 def measurement_context_json(id):
     measurement_context = g.db_session.get(MeasurementContext, id)
-    if not measurement_context.study.isPublished:
+    if not measurement_context or not measurement_context.study.isPublished:
         raise NotFound
 
     measurement_count = g.db_session.scalars(
@@ -129,25 +135,115 @@ def measurement_context_json(id):
     ).one()
 
     return {
-        'id':               measurement_context.id,
-        'experimentId':     measurement_context.bioreplicate.experimentId,
-        'studyId':          measurement_context.studyId,
-        'bioreplicateName': measurement_context.bioreplicate.name,
-        'techniqueType':    measurement_context.technique.type,
-        'techniqueUnits':   measurement_context.technique.units,
-        'subject':          _render_measurement_subject(measurement_context),
-        'measurementCount': measurement_count,
+        'id':                   measurement_context.id,
+        'experimentId':         measurement_context.bioreplicate.experimentId,
+        'studyId':              measurement_context.studyId,
+        'bioreplicateId':       measurement_context.bioreplicate.id,
+        'bioreplicateName':     measurement_context.bioreplicate.name,
+        'techniqueType':        measurement_context.technique.type,
+        'techniqueUnits':       measurement_context.technique.units,
+        'subject':              _render_measurement_subject(measurement_context),
+        'measurementCount':     measurement_count,
+        'measurementTimeUnits': 'h',
     }
 
 
 def measurement_context_csv(id):
     measurement_context = g.db_session.get(MeasurementContext, id)
-    if not measurement_context.study.isPublished:
+    if not measurement_context or not measurement_context.study.isPublished:
         raise NotFound
 
     df = measurement_context.get_df(g.db_session)
 
     return df.to_csv(index=False)
+
+
+def bioreplicate_json(id):
+    bioreplicate = g.db_session.get(Bioreplicate, id)
+    if not bioreplicate or not bioreplicate.study.isPublished:
+        raise NotFound
+
+    return {
+        'id':                   bioreplicate.id,
+        'experimentId':         bioreplicate.experiment.publicId,
+        'studyId':              bioreplicate.experiment.studyId,
+        'name':                 bioreplicate.name,
+        'biosampleUrl':         bioreplicate.biosampleUrl,
+        'measurementTimeUnits': 'h',
+        'measurementContexts': [
+            {
+                'id':             mc.id,
+                'techniqueType':  mc.technique.type,
+                'techniqueUnits': mc.technique.units,
+                'subject':        _render_measurement_subject(mc),
+            }
+            for mc in bioreplicate.measurementContexts
+        ]
+    }
+
+
+def bioreplicate_csv(id):
+    bioreplicate = g.db_session.get(Bioreplicate, id)
+    if not bioreplicate or not bioreplicate.study.isPublished:
+        raise NotFound
+
+    df = bioreplicate.get_df(g.db_session)
+
+    return df.to_csv(index=False)
+
+
+def search_json():
+    request_args = request.args.to_dict()
+    if len(request_args) == 0:
+        return {"error": "No search query parameters"}, 400
+
+    results = set()
+
+    for (key, value) in request_args.items():
+        if key == 'strainNcbiIds':
+            values = value.split(',')
+            study_strain_ids = g.db_session.scalars(
+                sql.select(Strain.id)
+                .where(Strain.NCBId.in_(values)),
+            ).all()
+            results.update(_contexts_by_subject('strain', study_strain_ids))
+
+        elif key == 'metaboliteChebiIds':
+            values = [f"CHEBI:{v}" for v in value.split(',')]
+
+            metabolite_ids = g.db_session.scalars(
+                sql.select(Metabolite.id)
+                .where(Metabolite.chebiId.in_(values)),
+            ).all()
+            results.update(_contexts_by_subject('metabolite', metabolite_ids))
+
+        else:
+            return {"error": f"Unknown search parameter: {key}"}, 400
+
+    measurement_contexts    = list(results)
+    measurement_context_ids = [mc.id for mc in measurement_contexts]
+
+    experiment_ids = sorted({mc.experiment.publicId for mc in measurement_contexts})
+    study_ids      = sorted({mc.experiment.studyId for mc in measurement_contexts})
+
+    return {
+        'studies':              study_ids,
+        'experiments':          experiment_ids,
+        'measurementTimeUnits': 'h',
+        'measurementContexts': [
+            {
+                'id':               mc.id,
+                'experimentId':     mc.experiment.publicId,
+                'studyId':          mc.studyId,
+                'bioreplicateId':   mc.bioreplicate.id,
+                'bioreplicateName': mc.bioreplicate.name,
+                'techniqueType':    mc.technique.type,
+                'techniqueUnits':   mc.technique.units,
+                'subject':          _render_measurement_subject(mc),
+            }
+            for mc in measurement_contexts
+        ]
+    }
 
 
 def _render_measurement_subject(measurement_context):
@@ -162,8 +258,33 @@ def _render_measurement_subject(measurement_context):
         extra_data = {}
 
     return {
-        'id':   subject.id,
         'type': subject_type,
         'name': subject.name,
         **extra_data,
     }
+
+
+def _contexts_by_subject(subject_type, subject_id):
+    sql_options = (
+        sql.orm.joinedload(MeasurementContext.technique),
+        sql.orm.joinedload(MeasurementContext.experiment),
+    )
+
+    if isinstance(subject_id, list):
+        return g.db_session.scalars(
+            sql.select(MeasurementContext)
+            .where(
+                MeasurementContext.subjectType == subject_type,
+                MeasurementContext.subjectId.in_(subject_id),
+            )
+            .options(*sql_options)
+        ).all()
+    else:
+        return g.db_session.scalars(
+            sql.select(MeasurementContext)
+            .where(
+                MeasurementContext.subjectType == subject_type,
+                MeasurementContext.subjectId == subject_id,
+            )
+            .options(*sql_options)
+        ).all()

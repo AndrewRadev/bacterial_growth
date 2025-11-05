@@ -28,8 +28,10 @@ def init_config(app):
     # 200MiB max size
     app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024
 
-    # Render JSON in the given order, instead of sorting
+    # Render JSON in the given order, instead of sorting:
     app.json_provider_class.sort_keys = False
+    # Render μ correctly:
+    app.json_provider_class.ensure_ascii = False
 
     if app_env == 'development':
         app.config.update(

@@ -17,6 +17,8 @@ from app.model.orm import (
     StudyUser,
 )
 
+_PER_PAGE = 10
+
 
 def search_index_page():
     form = SearchForm(request.args)
@@ -58,20 +60,19 @@ def search_index_page():
             .join(StudyUser, isouter=True)
             .where(publish_clause)
             .group_by(Study)
-            .order_by(Study.updatedAt.desc())
-            .limit(5)
+            .limit(_PER_PAGE)
         ).all()
 
     if studyIds:
         results = g.db_session.scalars(
             sql.select(Study)
             .where(Study.publicId.in_(studyIds))
-            .order_by(Study.updatedAt.desc())
+            .order_by(Study.createdAt.desc())
         )
 
     return render_template(
         "pages/search/index.html",
         form=form,
         template_clause=template_clause,
-        results=results
+        results=results,
     )

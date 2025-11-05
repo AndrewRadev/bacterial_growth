@@ -16,7 +16,7 @@ CELL_COUNT_UNITS = ('Cells/mL', 'Cells/μL')
 CFU_COUNT_UNITS  = ('CFUs/mL', 'CFUs/μL')
 "Units that measure number of CFUs per volume"
 
-METABOLITE_UNITS = ('mM', 'μM', 'nM', 'pM', 'g/L')
+METABOLITE_UNITS = ('mM', 'μM', 'nM', 'pM', 'g/L', 'mg/L')
 "Units for metabolites, both molar and mass concentration"
 
 
@@ -115,9 +115,14 @@ class Chart:
 
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=True)
 
-        xaxis_range       = self._calculate_x_range(converted_data_left + converted_data_right)
-        left_yaxis_range  = self._calculate_y_range(converted_data_left)
-        right_yaxis_range = self._calculate_y_range(converted_data_right)
+        if self.clamp_x_data:
+            # Fit the x-axis of the shortest chart:
+            xaxis_range = self._calculate_x_range(converted_data_left + converted_data_right)
+        else:
+            xaxis_range = None
+
+        left_yaxis_range  = self._calculate_y_range(converted_data_left, log=self.log_left)
+        right_yaxis_range = self._calculate_y_range(converted_data_right, log=self.log_right)
 
         for index, (x0, x1, label, text) in enumerate(self.regions):
             y0, y1 = left_yaxis_range
@@ -272,7 +277,7 @@ class Chart:
         padding = (global_max_x - global_min_x) * 0.05
         return [global_min_x - padding, global_max_x + padding]
 
-    def _calculate_y_range(self, data):
+    def _calculate_y_range(self, data, log=False):
         """
         Find the limit for the y axis, ignoring model dataframes, since they
         might have exponentials that shoot up.
@@ -286,26 +291,24 @@ class Chart:
                 # consider it for the chart range
                 continue
 
-            # We look for the min and max values in the dataframe and their
-            # corresponding standard deviation:
-            min_value = df['value'].min()
-            max_value = df['value'].max()
+            # We look for the min and max values + std in the dataframe:
+            lowers = []
+            uppers = []
 
-            min_row = df[df['value'] == min_value]
-            max_row = df[df['value'] == max_value]
+            for value, std in zip(df['value'], df['std']):
+                # For some reason, pandas might give us a None here, or it might
+                # give us a NaN
+                if std is None or math.isnan(std):
+                    std = 0
 
-            min_std = min_row['std'].iloc[0]
-            max_std = max_row['std'].iloc[0]
+                uppers.append(value + std)
+                if log:
+                    lowers.append(value - std)
+                else:
+                    lowers.append(np.clip(value - std, min=0))
 
-            # For some reason, pandas might give us a None here, or it might
-            # give us a NaN
-            if min_std is None or math.isnan(min_std):
-                min_std = 0
-            if max_std is None or math.isnan(max_std):
-                max_std = 0
-
-            max_y = max_value + max_std
-            min_y = min_value - min_std
+            max_y = max(uppers)
+            min_y = min(lowers)
 
             if max_y > global_max_y:
                 global_max_y = max_y

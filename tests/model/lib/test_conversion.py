@@ -35,9 +35,14 @@ class TestConversion(unittest.TestCase):
         value = convert_measurement_units(200, 'g/L', 'mM', mass=mass)
         self.assertEqual(value, 4000)
 
+        value = convert_measurement_units(200, 'mg/L', 'mM', mass=mass)
+        self.assertEqual(value, 4)
+
         mass = 30
         value = convert_measurement_units(4000, 'mM', 'g/L', mass=mass)
         self.assertEqual(value, 120)
+        value = convert_measurement_units(4000, 'mM', 'mg/L', mass=mass)
+        self.assertEqual(value, 120_000)
 
         # Can't convert g/L without a mass
         value = convert_measurement_units(200, 'g/L', 'mM')

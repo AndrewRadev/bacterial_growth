@@ -1,6 +1,6 @@
 ## Search form
 
-On the search page, by default, you can see the 5 latest studies uploaded. You can enter a specific search query to find studies that match certain criteria.
+On the search page, by default, you can see the 10 latest studies uploaded. You can enter a specific search query to find studies that match certain criteria.
 
 <p>
     <div style="width: 100%; text-align: center">
