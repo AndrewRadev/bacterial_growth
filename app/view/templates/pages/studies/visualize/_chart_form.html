@@ -20,6 +20,12 @@
     </div>
   {% endfor %}
 
+  <div class="form-row margin-top-10 small">
+    <a href="#" class="white-button small-button flex-right js-clear-chart">
+      🧹 Clear chart
+    </a>
+  </div>
+
   <div class="form-row margin-top-10">
     <label class="full">
       <span>Measurement technique:</span>
@@ -67,7 +73,7 @@
               {% set key = "measurementContext|{}".format(measurement_context.id) %}
 
               <div
-                  class="form-row hidden js-technique-row js-context-row"
+                  class="form-row hidden js-technique-row"
                   data-technique-id="{{ measurement_context.techniqueId }}">
                 <input
                     type="checkbox"
@@ -90,11 +96,6 @@
             {% endfor %}
           {% endfor %}
         {% endfor %}
-
-        <div class="form-row margin-top-10">
-          <a href="#" class="white-button js-select-all">Select all</a>
-          <a href="#" class="white-button flex-right js-clear-chart">Clear</a>
-        </div>
 
       </div>
     </div>

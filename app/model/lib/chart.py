@@ -5,19 +5,15 @@ import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
 
-from app.model.lib.conversion import convert_measurement_units
+from app.model.lib.conversion import (
+    convert_df_units,
+    CELL_COUNT_UNITS,
+    CFU_COUNT_UNITS,
+    METABOLITE_UNITS,
+)
 
 PLOTLY_TEMPLATE = 'plotly_white'
 "List of templates can be found at plotly.com/python/templates"
-
-CELL_COUNT_UNITS = ('Cells/mL', 'Cells/μL')
-"Units that measure number of cells per volume"
-
-CFU_COUNT_UNITS  = ('CFUs/mL', 'CFUs/μL')
-"Units that measure number of CFUs per volume"
-
-METABOLITE_UNITS = ('mM', 'μM', 'nM', 'pM', 'g/L', 'mg/L')
-"Units for metabolites, both molar and mass concentration"
 
 
 class Chart:
@@ -197,13 +193,13 @@ class Chart:
 
         for (df, units, label, metabolite_mass) in data:
             if units in CELL_COUNT_UNITS:
-                result_units = self._convert_df_units(df, units, self.cell_count_units)
+                result_units = convert_df_units(df, units, self.cell_count_units)
                 converted_units.add(result_units)
             elif units in CFU_COUNT_UNITS:
-                result_units = self._convert_df_units(df, units, self.cfu_count_units)
+                result_units = convert_df_units(df, units, self.cfu_count_units)
                 converted_units.add(result_units)
             elif units in METABOLITE_UNITS:
-                result_units = self._convert_df_units(df, units, self.metabolite_units, metabolite_mass)
+                result_units = convert_df_units(df, units, self.metabolite_units, metabolite_mass)
                 converted_units.add(result_units)
             else:
                 converted_units.add(units)
@@ -214,16 +210,28 @@ class Chart:
         return converted_data, tuple(converted_units)[0]
 
     def _get_scatter_params(self, df, label, log=False):
+        if log:
+            value = df['log_value']
+        else:
+            value = df['value']
+
         if self.show_std and 'std' in df:
             if df['std'].isnull().all():
                 # STD values were blank, don't draw error bars
                 error_y = None
+            elif log:
+                # data should have been transformed, the std will be split into
+                # upper and lower:
+                error_y = go.scatter.ErrorY(
+                    array=df['log_std_upper'],
+                    arrayminus=df['log_std_lower'],
+                )
             else:
-                # We want to clip negative error bars to 0, except in log-view:
+                # We want to clip negative error bars to 0
                 positive_err = df['std']
                 negative_err = np.clip(df['std'], max=df['value'])
 
-                if log or (positive_err == negative_err).all():
+                if (positive_err == negative_err).all():
                     error_y = go.scatter.ErrorY(array=positive_err)
                 else:
                     error_y = go.scatter.ErrorY(array=positive_err, arrayminus=negative_err)
@@ -232,31 +240,10 @@ class Chart:
 
         return dict(
             x=df['time'],
-            y=df['value'],
+            y=value,
             name=label,
             error_y=error_y,
         )
-
-    def _convert_df_units(self, df, source_units, target_units, metabolite_mass=None):
-        new_value = convert_measurement_units(
-            df['value'],
-            source_units,
-            target_units,
-            mass=metabolite_mass,
-        )
-
-        if new_value is not None:
-            df['value'] = new_value
-            if 'std' in df:
-                df['std'] = convert_measurement_units(
-                    df['std'],
-                    source_units,
-                    target_units,
-                    mass=metabolite_mass,
-                )
-            return target_units
-        else:
-            return source_units
 
     def _calculate_x_range(self, data):
         # With multiple charts, fit the x-axis of the shortest one:
@@ -295,17 +282,24 @@ class Chart:
             lowers = []
             uppers = []
 
-            for value, std in zip(df['value'], df['std']):
+            if log:
+                entries = zip(df['log_value'], df['log_std_upper'], df['log_std_lower'])
+            else:
+                entries = zip(df['value'], df['std'], df['std'])
+
+            for value, upper_std, lower_std in entries:
                 # For some reason, pandas might give us a None here, or it might
                 # give us a NaN
-                if std is None or math.isnan(std):
-                    std = 0
+                if upper_std is None or math.isnan(upper_std):
+                    upper_std = 0
+                if lower_std is None or math.isnan(lower_std):
+                    lower_std = 0
 
-                uppers.append(value + std)
+                uppers.append(value + upper_std)
                 if log:
-                    lowers.append(value - std)
+                    lowers.append(value - lower_std)
                 else:
-                    lowers.append(np.clip(value - std, min=0))
+                    lowers.append(np.clip(value - lower_std, min=0))
 
             max_y = max(uppers)
             min_y = min(lowers)

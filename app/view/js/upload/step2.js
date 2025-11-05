@@ -67,7 +67,7 @@ Page('.upload-page .step-content.step-2.active', function($step2) {
       let $option = $select.find('option:selected');
 
       $select.select2({
-        placeholder: 'Select parent species',
+        placeholder: 'Select closest taxonomic parent',
         theme: 'custom',
         width: '100%',
         minimumInputLength: 1,

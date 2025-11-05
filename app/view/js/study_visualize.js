@@ -73,7 +73,7 @@ Page('.study-visualize-page', function($page) {
 
     let $link = $(e.currentTarget);
     let $form = $link.parents('form');
-    $form.find('input[type=checkbox]').prop('checked', false);
+    $form.find('.js-technique-row input[type=checkbox]').prop('checked', false);
 
     updateChart($form)
   });

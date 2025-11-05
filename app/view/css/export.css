@@ -10,6 +10,18 @@
     margin-bottom: 20px;
   }
 
+  .measurement-inputs {
+    min-width: 400px;
+
+    span {
+      display: inline-block;
+      width: 35%;
+    }
+    select {
+      width: 60%;
+    }
+  }
+
   .section-delimiter {
     label {
       display: block;
