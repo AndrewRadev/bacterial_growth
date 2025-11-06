@@ -1,6 +1,7 @@
 import csv
 import re
 import itertools
+import json
 from pathlib import Path
 
 from bioservices import ChEBI
@@ -13,7 +14,10 @@ base_dir.mkdir(exist_ok=True)
 
 output_path  = base_dir / 'data_dump.csv'
 
-target_chebi_ids = None
+target_chebi_ids = {
+    # dihydrogen (hydrogen molecule):
+    5785,
+}
 
 with print_with_time("Downloading and processing MCO owl file"):
     mco_url = 'https://raw.githubusercontent.com/microbial-conditions-ontology/microbial-conditions-ontology/master/mco.owl'
@@ -24,6 +28,18 @@ with print_with_time("Downloading and processing MCO owl file"):
     chebi_pattern = re.compile(r'//purl.obolibrary.org/obo/CHEBI_(\d+)')
 
     target_chebi_ids = {int(chebi_id) for chebi_id in chebi_pattern.findall(owl_text)}
+
+with print_with_time("Downloading and processing MetaboLights JSON file"):
+    metabolights_url = 'http://ftp.ebi.ac.uk/pub/databases/metabolights/eb-eye/metabolites_complete.json'
+    metabolights_json = base_dir / 'metabolights.json'
+    download_file(metabolights_url, metabolights_json)
+
+    with metabolights_json.open() as f:
+        metabolights_pattern = re.compile(r'CHEBI:\s*(\d+)')
+
+        for raw_id in json.load(f):
+            if match := re.search(metabolights_pattern, raw_id):
+                target_chebi_ids.add(int(match[1]))
 
 data = {}
 chebi_api = ChEBI()
