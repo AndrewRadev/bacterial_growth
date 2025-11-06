@@ -24,12 +24,10 @@ def up(conn):
             study_id
         ) = row
 
-        if technique_type in ('fc', '16s', 'od', 'qpcr'):
+        if technique_type in ('fc', '16s', 'qpcr'):
             subtype = 'live'
-            label = TECHNIQUE_SHORT_NAMES[technique_type] + ' live'
         else:
             subtype = ''
-            label = TECHNIQUE_SHORT_NAMES[technique_type]
 
         query = """
             INSERT INTO StudyTechniques (type, description, subjectType, studyId)
@@ -48,15 +46,13 @@ def up(conn):
             UPDATE MeasurementTechniques
             SET
                 studyTechniqueId = :study_technique_id,
-                subtype = :subtype,
-                label = :label
+                subtype = :subtype
             WHERE id = :measurement_technique_id
         """
         conn.execute(sql.text(query), {
             'measurement_technique_id': measurement_technique_id,
             'study_technique_id':       study_technique_id,
             'subtype':                  subtype,
-            'label':                    label,
         })
 
 

@@ -7,6 +7,7 @@ def up(conn):
             id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
             `type` VARCHAR(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
             `description` text,
+            label VARCHAR(100) DEFAULT NULL,
             subjectType varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
             studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
             createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -1,13 +1,10 @@
 import sqlalchemy as sql
 
-# TODO label, subtype (live, etc)
-
 def up(conn):
     query = """
         ALTER TABLE MeasurementTechniques
         ADD studyTechniqueId INT DEFAULT NULL,
         ADD subtype varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-        ADD label VARCHAR(100) DEFAULT NULL,
         DROP CONSTRAINT MeasurementTechniques_studyUniqueId,
         DROP studyUniqueId,
         DROP strainIds,
