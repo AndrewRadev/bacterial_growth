@@ -93,6 +93,7 @@ class MeasurementTechnique(OrmBase):
     def long_name(self):
         return TECHNIQUE_LONG_NAMES[self.type]
 
+    # TODO (2025-11-04) Can be removed in favor of using label
     @property
     def long_name_with_subject_type(self):
         parts = [self.long_name]

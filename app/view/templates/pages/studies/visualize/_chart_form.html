@@ -30,10 +30,14 @@
     <label class="full">
       <span>Measurement technique:</span>
       <select name="techniqueId" class="form-input-blue full">
-        {% for technique in study.measurementTechniques: %}
-          <option value="{{ technique.id }}" data-subject-type="{{ technique.subjectType }}">
-          {{- technique.long_name_with_subject_type -}}
-          </option>
+        {% for study_technique in study.studyTechniques: %}
+          <optgroup label="{{- study_technique.long_name_with_subject_type -}}">
+            {% for technique in study_technique.measurementTechniques: %}
+              <option value="{{ technique.id }}" data-subject-type="{{ technique.subjectType }}">
+              {{- technique.label -}}
+              </option>
+            {% endfor %}
+          </optgroup>
         {% endfor %}
       </select>
     </label>
