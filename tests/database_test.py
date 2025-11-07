@@ -202,14 +202,28 @@ class DatabaseTest(unittest.TestCase):
 
         return self._create_orm_record(Measurement, params)
 
-    def create_measurement_technique(self, **params):
+    def create_study_technique(self, **params):
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+
+        params = {
+            'type': 'fc',
+            'subjectType': 'bioreplicate',
+            'studyId': study_id,
+            **params,
+        }
+
+        return self._create_orm_record(MeasurementTechnique, params)
+
+    def create_measurement_technique(self, **params):
+        study_id           = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+        study_technique_id = self._get_or_create_dependency(params, 'studyTechniqueId', ('studyTechnique', 'id'))
 
         params = {
             'type': 'fc',
             'subjectType': 'bioreplicate',
             'units': '',
             'studyId': study_id,
+            'studyTechniqueId': study_technique_id,
             **params,
         }
 

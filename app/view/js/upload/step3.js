@@ -30,7 +30,7 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
       });
 
       // When the type or unit of measurement change, generate preview:
-      $subform.on('change', '.js-type-select,.js-unit-select,.js-include-std', function() {
+      $subform.on('change', '.js-preview-trigger', function() {
         updatePreview($subform, subjectType);
       });
       updatePreview($subform, subjectType);
@@ -76,10 +76,22 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
 
   function updatePreview($container, subjectType) {
     let $typeSelect = $container.find('.js-type-select');
-    let $stdCheckbox = $container.find('.js-include-std');
 
     let columnName = $typeSelect.find('option:selected').data('columnName');
-    let includeStd = $stdCheckbox.is(':checked');
+    let includeStd = $container.find('.js-include-std').is(':checked');
+
+    let label = $.trim($container.find('.js-label').val())
+    if (label == '') {
+      label = null;
+    } else {
+      label = '(' + label + ')'
+    }
+
+    let subtypes = [];
+    if ($container.find('.js-include-live').is(':checked')) subtypes.push('live');
+    if ($container.find('.js-include-dead').is(':checked')) subtypes.push('dead');
+    if ($container.find('.js-include-total').is(':checked')) subtypes.push('total');
+
     let subject = null;
 
     if (subjectType == 'bioreplicate') {
@@ -91,22 +103,32 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
       columnName = null;
     }
 
-    columnName = [subject, columnName].filter(Boolean).join(' ');
+    let columnNames = []
+
+    if (subtypes.length == 0) {
+      columnNames.push([subject, columnName, label].filter(Boolean).join(' '));
+    } else {
+      for (let subtype of subtypes) {
+        columnNames.push([subject, subtype, columnName, label].filter(Boolean).join(' '));
+      }
+    }
 
     let previewTableHeader = [];
     let previewTableBody   = [];
 
     previewTableHeader.push('<th>...</th>');
-    previewTableHeader.push(`<th>${columnName}</th>`);
-
     previewTableBody.push('<td>...</td>');
-    previewTableBody.push('<td align="center">...</td>');
 
-    if (includeStd) {
-      let stdColumnName = [columnName, 'STD'].filter(Boolean).join(' ');
-
-      previewTableHeader.push(`<th>${stdColumnName}</th>`);
+    for (let columnName of columnNames) {
+      previewTableHeader.push(`<th>${columnName}</th>`);
       previewTableBody.push('<td align="center">...</td>');
+
+      if (includeStd) {
+        let stdColumnName = [columnName, 'STD'].filter(Boolean).join(' ');
+
+        previewTableHeader.push(`<th>${stdColumnName}</th>`);
+        previewTableBody.push('<td align="center">...</td>');
+      }
     }
 
     previewTableHeader.push('<th>...</th>');
