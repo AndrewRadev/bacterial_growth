@@ -33,7 +33,8 @@ class StudyTechnique(OrmBase):
     type:  Mapped[str] = mapped_column(sql.String(100), nullable=False)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
-    description: Mapped[str]  = mapped_column(sql.String)
+    label:       Mapped[str] = mapped_column(sql.String(100))
+    description: Mapped[str] = mapped_column(sql.String)
 
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="studyTechniques")
@@ -51,12 +52,15 @@ class StudyTechnique(OrmBase):
 
     @property
     def long_name_with_subject_type(self):
-        parts = [self.long_name]
+        result = self.long_name
 
         if self.subjectType != 'metabolite':
-            parts.append(self.subject_short_name)
+            result += f" per {self.subject_short_name}"
 
-        return ' per '.join(parts)
+        if self.label and self.label != '':
+            result += f" ({self.label})"
+
+        return result
 
     @property
     def subject_short_name(self):

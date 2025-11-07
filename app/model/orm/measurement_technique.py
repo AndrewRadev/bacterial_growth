@@ -49,7 +49,6 @@ class MeasurementTechnique(OrmBase):
 
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
-    label:       Mapped[str]  = mapped_column(sql.String)
     description: Mapped[str]  = mapped_column(sql.String)
     includeStd:  Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
 

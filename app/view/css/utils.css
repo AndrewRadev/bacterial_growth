@@ -224,7 +224,8 @@ form.simple-form {
     }
 
     label span,
-    label div {
+    label div,
+    .input-label {
       font-size: 14px;
       line-height: 2;
 
