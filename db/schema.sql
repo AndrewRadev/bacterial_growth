@@ -257,7 +257,7 @@ DROP TABLE IF EXISTS Metabolites;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE Metabolites (
   chebiId varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `name` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   id int NOT NULL AUTO_INCREMENT,
   averageMass decimal(10,5) DEFAULT NULL,
   PRIMARY KEY (id),
@@ -658,5 +658,6 @@ INSERT INTO MigrationVersions VALUES
 (67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22'),
 (79,'2025_11_03_160947_create_study_techniques','2025-11-06 15:36:03'),
 (80,'2025_11_03_162139_modify_measurement_techniques','2025-11-06 15:36:04'),
-(82,'2025_11_03_164617_populate_study_techniques','2025-11-06 15:36:27');
+(82,'2025_11_03_164617_populate_study_techniques','2025-11-06 15:36:27'),
+(84,'2025_11_10_122037_increase_metabolite_name_length','2025-11-10 11:21:33');
 

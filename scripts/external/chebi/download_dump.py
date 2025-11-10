@@ -4,7 +4,7 @@ import itertools
 import json
 from pathlib import Path
 
-from bioservices import ChEBI
+import requests
 from long_task_printer import print_with_time, LongTask
 
 from app.model.lib.util import download_file
@@ -16,7 +16,7 @@ output_path  = base_dir / 'data_dump.csv'
 
 target_chebi_ids = {
     # dihydrogen (hydrogen molecule):
-    5785,
+    18276,
 }
 
 with print_with_time("Downloading and processing MCO owl file"):
@@ -27,7 +27,7 @@ with print_with_time("Downloading and processing MCO owl file"):
     owl_text      = mco_owl_path.read_text()
     chebi_pattern = re.compile(r'//purl.obolibrary.org/obo/CHEBI_(\d+)')
 
-    target_chebi_ids = {int(chebi_id) for chebi_id in chebi_pattern.findall(owl_text)}
+    target_chebi_ids |= {int(chebi_id) for chebi_id in chebi_pattern.findall(owl_text)}
 
 with print_with_time("Downloading and processing MetaboLights JSON file"):
     metabolights_url = 'http://ftp.ebi.ac.uk/pub/databases/metabolights/eb-eye/metabolites_complete.json'
@@ -42,22 +42,31 @@ with print_with_time("Downloading and processing MetaboLights JSON file"):
                 target_chebi_ids.add(int(match[1]))
 
 data = {}
-chebi_api = ChEBI()
+
+chebi_base_url = 'https://www.ebi.ac.uk/chebi/backend/api/public'
+page_size      = 100
 
 with print_with_time("Fetching data from ChEBI API"):
-    long_task = LongTask(total_count=(len(target_chebi_ids) // 50))
+    long_task = LongTask(total_count=(len(target_chebi_ids) // page_size))
 
-    for chebi_ids in itertools.batched(sorted(target_chebi_ids), 50):
+    for chebi_ids in itertools.batched(sorted(target_chebi_ids), page_size):
         with long_task.measure() as progress:
             print(progress)
 
-            entities = chebi_api.getCompleteEntityByList(chebi_ids)
+            response = requests.post(f"{chebi_base_url}/compounds/", data={
+                'chebi_ids': chebi_ids,
+            })
+            entities = response.json()
 
-            for entity in entities:
-                chebi_id = int(entity.chebiId.split(':')[-1])
-                data[chebi_id] = {
-                    'name':        entity.chebiAsciiName,
-                    'averageMass': getattr(entity, 'mass', None),
+            for chebi_id, entity in entities.items():
+                if not entity['data']:
+                    continue
+
+                chemical_data = entity['data'].get('chemical_data', None) or {}
+
+                data[int(chebi_id)] = {
+                    'name':        entity['data']['ascii_name'],
+                    'averageMass': chemical_data.get('mass', None),
                 }
 
 with print_with_time("Creating data dump"):
