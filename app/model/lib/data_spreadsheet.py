@@ -35,7 +35,6 @@ def create_excel(submission, metabolite_names, strain_names):
     long_time_units = _TIME_UNITS[short_time_units]
 
     headers_common = {
-        # 'Position':           'Predetermine position based on the type of vessel specified before.',
         'Biological Replicate': 'Unique names of individual samples: a bottle, a well in a well-plate, or a mini-bioreactor.',
         'Compartment':          'A compartment within the vessel where growth is measured.',
         'Time':                 f"Measurement time-points in {long_time_units} ({short_time_units}).",

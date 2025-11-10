@@ -93,8 +93,19 @@
     </div>
 
     <div class="form-row">
+      <label class="flex-column flex-2">
+        <div>Description of methodology</div>
+        <textarea
+            name="{{ prefix }}description"
+            class="form-input-full form-input-blue"
+            placeholder="Example: We used a <brand name> flow cytometer with CYBR Green I staining..."
+            rows=4>{{ data['description'] if data }}</textarea>
+      </label>
+
       <div class="flex-column flex-gap-6 flex-1">
-        <div class="flex-column flex-gap-6" data-tooltip="If you're not sure whether your measurements include only live cells or count all cells, you can leave the checkboxes blank. Ideally, we recommend marking the relevant types.">
+        <div
+          class="flex-column flex-gap-6 js-extra-inputs"
+          data-tooltip="If you're not sure whether your measurements include only live cells or count all cells, you can leave the checkboxes blank. Ideally, we recommend marking the relevant types.">
           <span class="input-label">Types of cells counted:</span>
           <label>
             <input
@@ -138,21 +149,12 @@
           </label>
         </div>
       </div>
-
-      <label class="flex-column flex-2">
-        <div>Description of methodology</div>
-        <textarea
-            name="{{ prefix }}description"
-            class="form-input-full form-input-blue"
-            placeholder="Example: We used a <brand name> flow cytometer with CYBR Green I staining..."
-            rows=4>{{ data['description'] if data }}</textarea>
-      </label>
     </div>
 
     <hr>
 
     <div class="form-row">
-      <div style="overflow-x: auto">
+      <div class="preview-container">
         Data spreadsheet preview:
 
         <table class="dataframe-table margin-top-10">
