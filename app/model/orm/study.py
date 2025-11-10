@@ -63,12 +63,16 @@ class Study(OrmBase):
     compartments: Mapped[List['Compartment']] = owner_relationship()
 
     studyTechniques:       Mapped[List['StudyTechnique']]       = owner_relationship()
-    measurementTechniques: Mapped[List['MeasurementTechnique']] = owner_relationship()
     measurementContexts:   Mapped[List['MeasurementContext']]   = owner_relationship()
     modelingRequests:      Mapped[List['ModelingRequest']]      = owner_relationship()
 
     bioreplicates: Mapped[List['Bioreplicate']] = relationship(
         secondary='Experiments',
+        viewonly=True,
+    )
+
+    measurementTechniques: Mapped[List['MeasurementTechnique']] = relationship(
+        secondary='StudyTechniques',
         viewonly=True,
     )
 

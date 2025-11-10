@@ -51,7 +51,7 @@ def persist_submission_to_database(submission_form):
         _save_compartments(db_trans_session, submission_form, study)
         _save_communities(db_trans_session, submission_form, study, user_uuid)
         _save_experiments(db_trans_session, submission_form, study)
-        _save_measurement_techniques(db_trans_session, submission_form, study)
+        _save_study_techniques(db_trans_session, submission_form, study)
 
         db_trans_session.flush()
         _save_measurements(db_trans_session, study, submission_form)
@@ -251,13 +251,13 @@ def _clear_study(study):
         experiment.perturbations          = []
         experiment.bioreplicates          = []
 
-    study.measurements           = []
-    study.measurementContexts    = []
-    study.measurementTechniques  = []
-    study.strains                = []
-    study.compartments           = []
-    study.communities            = []
-    study.studyMetabolites       = []
+    study.measurements        = []
+    study.measurementContexts = []
+    study.studyTechniques     = []
+    study.strains             = []
+    study.compartments        = []
+    study.communities         = []
+    study.studyMetabolites    = []
 
 
 def _save_compartments(db_session, submission_form, study):
@@ -399,20 +399,21 @@ def _save_experiments(db_session, submission_form, study):
     return experiments
 
 
-def _save_measurement_techniques(db_session, submission_form, study):
+def _save_study_techniques(db_session, submission_form, study):
     submission = submission_form.submission
     techniques = []
 
-    for technique in submission.build_techniques():
-        technique.study = study
+    for study_technique in submission.build_techniques():
+        study_technique.study = study
 
-        if technique.metaboliteIds:
-            for chebiId in technique.metaboliteIds:
-                db_session.add(StudyMetabolite(
-                    chebi_id=chebiId,
-                    study=study,
-                ))
-        techniques.append(technique)
+        for measurement_technique in study_technique.measurementTechniques:
+            if measurement_technique.metaboliteIds:
+                for chebiId in measurement_technique.metaboliteIds:
+                    db_session.add(StudyMetabolite(
+                        chebi_id=chebiId,
+                        study=study,
+                    ))
+        techniques.append(study_technique)
 
     db_session.add_all(techniques)
     return techniques
@@ -586,35 +587,36 @@ def _get_expected_column_names(submission_form):
     metabolite_columns = set()
 
     # Validate column presence:
-    for technique in submission.build_techniques():
-        if technique.subjectType == 'bioreplicate':
-            column = technique.csv_column_name()
-            community_columns.add(column)
-            if technique.includeStd:
-                community_columns.add(f"{column} STD")
+    for study_technique in submission.build_techniques():
+        for measurement_technique in study_technique.measurementTechniques:
+            if measurement_technique.subjectType == 'bioreplicate':
+                column = measurement_technique.csv_column_name()
+                community_columns.add(column)
+                if study_technique.includeStd:
+                    community_columns.add(f"{column} STD")
 
-        elif technique.subjectType == 'strain':
-            for taxon in submission_form.fetch_taxa():
-                column = technique.csv_column_name(taxon.name)
-                strain_columns.add(column)
-                if technique.includeStd:
-                    strain_columns.add(f"{column} STD")
+            elif measurement_technique.subjectType == 'strain':
+                for taxon in submission_form.fetch_taxa():
+                    column = measurement_technique.csv_column_name(taxon.name)
+                    strain_columns.add(column)
+                    if study_technique.includeStd:
+                        strain_columns.add(f"{column} STD")
 
-            for strain in submission.studyDesign['custom_strains']:
-                column = technique.csv_column_name(strain['name'])
-                strain_columns.add(column)
-                if technique.includeStd:
-                    strain_columns.add(f"{column} STD")
+                for strain in submission.studyDesign['custom_strains']:
+                    column = measurement_technique.csv_column_name(strain['name'])
+                    strain_columns.add(column)
+                    if study_technique.includeStd:
+                        strain_columns.add(f"{column} STD")
 
-        elif technique.subjectType == 'metabolite':
-            for metabolite in submission_form.fetch_all_metabolites():
-                column = technique.csv_column_name(metabolite.name)
-                metabolite_columns.add(column)
-                if technique.includeStd:
-                    metabolite_columns.add(f"{column} STD")
+            elif measurement_technique.subjectType == 'metabolite':
+                for metabolite in submission_form.fetch_all_metabolites():
+                    column = measurement_technique.csv_column_name(metabolite.name)
+                    metabolite_columns.add(column)
+                    if study_technique.includeStd:
+                        metabolite_columns.add(f"{column} STD")
 
-        else:
-            raise ValueError(f"Unexpected technique subjectType: {technique.subjectType}")
+            else:
+                raise ValueError(f"Unexpected measurement_technique subjectType: {measurement_technique.subjectType}")
 
     return community_columns, strain_columns, metabolite_columns
 

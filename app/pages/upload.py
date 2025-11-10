@@ -97,7 +97,7 @@ def upload_step3_page():
         return _step3_partial(upload_form, submission_form)
 
     if request.method == 'POST':
-        submission_form.update_study_design(upload_form.data)
+        submission_form.update_techniques(upload_form.data)
 
         if upload_form.validate():
             session['submission_id'] = submission_form.save()

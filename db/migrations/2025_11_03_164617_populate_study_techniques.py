@@ -13,7 +13,10 @@ TECHNIQUE_SHORT_NAMES = {
 
 def up(conn):
     # Loop through all measurement techniques and create a parent study technique:
-    query = "SELECT id, type, description, subjectType, studyId from MeasurementTechniques"
+    query = """
+        SELECT id, type, description, subjectType, units, includeStd, studyId
+        FROM MeasurementTechniques
+    """
 
     for row in conn.execute(sql.text(query)).all():
         (
@@ -21,23 +24,27 @@ def up(conn):
             technique_type,
             description,
             subject_type,
+            units,
+            include_std,
             study_id
         ) = row
 
         if technique_type in ('fc', '16s', 'qpcr'):
-            subtype = 'live'
+            cell_type = 'live'
         else:
-            subtype = ''
+            cell_type = ''
 
         query = """
-            INSERT INTO StudyTechniques (type, description, subjectType, studyId)
-            VALUES (:type, :description, :subject_type, :study_id)
+            INSERT INTO StudyTechniques (type, description, subjectType, units, includeStd, studyId)
+            VALUES (:type, :description, :subject_type, :units, :include_std, :study_id)
         """
         conn.execute(sql.text(query), {
-            'type': technique_type,
-            'description': description,
+            'type':         technique_type,
+            'description':  description,
             'subject_type': subject_type,
-            'study_id': study_id,
+            'units':        units,
+            'include_std':  include_std,
+            'study_id':     study_id,
         })
 
         (study_technique_id,) = conn.execute(sql.text("SELECT LAST_INSERT_ID()")).one()
@@ -46,13 +53,13 @@ def up(conn):
             UPDATE MeasurementTechniques
             SET
                 studyTechniqueId = :study_technique_id,
-                subtype = :subtype
+                cellType = :cell_type
             WHERE id = :measurement_technique_id
         """
         conn.execute(sql.text(query), {
             'measurement_technique_id': measurement_technique_id,
             'study_technique_id':       study_technique_id,
-            'subtype':                  subtype,
+            'cell_type':                cell_type,
         })
 
 

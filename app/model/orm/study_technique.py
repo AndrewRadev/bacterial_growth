@@ -11,6 +11,17 @@ from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
 
+TECHNIQUE_SHORT_NAMES = {
+    'ph':         'pH',
+    'fc':         'FC',
+    'od':         'OD',
+    'plates':     'PC',
+    '16s':        '16S-rRNA reads',
+    'qpcr':       'qPCR',
+    'metabolite': 'Metabolite',
+}
+"Human-readable short names of techniques"
+
 TECHNIQUE_LONG_NAMES = {
     'ph':         'pH',
     'fc':         'Flow Cytometry',
@@ -30,8 +41,10 @@ class StudyTechnique(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    type:  Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    type:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    units:       Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    includeStd:  Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
 
     label:       Mapped[str] = mapped_column(sql.String(100))
     description: Mapped[str] = mapped_column(sql.String)
@@ -44,7 +57,18 @@ class StudyTechnique(OrmBase):
 
     measurementTechniques: Mapped[List['MeasurementTechnique']] = relationship(
         back_populates="studyTechnique",
+        cascade='all, delete-orphan',
     )
+
+    @property
+    def short_name(self):
+        return TECHNIQUE_SHORT_NAMES[self.type]
+
+    @property
+    def short_name_with_units(self):
+        units = f" ({self.units})" if self.units else ""
+
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
 
     @property
     def long_name(self):

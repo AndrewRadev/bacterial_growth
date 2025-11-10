@@ -44,50 +44,51 @@ def create_excel(submission, metabolite_names, strain_names):
     headers_strains       = {**headers_common}
     headers_metabolites   = {**headers_common}
 
-    for technique in submission.build_techniques():
-        subject_type   = technique.subjectType
-        technique_type = technique.type
-        units          = technique.units
+    for study_technique in submission.build_techniques():
+        subject_type   = study_technique.subjectType
+        technique_type = study_technique.type
+        units          = study_technique.units
 
-        if subject_type == 'bioreplicate':
-            technique_name = technique.csv_column_name()
-            description = _TECHNIQUE_DESCRIPTIONS[technique_type].format(units=technique.units)
+        for measurement_technique in study_technique.measurementTechniques:
+            if subject_type == 'bioreplicate':
+                technique_name = measurement_technique.csv_column_name()
+                description = _TECHNIQUE_DESCRIPTIONS[technique_type].format(units=study_technique.units)
 
-            headers_bioreplicates[technique_name] = description
+                headers_bioreplicates[technique_name] = description
 
-            if technique.includeStd:
-                title = ' '.join([technique_name, 'STD'])
-                headers_bioreplicates[title] = _TECHNIQUE_DESCRIPTIONS['STD']
+                if study_technique.includeStd:
+                    title = ' '.join([technique_name, 'STD'])
+                    headers_bioreplicates[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
-        elif subject_type == 'strain':
-            for strain_name in strain_names:
-                title = technique.csv_column_name(strain_name)
+            elif subject_type == 'strain':
+                for strain_name in strain_names:
+                    title = measurement_technique.csv_column_name(strain_name)
 
-                description = _TECHNIQUE_DESCRIPTIONS[f"{technique_type}_ps"].format(
-                    strain=strain_name,
-                    units=units,
-                )
-                headers_strains[title] = description
+                    description = _TECHNIQUE_DESCRIPTIONS[f"{technique_type}_ps"].format(
+                        strain=strain_name,
+                        units=units,
+                    )
+                    headers_strains[title] = description
 
-                if technique.includeStd:
-                    title = ' '.join([title, 'STD'])
-                    headers_strains[title] = _TECHNIQUE_DESCRIPTIONS['STD']
+                    if study_technique.includeStd:
+                        title = ' '.join([title, 'STD'])
+                        headers_strains[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
-        elif subject_type == 'metabolite':
-            for metabolite in metabolite_names:
-                title = technique.csv_column_name(metabolite)
-                description = _TECHNIQUE_DESCRIPTIONS['metabolites'].format(
-                    metabolite=metabolite,
-                    units=units,
-                )
-                headers_metabolites[title] = description
+            elif subject_type == 'metabolite':
+                for metabolite in metabolite_names:
+                    title = measurement_technique.csv_column_name(metabolite)
+                    description = _TECHNIQUE_DESCRIPTIONS['metabolites'].format(
+                        metabolite=metabolite,
+                        units=units,
+                    )
+                    headers_metabolites[title] = description
 
-                if technique.includeStd:
-                    title = ' '.join([metabolite, 'STD'])
-                    headers_metabolites[title] = _TECHNIQUE_DESCRIPTIONS['STD']
+                    if study_technique.includeStd:
+                        title = ' '.join([metabolite, 'STD'])
+                        headers_metabolites[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
-        else:
-            raise ValueError(f"Invalid technique subject_type: {subject_type}")
+            else:
+                raise ValueError(f"Invalid technique subject_type: {subject_type}")
 
     # Create sheets for each category of measurement:
     if len(headers_bioreplicates) > 3:

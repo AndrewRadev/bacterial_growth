@@ -220,7 +220,7 @@ CREATE TABLE MeasurementTechniques (
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   studyTechniqueId int DEFAULT NULL,
-  subtype varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  cellType varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (id),
   KEY MeasurementTechniques_studyId (studyId),
   KEY MeasurementTechniques_studyTechniqueId (studyTechniqueId),
@@ -472,6 +472,8 @@ CREATE TABLE StudyTechniques (
   id int NOT NULL AUTO_INCREMENT,
   `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` text,
+  units varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  includeStd tinyint(1) NOT NULL DEFAULT '0',
   label varchar(100) DEFAULT NULL,
   subjectType varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
@@ -658,7 +660,8 @@ INSERT INTO MigrationVersions VALUES
 (64,'2025_07_13_121621_make_orcid_token_nullable','2025-08-20 12:11:25'),
 (65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-21 14:36:17'),
 (67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22'),
-(79,'2025_11_03_160947_create_study_techniques','2025-11-06 15:36:03'),
-(80,'2025_11_03_162139_modify_measurement_techniques','2025-11-06 15:36:04'),
-(82,'2025_11_03_164617_populate_study_techniques','2025-11-06 15:36:27');
+(98,'2025_11_03_160947_create_study_techniques','2025-11-10 16:09:00'),
+(99,'2025_11_03_162139_modify_measurement_techniques','2025-11-10 16:09:00'),
+(100,'2025_11_03_164617_populate_study_techniques','2025-11-10 16:09:00'),
+(101,'2025_11_10_122037_increase_metabolite_name_length','2025-11-10 16:09:00');
 

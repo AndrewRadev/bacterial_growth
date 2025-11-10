@@ -102,10 +102,10 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
       label = '(' + label + ')'
     }
 
-    let subtypes = [];
-    if ($container.find('.js-include-live').is(':checked')) subtypes.push('live');
-    if ($container.find('.js-include-dead').is(':checked')) subtypes.push('dead');
-    if ($container.find('.js-include-total').is(':checked')) subtypes.push('total');
+    let cellTypes = [];
+    if ($container.find('.js-include-live').is(':checked')) cellTypes.push('live');
+    if ($container.find('.js-include-dead').is(':checked')) cellTypes.push('dead');
+    if ($container.find('.js-include-total').is(':checked')) cellTypes.push('total');
 
     let subject = null;
 
@@ -120,11 +120,11 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
 
     let columnNames = []
 
-    if (subtypes.length == 0) {
+    if (cellTypes.length == 0) {
       columnNames.push([subject, columnName, label].filter(Boolean).join(' '));
     } else {
-      for (let subtype of subtypes) {
-        columnNames.push([subject, subtype, columnName, label].filter(Boolean).join(' '));
+      for (let cellType of cellTypes) {
+        columnNames.push([subject, cellType, columnName, label].filter(Boolean).join(' '));
       }
     }
 

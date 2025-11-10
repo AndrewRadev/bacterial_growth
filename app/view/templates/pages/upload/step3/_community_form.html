@@ -93,15 +93,6 @@
     </div>
 
     <div class="form-row">
-      <label class="flex-column flex-2">
-        <div>Description of methodology</div>
-        <textarea
-            name="{{ prefix }}description"
-            class="form-input-full form-input-blue"
-            placeholder="Example: We used a <brand name> flow cytometer with CYBR Green I staining..."
-            rows=4>{{ data['description'] if data }}</textarea>
-      </label>
-
       <div class="flex-column flex-gap-6 flex-1">
         <div
           class="flex-column flex-gap-6 js-extra-inputs"
@@ -112,7 +103,7 @@
                 type="checkbox"
                 class="js-include-live js-preview-trigger"
                 name="{{ prefix }}includeLive"
-                {{ "checked" if not data or data['includeLive'] }} />
+                {{ "checked" if data and data['includeLive'] }} />
             Live cells
           </label>
 
@@ -121,7 +112,7 @@
                 type="checkbox"
                 class="js-include-dead js-preview-trigger"
                 name="{{ prefix }}includeDead"
-                {{ "checked" if not data or data['includeDead'] }} />
+                {{ "checked" if data and data['includeDead'] }} />
             Dead cells
           </label>
 
@@ -130,7 +121,7 @@
                 type="checkbox"
                 class="js-include-total js-preview-trigger"
                 name="{{ prefix }}includeTotal"
-                {{ "checked" if not data or data['includeTotal'] }} />
+                {{ "checked" if data and data['includeTotal'] }} />
             Total cells (live + dead)
           </label>
         </div>
@@ -149,6 +140,15 @@
           </label>
         </div>
       </div>
+
+      <label class="flex-column flex-2">
+        <div>Description of methodology</div>
+        <textarea
+            name="{{ prefix }}description"
+            class="form-input-full form-input-blue"
+            placeholder="Example: We used a <brand name> flow cytometer with CYBR Green I staining..."
+            rows=4>{{ data['description'] if data }}</textarea>
+      </label>
     </div>
 
     <hr>
