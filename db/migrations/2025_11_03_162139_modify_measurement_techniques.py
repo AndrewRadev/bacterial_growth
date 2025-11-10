@@ -4,7 +4,7 @@ def up(conn):
     query = """
         ALTER TABLE MeasurementTechniques
         ADD studyTechniqueId INT DEFAULT NULL,
-        ADD subtype varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+        ADD cellType varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
         DROP CONSTRAINT MeasurementTechniques_studyUniqueId,
         DROP studyUniqueId,
         DROP strainIds,
@@ -22,8 +22,7 @@ def down(conn):
         ALTER TABLE MeasurementTechniques
         DROP CONSTRAINT MeasurementTechniques_studyTechniqueId,
         DROP studyTechniqueId,
-        DROP subtype,
-        DROP label,
+        DROP cellType,
         ADD strainIds json NOT NULL DEFAULT (json_array()),
         ADD studyUniqueId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
         ADD CONSTRAINT MeasurementTechniques_studyUniqueId

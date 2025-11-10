@@ -142,8 +142,25 @@ class SubmissionForm:
         for strain_data in self.submission.studyDesign['custom_strains']:
             strain_data['name'] = strain_data['name'].strip()
 
+    def update_techniques(self, data):
+        for i in range(len(data['techniques'])):
+            technique_data = data['techniques'][i]
+
+            cell_types = []
+            if technique_data.pop('includeLive', False):
+                cell_types.append('live')
+            if technique_data.pop('includeDead', False):
+                cell_types.append('dead')
+            if technique_data.pop('includeTotal', False):
+                cell_types.append('total')
+
+            technique_data['cellTypes'] = cell_types
+
+        self.update_study_design(data)
+
     def update_study_design(self, data):
         study_design = {**self.submission.studyDesign, **data}
+
         if 'csrf_token' in study_design:
             del study_design['csrf_token']
 
@@ -218,15 +235,17 @@ class SubmissionForm:
 
     def technique_descriptions(self):
         ordering = ('bioreplicate', 'strain', 'metabolite')
-        techniques = sorted(self.submission.build_techniques(), key=lambda t: ordering.index(t.subjectType))
+        study_techniques = self.submission.build_techniques()
+        measurement_techniques = [mt for st in study_techniques for mt in st.measurementTechniques]
+        sorted_techniques = sorted(measurement_techniques, key=lambda t: ordering.index(t.subjectType))
 
-        for (subject_type, techniques) in itertools.groupby(techniques, lambda t: t.subjectType):
+        for (subject_type, grouped_techniques) in itertools.groupby(sorted_techniques, lambda t: t.subjectType):
             match subject_type:
                 case 'bioreplicate': type = 'Community-level'
                 case 'strain':       type = 'Strain-level'
                 case 'metabolite':   type = 'Metabolite'
 
-            yield (type, list(techniques))
+            yield (type, list(grouped_techniques))
 
     def html_step_classes(self, target_step):
         if self.step < target_step:

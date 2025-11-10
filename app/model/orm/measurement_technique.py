@@ -42,17 +42,19 @@ class MeasurementTechnique(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    type:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    subtype: Mapped[str] = mapped_column(sql.String(100), nullable=True)
-    units:   Mapped[str] = mapped_column(sql.String(100), nullable=False)
-
+    type:     Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    cellType: Mapped[str] = mapped_column(sql.String(100), nullable=True)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
+    # TODO (2025-11-10) Remove
+    units:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
+
+    # TODO (2025-11-10) Remove
     description: Mapped[str]  = mapped_column(sql.String)
-    includeStd:  Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
 
     metaboliteIds: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
+    # TODO (2025-11-10) Remove
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="measurementTechniques")
 
@@ -78,14 +80,13 @@ class MeasurementTechnique(OrmBase):
 
     @property
     def short_name(self):
-        return TECHNIQUE_SHORT_NAMES[self.type]
+        cell_type = f" {self.cellType}" if self.cellType else ""
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{cell_type}"
 
     @property
     def short_name_with_units(self):
-        subtype = f" {self.subtype}" if self.subtype else ""
-        units   = f" ({self.units})" if self.units else ""
-
-        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{subtype}{units}"
+        units = f" ({self.units})" if self.units else ""
+        return f"{self.short_name}{units}"
 
     @property
     def long_name(self):
@@ -123,10 +124,10 @@ class MeasurementTechnique(OrmBase):
         ).all()
 
     def csv_column_name(self, subject_name=None):
-        subtype = f"{self.subtype} " if self.subtype else ""
+        cell_type = f"{self.cellType} " if self.cellType else ""
 
         if self.subjectType == 'bioreplicate':
-            return f"Community {subtype}{TECHNIQUE_SHORT_NAMES[self.type]}"
+            return f"Community {cell_type}{TECHNIQUE_SHORT_NAMES[self.type]}"
 
         elif self.subjectType == 'metabolite':
             return subject_name
@@ -143,7 +144,7 @@ class MeasurementTechnique(OrmBase):
             else:
                 raise ValueError(f"Incompatible type and subjectType: {self.type}, {self.subjectType}")
 
-            return f"{subject_name} {subtype}{suffix}"
+            return f"{subject_name} {cell_type}{suffix}"
 
     def get_grouped_contexts(self):
         grouper = lambda mc: (mc.bioreplicate, mc.compartment)
