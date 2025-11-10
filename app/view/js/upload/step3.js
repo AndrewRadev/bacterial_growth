@@ -23,11 +23,16 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
     initializeSubform: function($subform) {
       let subjectType = $subform.data('subjectType');
 
-      // Specific types of measurements require specific units:
       $subform.on('change', '.js-type-select', function() {
         let $typeSelect = $(this);
+
+        // Specific types of measurements require specific units:
         updateUnitSelect($subform, $typeSelect);
+
+        // Specific types of measurements have different input options
+        updateExtraInputs($subform, $typeSelect);
       });
+      updateExtraInputs($subform, $subform.find('.js-type-select'));
 
       // When the type or unit of measurement change, generate preview:
       $subform.on('change', '.js-preview-trigger', function() {
@@ -70,9 +75,19 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
       $unitsSelect.val('CFUs/mL');
     } else if (type == 'fc') {
       $unitsSelect.val('Cells/mL');
-    } else {
     }
   }
+
+  function updateExtraInputs($container, $typeSelect) {
+    let type = $typeSelect.val();
+
+    if (type == 'fc' || type == '16s' || type == 'qpcr') {
+      $container.find('.js-extra-inputs').show()
+    } else {
+      $container.find('.js-extra-inputs').hide().find(':checkbox').prop('checked', false);
+    }
+  }
+
 
   function updatePreview($container, subjectType) {
     let $typeSelect = $container.find('.js-type-select');

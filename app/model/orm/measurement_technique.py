@@ -96,11 +96,10 @@ class MeasurementTechnique(OrmBase):
 
     @property
     def short_name_with_units(self):
-        if self.units:
-            units = f" ({self.units})"
-        else:
-            units = ""
-        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
+        subtype = f" {self.subtype}" if self.subtype else ""
+        units   = f" ({self.units})" if self.units else ""
+
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{subtype}{units}"
 
     @property
     def short_name_with_subject_type(self):
@@ -147,8 +146,10 @@ class MeasurementTechnique(OrmBase):
         ).all()
 
     def csv_column_name(self, subject_name=None):
+        subtype = f"{self.subtype} " if self.subtype else ""
+
         if self.subjectType == 'bioreplicate':
-            return f"Community {TECHNIQUE_SHORT_NAMES[self.type]}"
+            return f"Community {subtype}{TECHNIQUE_SHORT_NAMES[self.type]}"
 
         elif self.subjectType == 'metabolite':
             return subject_name
@@ -165,7 +166,7 @@ class MeasurementTechnique(OrmBase):
             else:
                 raise ValueError(f"Incompatible type and subjectType: {self.type}, {self.subjectType}")
 
-            return f"{subject_name} {suffix}"
+            return f"{subject_name} {subtype}{suffix}"
 
     def get_grouped_contexts(self):
         grouper = lambda mc: (mc.bioreplicate, mc.compartment)

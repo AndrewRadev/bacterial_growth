@@ -72,8 +72,16 @@ class Submission(OrmBase):
         return self.completed_step_count == 7
 
     def build_techniques(self):
-        from app.model.orm import MeasurementTechnique
-        return [MeasurementTechnique(**m) for m in self.studyDesign['techniques']]
+        from app.model.orm import StudyTechnique, MeasurementTechnique
+
+        measurement_techniques = []
+
+        for technique_data in self.studyDesign['techniques']:
+            for subtype in self._technique_subtypes(technique_data):
+                mt = MeasurementTechnique(**MeasurementTechnique.filter_keys(technique_data), subtype=subtype)
+                measurement_techniques.append(mt)
+
+        return measurement_techniques
 
     def export_data(self, message, timestamp=None):
         assert(self.study is not None)
@@ -103,3 +111,18 @@ class Submission(OrmBase):
         # Record a changelog entry
         with open(base_dir / 'changes.log', 'a') as f:
             print(f"[{timestamp.isoformat()}] {message}", file=f)
+
+    def _technique_subtypes(self, technique_data):
+        subtypes = []
+
+        if technique_data['includeLive']:
+            subtypes.append('live')
+        if technique_data['includeDead']:
+            subtypes.append('dead')
+        if technique_data['includeTotal']:
+            subtypes.append('total')
+
+        if not subtypes:
+            subtypes.append('')
+
+        return subtypes

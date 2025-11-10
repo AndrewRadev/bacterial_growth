@@ -180,6 +180,10 @@
     }
   }
 
+  .preview-container {
+    overflow-x: auto;
+  }
+
   .preview {
     display: flex;
     flex-direction: column;
