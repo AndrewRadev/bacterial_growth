@@ -257,7 +257,7 @@ DROP TABLE IF EXISTS Metabolites;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE Metabolites (
   chebiId varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  `name` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   id int NOT NULL AUTO_INCREMENT,
   averageMass decimal(10,5) DEFAULT NULL,
   PRIMARY KEY (id),
@@ -633,5 +633,6 @@ INSERT INTO MigrationVersions VALUES
 (63,'2025_07_10_183310_make_subject_id_not_null','2025-08-20 12:11:25'),
 (64,'2025_07_13_121621_make_orcid_token_nullable','2025-08-20 12:11:25'),
 (65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-21 14:36:17'),
-(67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22');
+(67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22'),
+(84,'2025_11_10_122037_increase_metabolite_name_length','2025-11-10 11:21:33');
 
