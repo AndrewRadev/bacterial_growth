@@ -124,6 +124,16 @@ def experiment_json(publicId):
     }
 
 
+def experiment_csv(publicId):
+    experiment = g.db_session.get(Experiment, publicId)
+    if not experiment or not experiment.study.isPublished:
+        raise NotFound
+
+    df = experiment.get_df(g.db_session)
+
+    return df.to_csv(index=False)
+
+
 def measurement_context_json(id):
     measurement_context = g.db_session.get(MeasurementContext, id)
     if not measurement_context or not measurement_context.study.isPublished:
@@ -247,19 +257,21 @@ def search_json():
 
 
 def _render_measurement_subject(measurement_context):
-    subject = measurement_context.get_subject(g.db_session)
     subject_type = measurement_context.subjectType
+    subject_name = measurement_context.subjectName
+    extra_data = {}
 
-    if subject_type == 'strain':
-        extra_data = {'NCBId': subject.NCBId}
-    elif subject_type == 'metabolite':
-        extra_data = {'chebiId': int(subject.chebiId.removeprefix('CHEBI:'))}
-    else:
-        extra_data = {}
+    if measurement_context.subjectExternalId:
+        if subject_type == 'strain':
+            external_id = int(measurement_context.subjectExternalId.removeprefix('NCBI:'))
+            extra_data = {'NCBId': external_id}
+        elif subject_type == 'metabolite':
+            external_id = int(measurement_context.subjectExternalId.removeprefix('CHEBI:'))
+            extra_data = {'chebiId': external_id}
 
     return {
         'type': subject_type,
-        'name': subject.name,
+        'name': subject_name,
         **extra_data,
     }
 
