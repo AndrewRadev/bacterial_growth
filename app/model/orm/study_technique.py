@@ -6,32 +6,15 @@ from sqlalchemy.orm import (
     Mapped,
     mapped_column,
     relationship,
+    column_property,
 )
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
-
-TECHNIQUE_SHORT_NAMES = {
-    'ph':         'pH',
-    'fc':         'FC',
-    'od':         'OD',
-    'plates':     'PC',
-    '16s':        '16S-rRNA reads',
-    'qpcr':       'qPCR',
-    'metabolite': 'Metabolite',
-}
-"Human-readable short names of techniques"
-
-TECHNIQUE_LONG_NAMES = {
-    'ph':         'pH',
-    'fc':         'Flow Cytometry',
-    'od':         'Optical Density',
-    'plates':     'Plate Counts',
-    '16s':        '16S-rRNA reads',
-    'qpcr':       'qPCR',
-    'metabolite': 'Metabolites',
-}
-"Human-readable long names of techniques"
+from app.model.lib.techniques import (
+    TECHNIQUE_SHORT_NAMES,
+    TECHNIQUE_LONG_NAMES,
+)
 
 
 class StudyTechnique(OrmBase):
@@ -59,6 +42,19 @@ class StudyTechnique(OrmBase):
         back_populates="studyTechnique",
         cascade='all, delete-orphan',
     )
+
+    # Order techniques based on their type, according to the way they're
+    # defined in the name index: FC first, then OD, etc.
+    typeOrdering = column_property(OrmBase.list_ordering(
+        type,
+        TECHNIQUE_SHORT_NAMES.keys(),
+    ))
+
+    # Order records based on their subject type
+    subjectTypeOrdering = column_property(OrmBase.list_ordering(
+        subjectType,
+        ('bioreplicate', 'strain', 'metabolite'),
+    ))
 
     @property
     def short_name(self):

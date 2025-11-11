@@ -147,11 +147,11 @@ class SubmissionForm:
             technique_data = data['techniques'][i]
 
             cell_types = []
-            if technique_data.pop('includeLive', False):
+            if technique_data.get('includeLive', False):
                 cell_types.append('live')
-            if technique_data.pop('includeDead', False):
+            if technique_data.get('includeDead', False):
                 cell_types.append('dead')
-            if technique_data.pop('includeTotal', False):
+            if technique_data.get('includeTotal', False):
                 cell_types.append('total')
 
             technique_data['cellTypes'] = cell_types

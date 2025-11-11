@@ -12,28 +12,10 @@ from sqlalchemy.orm import (
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
-
-TECHNIQUE_SHORT_NAMES = {
-    'fc':         'FC',
-    'od':         'OD',
-    'plates':     'PC',
-    '16s':        '16S-rRNA reads',
-    'qpcr':       'qPCR',
-    'ph':         'pH',
-    'metabolite': 'Metabolite',
-}
-"Human-readable short names of techniques"
-
-TECHNIQUE_LONG_NAMES = {
-    'fc':         'Flow Cytometry',
-    'od':         'Optical Density',
-    'plates':     'Plate Counts',
-    '16s':        '16S-rRNA reads',
-    'qpcr':       'qPCR',
-    'ph':         'pH',
-    'metabolite': 'Metabolites',
-}
-"Human-readable long names of techniques"
+from app.model.lib.techniques import (
+    TECHNIQUE_SHORT_NAMES,
+    TECHNIQUE_LONG_NAMES,
+)
 
 
 class MeasurementTechnique(OrmBase):
@@ -43,12 +25,12 @@ class MeasurementTechnique(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    type:     Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    cellType: Mapped[str] = mapped_column(sql.String(100), nullable=True)
+    type:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    cellType:    Mapped[str] = mapped_column(sql.String(100), nullable=True)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
     # TODO (2025-11-10) Remove
-    units:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    units: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
     # TODO (2025-11-10) Remove
     description: Mapped[str]  = mapped_column(sql.String)
