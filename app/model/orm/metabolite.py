@@ -35,6 +35,14 @@ class Metabolite(OrmBase):
     def __lt__(self, other):
         return self.name < other.name
 
+    @property
+    def externalId(self):
+        """
+        For compatibility with other subjects of measurements.
+        The metabolite's ChEBI id, e.g. "CHEBI:1234"
+        """
+        return self.chebiId
+
     @staticmethod
     def search_by_name(db_conn, term, page=1, per_page=10):
         term = term.lower().strip()

@@ -54,6 +54,14 @@ class Bioreplicate(OrmBase):
         viewonly=True,
     )
 
+    @property
+    def externalId(self):
+        """
+        For compatibility with other subjects of measurements.
+        Always ``None``, since a bioreplicate is not an external record.
+        """
+        return None
+
     def get_df(self, db_session):
         from app.model.orm import Measurement, MeasurementContext
 
