@@ -8,6 +8,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
+from app.model.lib.db import execute_into_df
 from app.model.orm.orm_base import OrmBase
 
 
@@ -63,6 +64,50 @@ class Experiment(OrmBase):
         secondary='Bioreplicates',
         viewonly=True,
     )
+
+    def get_df(self, db_session):
+        from app.model.orm import (
+            Bioreplicate,
+            Compartment,
+            Measurement,
+            MeasurementTechnique,
+            MeasurementContext,
+        )
+
+        query = (
+            sql.select(
+                Bioreplicate.id.label("bioreplicateId"),
+                Bioreplicate.name.label("bioreplicateName"),
+                Compartment.name.label("compartmentName"),
+                MeasurementTechnique.type.label("techniqueType"),
+                MeasurementContext.id.label("measurementContextId"),
+                MeasurementContext.subjectType.label("subjectType"),
+                MeasurementContext.subjectName.label("subjectName"),
+                MeasurementContext.subjectExternalId.label("subjectExternalId"),
+                Measurement.timeInHours.label("time"),
+                Measurement.value,
+                Measurement.std,
+            )
+            .distinct()
+            .select_from(Measurement)
+            .join(MeasurementContext)
+            .join(Compartment)
+            .join(Bioreplicate)
+            .join(Experiment)
+            .where(
+                Experiment.publicId == self.publicId,
+                Measurement.value.is_not(None),
+            )
+            .order_by(
+                Bioreplicate.id,
+                Compartment.name,
+                MeasurementTechnique.type,
+                MeasurementContext.id,
+                Measurement.timeInHours,
+            )
+        )
+
+        return execute_into_df(db_session, query)
 
     @staticmethod
     def generate_public_id(db_session):

@@ -68,6 +68,9 @@ class Bioreplicate(OrmBase):
         query = (
             sql.select(
                 MeasurementContext.id.label("measurementContextId"),
+                MeasurementContext.subjectType.label("subjectType"),
+                MeasurementContext.subjectName.label("subjectName"),
+                MeasurementContext.subjectExternalId.label("subjectExternalId"),
                 Measurement.timeInHours.label("time"),
                 Measurement.value,
                 Measurement.std,
