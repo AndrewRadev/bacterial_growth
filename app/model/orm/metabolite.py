@@ -23,8 +23,8 @@ class Metabolite(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    chebiId: Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    name:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    chebiId: Mapped[str] = mapped_column(sql.String(100),  nullable=False)
+    name:    Mapped[str] = mapped_column(sql.String(1024), nullable=False)
 
     averageMass: Mapped[Decimal] = mapped_column(sql.Numeric(10, 5))
 

@@ -59,6 +59,7 @@ class Experiment(OrmBase):
     )
 
     measurementContexts: Mapped[List['MeasurementContext']] = relationship(
+        order_by='MeasurementContext.subjectTypeOrdering, MeasurementContext.subjectName',
         secondary='Bioreplicates',
         viewonly=True,
     )
