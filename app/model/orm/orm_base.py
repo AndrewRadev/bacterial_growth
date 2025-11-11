@@ -1,6 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.inspection import inspect
-from sqlalchemy import LargeBinary
+import sqlalchemy as sql
 
 
 class OrmBase(DeclarativeBase):
@@ -10,6 +10,19 @@ class OrmBase(DeclarativeBase):
     def filter_keys(Self, data: dict):
         return {k: v for k, v in data.items() if hasattr(Self, k)}
 
+    @classmethod
+    def list_ordering(Self, column, values):
+        """
+        Return an sql CASE statement that can be used to order records based on
+        the values of this column according to the given list of values.
+        """
+        cases = []
+
+        for i, entry in enumerate(values):
+            cases.append((column == entry, i))
+
+        return sql.case(*cases, else_=len(cases))
+
     def update(self, **kwargs):
         for key, value in kwargs.items():
             if hasattr(self, key):
@@ -17,7 +30,7 @@ class OrmBase(DeclarativeBase):
 
     def _asdict(self):
         return {
-            c.name: "<BLOB>" if isinstance(c.type, LargeBinary) else getattr(self, c.name)
+            c.name: "<BLOB>" if isinstance(c.type, sql.LargeBinary) else getattr(self, c.name)
             for c in inspect(type(self)).c
         }
 

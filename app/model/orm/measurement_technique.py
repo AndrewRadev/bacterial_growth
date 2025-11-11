@@ -7,29 +7,30 @@ from sqlalchemy.orm import (
     Mapped,
     mapped_column,
     relationship,
+    column_property,
 )
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
 
 TECHNIQUE_SHORT_NAMES = {
-    'ph':         'pH',
     'fc':         'FC',
     'od':         'OD',
     'plates':     'PC',
     '16s':        '16S-rRNA reads',
     'qpcr':       'qPCR',
+    'ph':         'pH',
     'metabolite': 'Metabolite',
 }
 "Human-readable short names of techniques"
 
 TECHNIQUE_LONG_NAMES = {
-    'ph':         'pH',
     'fc':         'Flow Cytometry',
     'od':         'Optical Density',
     'plates':     'Plate Counts',
     '16s':        '16S-rRNA reads',
     'qpcr':       'qPCR',
+    'ph':         'pH',
     'metabolite': 'Metabolites',
 }
 "Human-readable long names of techniques"
@@ -67,6 +68,19 @@ class MeasurementTechnique(OrmBase):
         viewonly=True,
     )
 
+    # Order techniques based on their type, according to the way they're
+    # defined in the name index: FC first, then OD, etc.
+    typeOrdering = column_property(OrmBase.list_ordering(
+        type,
+        TECHNIQUE_SHORT_NAMES.keys(),
+    ))
+
+    # Order records based on their subject type
+    subjectTypeOrdering = column_property(OrmBase.list_ordering(
+        subjectType,
+        ('bioreplicate', 'strain', 'metabolite'),
+    ))
+
     def __lt__(self, other):
         return self.id < other.id
 
@@ -81,6 +95,15 @@ class MeasurementTechnique(OrmBase):
         else:
             units = ""
         return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
+
+    @property
+    def short_name_with_subject_type(self):
+        parts = [self.short_name]
+
+        if self.subjectType != 'metabolite':
+            parts.append(self.subject_short_name)
+
+        return ' per '.join(parts)
 
     @property
     def long_name(self):

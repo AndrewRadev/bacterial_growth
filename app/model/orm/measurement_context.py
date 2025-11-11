@@ -62,10 +62,9 @@ class MeasurementContext(OrmBase):
     subjectName:       Mapped[str] = mapped_column(sql.String(1024), nullable=False)
     subjectExternalId: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
-    subjectTypeOrdering = column_property(sql.case(
-        (subjectType == 'bioreplicate', 0),
-        (subjectType == 'strain',       1),
-        (subjectType == 'metabolite',   2),
+    subjectTypeOrdering = column_property(OrmBase.list_ordering(
+        subjectType,
+        ('bioreplicate', 'strain', 'metabolite'),
     ))
 
     def get_df(self, db_session):
