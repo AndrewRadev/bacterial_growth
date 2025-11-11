@@ -44,6 +44,7 @@ class Bioreplicate(OrmBase):
     )
 
     measurementContexts: Mapped[List['MeasurementContext']] = relationship(
+        order_by='MeasurementContext.subjectTypeOrdering, MeasurementContext.subjectName',
         back_populates='bioreplicate',
         cascade='all, delete-orphan'
     )
@@ -53,12 +54,23 @@ class Bioreplicate(OrmBase):
         viewonly=True,
     )
 
+    @property
+    def externalId(self):
+        """
+        For compatibility with other subjects of measurements.
+        Always ``None``, since a bioreplicate is not an external record.
+        """
+        return None
+
     def get_df(self, db_session):
         from app.model.orm import Measurement, MeasurementContext
 
         query = (
             sql.select(
                 MeasurementContext.id.label("measurementContextId"),
+                MeasurementContext.subjectType.label("subjectType"),
+                MeasurementContext.subjectName.label("subjectName"),
+                MeasurementContext.subjectExternalId.label("subjectExternalId"),
                 Measurement.timeInHours.label("time"),
                 Measurement.value,
                 Measurement.std,

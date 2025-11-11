@@ -23,8 +23,8 @@ class Metabolite(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    chebiId: Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    name:    Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    chebiId: Mapped[str] = mapped_column(sql.String(100),  nullable=False)
+    name:    Mapped[str] = mapped_column(sql.String(1024), nullable=False)
 
     averageMass: Mapped[Decimal] = mapped_column(sql.Numeric(10, 5))
 
@@ -34,6 +34,14 @@ class Metabolite(OrmBase):
 
     def __lt__(self, other):
         return self.name < other.name
+
+    @property
+    def externalId(self):
+        """
+        For compatibility with other subjects of measurements.
+        The metabolite's ChEBI id, e.g. "CHEBI:1234"
+        """
+        return self.chebiId
 
     @staticmethod
     def search_by_name(db_conn, term, page=1, per_page=10):

@@ -29,9 +29,10 @@ class Study(OrmBase):
 
     # A relationship representing ownership of these records. Clearing them out
     # should directly delete them so they can be replaced.
-    owner_relationship = lambda: relationship(
+    owner_relationship = lambda **kwargs: relationship(
         back_populates='study',
         cascade='all, delete-orphan',
+        **kwargs
     )
 
     publicId: Mapped[str] = mapped_column(sql.String(100), primary_key=True)
@@ -56,7 +57,7 @@ class Study(OrmBase):
 
     studyUsers:  Mapped[List['StudyUser']]  = owner_relationship()
     experiments: Mapped[List['Experiment']] = owner_relationship()
-    strains:     Mapped[List['Strain']]     = owner_relationship()
+    strains:     Mapped[List['Strain']]     = owner_relationship(order_by='Strain.name')
 
     communities:  Mapped[List['Community']]   = owner_relationship()
     compartments: Mapped[List['Compartment']] = owner_relationship()
@@ -71,6 +72,7 @@ class Study(OrmBase):
     )
 
     measurementTechniques: Mapped[List['MeasurementTechnique']] = relationship(
+        order_by='MeasurementTechnique.subjectTypeOrdering, MeasurementTechnique.typeOrdering',
         secondary='StudyTechniques',
         viewonly=True,
     )
@@ -88,6 +90,7 @@ class Study(OrmBase):
 
     studyMetabolites: Mapped[List['StudyMetabolite']] = owner_relationship()
     metabolites: Mapped[List['Metabolite']] = relationship(
+        order_by='Metabolite.name',
         secondary='StudyMetabolites',
         viewonly=True,
     )
