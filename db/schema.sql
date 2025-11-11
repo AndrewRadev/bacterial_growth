@@ -187,6 +187,8 @@ CREATE TABLE MeasurementContexts (
   subjectType varchar(100) NOT NULL,
   calculationType varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   subjectId int NOT NULL,
+  subjectName varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  subjectExternalId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (id),
   KEY MeasurementContexts_fk_1 (bioreplicateId),
   KEY MeasurementContexts_fk_2 (compartmentId),
@@ -634,5 +636,5 @@ INSERT INTO MigrationVersions VALUES
 (64,'2025_07_13_121621_make_orcid_token_nullable','2025-08-20 12:11:25'),
 (65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-21 14:36:17'),
 (67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22'),
-(84,'2025_11_10_122037_increase_metabolite_name_length','2025-11-10 11:21:33');
+(108,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-11 15:13:01');
 

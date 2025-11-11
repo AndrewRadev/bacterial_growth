@@ -5,6 +5,7 @@ from sqlalchemy.orm import (
     Mapped,
     mapped_column,
     relationship,
+    column_property,
 )
 
 from app.model.orm.orm_base import OrmBase
@@ -56,6 +57,16 @@ class MeasurementContext(OrmBase):
 
     subjectId:   Mapped[int] = mapped_column(sql.Integer,     nullable=False)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
+
+    # Denormalized name and external id for sorting and displaying purposes
+    subjectName:       Mapped[str] = mapped_column(sql.String(1024), nullable=False)
+    subjectExternalId: Mapped[str] = mapped_column(sql.String(100), nullable=False)
+
+    subjectTypeOrdering = column_property(sql.case(
+        (subjectType == 'bioreplicate', 0),
+        (subjectType == 'strain',       1),
+        (subjectType == 'metabolite',   2),
+    ))
 
     def get_df(self, db_session):
         from app.model.orm import Measurement

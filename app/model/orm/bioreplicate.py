@@ -44,6 +44,7 @@ class Bioreplicate(OrmBase):
     )
 
     measurementContexts: Mapped[List['MeasurementContext']] = relationship(
+        order_by='MeasurementContext.subjectTypeOrdering, MeasurementContext.subjectName',
         back_populates='bioreplicate',
         cascade='all, delete-orphan'
     )
