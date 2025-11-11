@@ -121,6 +121,8 @@ class Measurement(OrmBase):
                             # Subject:
                             subjectId=subject.id,
                             subjectType=technique.subjectType,
+                            subjectName=subject.name,
+                            subjectExternalId=subject.externalId,
                             # Technique:
                             techniqueId=technique.id,
                         )

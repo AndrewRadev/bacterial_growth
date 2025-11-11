@@ -481,11 +481,23 @@ def _create_average_measurements(db_session, study, experiment):
                     average_bioreplicate=average_bioreplicate,
                     subject_id=average_bioreplicate.id,
                     subject_type='bioreplicate',
+                    subject_name=average_bioreplicate.name,
+                    subject_external_id=None,
                 )
             else:
-                grouped_contexts = itertools.groupby(measurement_contexts, lambda mc: (mc.subjectId, mc.subjectType))
+                grouped_contexts = itertools.groupby(
+                    measurement_contexts,
+                    lambda mc: (mc.subjectId, mc.subjectType, mc.subjectName, mc.subjectExternalId),
+                )
 
-                for (subject_id, subject_type), subject_contexts in grouped_contexts:
+                for key, subject_contexts in grouped_contexts:
+                    (
+                        subject_id,
+                        subject_type,
+                        subject_name,
+                        subject_external_id,
+                    ) = key
+
                     # One context for each subject:
                     _create_average_measurement_context(
                         db_session,
@@ -493,7 +505,9 @@ def _create_average_measurements(db_session, study, experiment):
                         measurement_contexts=list(subject_contexts),
                         average_bioreplicate=average_bioreplicate,
                         subject_id=subject_id,
-                        subject_type=subject_type
+                        subject_type=subject_type,
+                        subject_name=subject_name,
+                        subject_external_id=subject_external_id,
                     )
 
             has_measurements = True
@@ -509,6 +523,8 @@ def _create_average_measurement_context(
     average_bioreplicate,
     subject_id,
     subject_type,
+    subject_name,
+    subject_external_id=None,
 ):
     (study, technique, compartment) = parent_records
 
@@ -535,6 +551,8 @@ def _create_average_measurement_context(
         compartment=compartment,
         subjectId=subject_id,
         subjectType=subject_type,
+        subjectName=subject_name,
+        subjectExternalId=subject_external_id,
         technique=technique,
         calculationType='average',
     )
