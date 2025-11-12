@@ -29,11 +29,6 @@ def up(conn):
             study_id
         ) = row
 
-        if technique_type in ('fc', '16s', 'qpcr'):
-            cell_type = 'live'
-        else:
-            cell_type = ''
-
         query = """
             INSERT INTO StudyTechniques (type, description, subjectType, units, includeStd, studyId)
             VALUES (:type, :description, :subject_type, :units, :include_std, :study_id)
@@ -51,15 +46,12 @@ def up(conn):
 
         query = """
             UPDATE MeasurementTechniques
-            SET
-                studyTechniqueId = :study_technique_id,
-                cellType = :cell_type
+            SET studyTechniqueId = :study_technique_id
             WHERE id = :measurement_technique_id
         """
         conn.execute(sql.text(query), {
             'measurement_technique_id': measurement_technique_id,
             'study_technique_id':       study_technique_id,
-            'cell_type':                cell_type,
         })
 
 
