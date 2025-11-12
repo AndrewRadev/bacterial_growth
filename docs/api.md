@@ -1,4 +1,4 @@
-# API documentation (WIP)
+# API documentation
 
 All published studies in the app should be exportable through an API of several different granularities:
 
@@ -400,6 +400,8 @@ time,value,std
 
 We can perform similar queries for biological replicates, getting the results for multiple measurement contexts in one CSV, grouped by measurement context id. We can get the bioreplicate IDs from the experiment metadata and use them to fetch either the bioreplicate-specific metadata or the measurements in CSV form.
 
+The CSV for a biological replicate includes additional context about the subject of each measurement: its type and name, and external database identifier, if applicable. This information can be seen in the JSON metadata, but it's included in the CSV for convenience.
+
 ```bash
 curl -s "$ROOT_URL/api/v1/bioreplicate/1314.json"
 curl -s "$ROOT_URL/api/v1/bioreplicate/1314.csv"
@@ -429,40 +431,49 @@ curl -s "$ROOT_URL/api/v1/bioreplicate/1314.csv"
 ```
 
 ```csv
-measurementContextId,time,value,std
-3364,0.0,0.013,0.003
-3364,4.0,0.035,0.002
-3364,8.0,0.383,0.008
-3364,12.0,0.92,0.005
-3364,16.0,1.121,0.006
-3364,20.0,1.045,0.006
-3364,24.0,0.911,0.007
-3364,28.0,0.833,0.007
-3364,32.0,0.8,0.007
-3364,36.0,0.801,0.005
-3364,40.0,0.789,0.007
-3364,48.0,0.757,0.005
-3364,60.0,0.744,0.005
-3364,72.0,0.748,0.005
-3364,96.0,0.772,0.006
-3364,120.0,0.809,0.007
-3365,0.0,6.597,0.019
-3365,4.0,6.65,0.0
-3365,8.0,6.203,0.019
-3365,12.0,5.327,0.019
-3365,16.0,5.117,0.019
-3365,20.0,5.057,0.024
-3365,24.0,5.053,0.019
-3365,28.0,5.057,0.024
-3365,32.0,5.057,0.024
-3365,36.0,5.13,0.033
-3365,40.0,5.21,0.0
-3365,48.0,5.25,0.0
-3365,60.0,5.213,0.005
-3365,72.0,5.217,0.024
-3365,96.0,5.227,0.019
-3365,120.0,5.237,0.019
-3366,0.0,987.667,27.195
-3366,4.0,14638.667,339.884
+measurementContextId,subjectType,subjectName,subjectExternalId,time,value,std
+3328,bioreplicate,Average(BT_WC),,0.0,0.006,0.001
+3328,bioreplicate,Average(BT_WC),,4.0,0.034,0.0
+3328,bioreplicate,Average(BT_WC),,8.0,0.406,0.001
+3328,bioreplicate,Average(BT_WC),,12.0,0.796,0.002
+3328,bioreplicate,Average(BT_WC),,16.0,0.965,0.001
+3328,bioreplicate,Average(BT_WC),,24.0,0.705,0.002
+3328,bioreplicate,Average(BT_WC),,28.0,0.659,0.003
+3328,bioreplicate,Average(BT_WC),,32.0,0.657,0.0
+3328,bioreplicate,Average(BT_WC),,38.0,0.868,0.006
+3328,bioreplicate,Average(BT_WC),,48.0,0.909,0.003
+3328,bioreplicate,Average(BT_WC),,60.0,0.921,0.004
+3328,bioreplicate,Average(BT_WC),,72.0,0.92,0.002
+3328,bioreplicate,Average(BT_WC),,96.0,0.909,0.002
+3328,bioreplicate,Average(BT_WC),,120.0,0.905,0.001
+3329,bioreplicate,Average(BT_WC),,0.0,6.613,0.019
+3329,bioreplicate,Average(BT_WC),,4.0,6.623,0.019
+3329,bioreplicate,Average(BT_WC),,8.0,6.15,0.0
+3329,bioreplicate,Average(BT_WC),,12.0,5.42,0.0
+3329,bioreplicate,Average(BT_WC),,16.0,5.073,0.024
+3329,bioreplicate,Average(BT_WC),,24.0,5.027,0.019
+3329,bioreplicate,Average(BT_WC),,28.0,4.97,0.0
+3329,bioreplicate,Average(BT_WC),,32.0,4.983,0.019
+3329,bioreplicate,Average(BT_WC),,38.0,5.023,0.019
+3329,bioreplicate,Average(BT_WC),,48.0,5.14,0.0
+3329,bioreplicate,Average(BT_WC),,60.0,5.09,0.0
+3329,bioreplicate,Average(BT_WC),,72.0,5.09,0.0
+3329,bioreplicate,Average(BT_WC),,96.0,5.14,0.0
+3329,bioreplicate,Average(BT_WC),,120.0,5.113,0.024
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,0.0,2619.0,477.072
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,4.0,36072.333,1522.018
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,12.0,1003028.333,30201.503
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,16.0,1106725.0,85176.706
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,24.0,857815.0,62848.275
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,28.0,778893.333,47670.388
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,32.0,962915.0,55489.511
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,38.0,675345.0,26650.222
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,48.0,348478.333,102905.344
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,60.0,111021.667,28523.155
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,72.0,45606.667,13966.714
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,96.0,13413.333,4155.786
+3330,strain,Bacteroides thetaiotaomicron VPI-5482,NCBI:226186,120.0,3215.0,461.808
+3331,metabolite,pyruvate,CHEBI:15361,0.0,9.663,0.061
+3331,metabolite,pyruvate,CHEBI:15361,4.0,9.69,0.127
 [...218 more lines...]
 ```
