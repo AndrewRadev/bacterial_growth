@@ -15,6 +15,9 @@ class OrmBase(DeclarativeBase):
         """
         Return an sql CASE statement that can be used to order records based on
         the values of this column according to the given list of values.
+
+        For details, see:
+        https://docs.sqlalchemy.org/en/20/core/sqlelement.html#sqlalchemy.sql.expression.case
         """
         cases = []
 
