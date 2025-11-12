@@ -224,17 +224,7 @@ def upload_step6_page():
 
 def download_data_template_xlsx():
     submission_form = _init_submission_form(step=6)
-    submission      = submission_form.submission
-
-    metabolite_names = [m.name for m in submission_form.fetch_all_metabolites()]
-    strain_names = [t.name for t in submission_form.fetch_taxa()]
-    strain_names += [s['name'] for s in submission.studyDesign['custom_strains']]
-
-    spreadsheet = data_spreadsheet.create_excel(
-        submission,
-        metabolite_names,
-        strain_names,
-    )
+    spreadsheet = data_spreadsheet.create_excel(submission_form)
 
     return send_file(
         io.BytesIO(spreadsheet),

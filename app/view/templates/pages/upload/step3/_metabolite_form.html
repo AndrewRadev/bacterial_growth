@@ -23,7 +23,39 @@
     <input type="hidden" name="{{ prefix }}subjectType" value="metabolite" />
 
     <div class="form-row">
-      <label class="full">
+      <div class="flex-1">
+        <label class="full">
+          <span>Units:</span>
+          <select
+              name="{{ prefix }}units"
+              class="form-input-full form-input-blue js-unit-select" />
+            <optgroup label="Molar concentration">
+              <option value="mM" {{ "selected" if data['units'] == 'mM' }}>Millimolars (mM)</option>
+              <option value="μM" {{ "selected" if data['units'] == 'μM' }}>Micromolars (μM)</option>
+              <option value="nM" {{ "selected" if data['units'] == 'nM' }}>Nanomolars (nM)</option>
+              <option value="pM" {{ "selected" if data['units'] == 'pM' }}>Picomolars (pM)</option>
+            </optgroup>
+            <optgroup label="Mass concentration">
+              <option value="g/L" {{ "selected" if data['units'] == 'g/L' }}>Grams per Liter (g/L)</option>
+              <option value="mg/L" {{ "selected" if data['units'] == 'mg/L' }}>Milligrams per Liter (g/L)</option>
+            </optgroup>
+            <optgroup label="Other">
+              <option value="AUC" {{ "selected" if data['units'] == 'AUC' }}>AUC</option>
+            </optgroup>
+          </select>
+        </label>
+
+        <label class="full" data-tooltip="If you have multiple kinds of measurements with the same technique, e.g. Flow Cytometry quantified in two different ways, you can specify a short label to differentiate them">
+          <span>Optional label:</span>
+          <input
+              type="text"
+              name="{{ prefix }}label"
+              class="form-input-full form-input-blue js-label js-preview-trigger"
+              value="{{ (data['label'] if data) or '' }}" />
+        </label>
+      </div>
+
+      <label class="flex-2">
         <span>List of metabolites:</span>
         <select
             multiple="multiple"
@@ -34,27 +66,6 @@
           {% for metabolite in submission_form.fetch_metabolites_for_technique(index): %}
             <option value="{{ metabolite.chebiId }}" selected>{{ metabolite.name }} ({{ metabolite.chebiId }})</option>
           {% endfor %}
-        </select>
-      </label>
-
-      <label style="width: 30%;">
-        <span>Units:</span>
-        <select
-            name="{{ prefix }}units"
-            class="form-input-full form-input-blue js-unit-select" />
-          <optgroup label="Molar concentration">
-            <option value="mM" {{ "selected" if data['units'] == 'mM' }}>Millimolars (mM)</option>
-            <option value="μM" {{ "selected" if data['units'] == 'μM' }}>Micromolars (μM)</option>
-            <option value="nM" {{ "selected" if data['units'] == 'nM' }}>Nanomolars (nM)</option>
-            <option value="pM" {{ "selected" if data['units'] == 'pM' }}>Picomolars (pM)</option>
-          </optgroup>
-          <optgroup label="Mass concentration">
-            <option value="g/L" {{ "selected" if data['units'] == 'g/L' }}>Grams per Liter (g/L)</option>
-            <option value="mg/L" {{ "selected" if data['units'] == 'mg/L' }}>Milligrams per Liter (g/L)</option>
-          </optgroup>
-          <optgroup label="Other">
-            <option value="AUC" {{ "selected" if data['units'] == 'AUC' }}>AUC</option>
-          </optgroup>
         </select>
       </label>
     </div>
