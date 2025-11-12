@@ -114,7 +114,7 @@
               <h3>Community: {{ experiment.community.name }}</h3>
 
               <ol>
-                {% for strain in experiment.community.strains: %}
+                {% for strain in experiment.community.strains|sort: %}
                   <li>{{ render_strain_link(strain) }}</li>
                 {% endfor %}
               </ol>
