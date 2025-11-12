@@ -3,6 +3,7 @@ import re
 import itertools
 import json
 from pathlib import Path
+from datetime import datetime, UTC
 
 import requests
 from long_task_printer import print_with_time, LongTask
@@ -81,3 +82,7 @@ with print_with_time("Creating data dump"):
 
         for chebi_id in sorted(data.keys()):
             writer.writerow({'chebiId': chebi_id, **data[chebi_id]})
+
+# Record time of this update:
+with open('var/external_data/last_chebi_update.txt', 'w') as f:
+    f.write(datetime.now(UTC).isoformat())
