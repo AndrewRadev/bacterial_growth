@@ -26,15 +26,13 @@ def static_home_page():
     ).one()
 
     experiment_count = g.db_session.scalars(
-        sql.select(sql.func.count(Experiment.publicId))
-        .distinct()
+        sql.select(sql.func.count(sql.distinct(Experiment.publicId)))
         .join(Study)
         .where(Study.isPublished)
     ).one()
 
     measurement_count = g.db_session.scalars(
-        sql.select(sql.func.count(Measurement.id))
-        .distinct()
+        sql.select(sql.func.count(sql.distinct(Measurement.id)))
         .join(Study)
         .where(Study.isPublished)
     ).one()
@@ -43,15 +41,13 @@ def static_home_page():
     metabolite_count = g.db_session.scalars(sql.select(sql.func.count(Metabolite.id))).one()
 
     study_taxa_count = g.db_session.scalars(
-        sql.select(sql.func.count(Strain.NCBId))
-        .distinct()
+        sql.select(sql.func.count(sql.distinct(Strain.NCBId)))
         .join(Study)
         .where(Study.isPublished)
     ).one()
 
     study_metabolite_count = g.db_session.scalars(
-        sql.select(sql.func.count(StudyMetabolite.chebi_id))
-        .distinct()
+        sql.select(sql.func.count(sql.distinct(StudyMetabolite.chebi_id)))
         .join(Study)
         .where(Study.isPublished)
     ).one()
