@@ -618,8 +618,6 @@ def _get_expected_column_names(submission_form):
             else:
                 raise ValueError(f"Unexpected measurement_technique subjectType: {measurement_technique.subjectType}")
 
-    print(metabolite_columns)
-
     return community_columns, strain_columns, metabolite_columns
 
 
