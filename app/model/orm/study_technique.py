@@ -67,6 +67,15 @@ class StudyTechnique(OrmBase):
         return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
 
     @property
+    def short_name_with_subject_type(self):
+        parts = [self.short_name]
+
+        if self.subjectType != 'metabolite':
+            parts.append(self.subject_short_name)
+
+        return ' per '.join(parts)
+
+    @property
     def long_name(self):
         return TECHNIQUE_LONG_NAMES[self.type]
 

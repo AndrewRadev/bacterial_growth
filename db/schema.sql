@@ -660,10 +660,10 @@ INSERT INTO MigrationVersions VALUES
 (64,'2025_07_13_121621_make_orcid_token_nullable','2025-08-20 12:11:25'),
 (65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-21 14:36:17'),
 (67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22'),
-(102,'2025_11_10_122037_increase_metabolite_name_length','2025-11-11 15:03:34'),
-(106,'2025_11_11_155050_add_subject_name_and_external_id_to_measurement_contexts','2025-11-11 15:11:06'),
-(108,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-11 15:13:01'),
 (109,'2025_11_03_160947_create_study_techniques','2025-11-11 18:47:59'),
 (110,'2025_11_03_162139_modify_measurement_techniques','2025-11-11 18:47:59'),
-(111,'2025_11_03_164617_populate_study_techniques','2025-11-11 18:48:55');
+(112,'2025_11_03_164617_populate_study_techniques','2025-11-12 09:26:51'),
+(113,'2025_11_10_122037_increase_metabolite_name_length','2025-11-12 09:26:51'),
+(114,'2025_11_11_155050_add_subject_name_and_external_id_to_measurement_contexts','2025-11-12 09:26:51'),
+(115,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-12 09:26:51');
 

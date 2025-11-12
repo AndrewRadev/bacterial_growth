@@ -39,7 +39,7 @@
           <tr>
             <td>
               <ul>
-                {% for technique_name in result.measurementTechniques|map(attribute="short_name_with_subject_type")|unique: %}
+                {% for technique_name in result.studyTechniques|map(attribute="short_name_with_subject_type")|unique: %}
                   <li>{{ technique_name }}</li>
                 {% endfor %}
               </ul>
