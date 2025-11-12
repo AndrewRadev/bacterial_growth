@@ -28,8 +28,45 @@
         studies based on the study or project name. The search can be filtered
         by different experimental conditions and characteristics like the
         microbial strains or metabolites that were analyzed in the study.
-        All of the data at µGrowthDB is publicly available for everyone.
-        {{ "searching"|help_link("Read more") }}.
+        All of the data at µGrowthDB is publicly available for everyone:
+      </p>
+
+      <p>
+        <ul>
+          <li>
+            <strong>{{ study_count|humanize_number }}</strong>
+            uploaded studies with
+            <strong>{{ experiment_count|humanize_number }}</strong> experiments between them.
+          </li>
+          <li>
+            <strong>{{ measurement_count|humanize_number }}</strong>
+            individual observations uploaded.
+          </li>
+          <li>
+            <strong>{{ taxa_count|humanize_number }}</strong>
+            taxa imported from NCBI, of which
+            <strong>{{ study_taxa_count|humanize_number }}</strong> are measured in uploaded studies.
+
+            {% if last_ncbi_update: %}
+              <br>
+              Last updated on <strong>{{ last_ncbi_update }}</strong>.
+            {% endif %}
+          </li>
+          <li>
+            <strong>{{ metabolite_count|humanize_number }}</strong>
+            metabolites imported from ChEBI, of which
+            <strong>{{ study_metabolite_count|humanize_number }}</strong> are measured in uploaded studies.
+
+            {% if last_chebi_update: %}
+              <br>
+              Last updated on <strong>{{ last_chebi_update }}</strong>.
+            {% endif %}
+          </li>
+        </ul>
+      </p>
+
+      <p>
+        Read more about searching for studies: {{ "searching"|help_link("Searching") }}.
       </p>
 
       <h3>
@@ -50,7 +87,10 @@
         {{ "https://orcid.org/"|external_link("ORCID") }}
         and upload their experimental data by following a step-by-step process
         that ensures it fits a standardized structure.
-        {{ "upload-process"|help_link("Read more") }}.
+      </p>
+
+      <p>
+        Read more about uploading studies: {{ "upload-process"|help_link("Upload process") }}.
       </p>
 
       <h3>
@@ -69,8 +109,10 @@
         Study owners can fit select growth models to their data through the web interface, courtesy of the
         {{ "https://cran.r-project.org/web/packages/growthrates/"|external_link("growthrates R package") }}.
         Growth parameters can be downloaded in CSV format.
+      </p>
 
-        {{ "data-analysis"|help_link("Read more") }}.
+      <p>
+        Read more about exploring data: {{ "data-analysis"|help_link("Data analysis") }}.
       </p>
     </article>
   </div>
