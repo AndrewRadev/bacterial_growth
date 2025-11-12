@@ -26,8 +26,13 @@ _TECHNIQUE_DESCRIPTIONS = {
 }
 
 
-def create_excel(submission, metabolite_names, strain_names):
+def create_excel(submission_form):
     "Create a template data file based on the submission's study design"
+
+    submission = submission_form.submission
+
+    strain_names = [t.name for t in submission_form.fetch_taxa()]
+    strain_names += [s['name'] for s in submission.studyDesign['custom_strains']]
 
     workbook = Workbook()
 
@@ -44,7 +49,7 @@ def create_excel(submission, metabolite_names, strain_names):
     headers_strains       = {**headers_common}
     headers_metabolites   = {**headers_common}
 
-    for study_technique in submission.build_techniques():
+    for index, study_technique in enumerate(submission.build_techniques()):
         subject_type   = study_technique.subjectType
         technique_type = study_technique.type
         units          = study_technique.units
@@ -75,16 +80,18 @@ def create_excel(submission, metabolite_names, strain_names):
                         headers_strains[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
             elif subject_type == 'metabolite':
-                for metabolite in metabolite_names:
-                    title = measurement_technique.csv_column_name(metabolite)
+                metabolites = submission_form.fetch_metabolites_for_technique(index)
+
+                for metabolite in metabolites:
+                    title = measurement_technique.csv_column_name(metabolite.name)
                     description = _TECHNIQUE_DESCRIPTIONS['metabolites'].format(
-                        metabolite=metabolite,
+                        metabolite=metabolite.name,
                         units=units,
                     )
                     headers_metabolites[title] = description
 
                     if study_technique.includeStd:
-                        title = ' '.join([metabolite, 'STD'])
+                        title = ' '.join([metabolite.name, 'STD'])
                         headers_metabolites[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
             else:

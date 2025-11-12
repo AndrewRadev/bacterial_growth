@@ -77,11 +77,13 @@ class MeasurementTechnique(OrmBase):
     @property
     def short_name(self):
         cell_type = f" {self.cellType}" if self.cellType else ""
-        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{cell_type}"
+        label = f" ({self.studyTechnique.label})" if self.studyTechnique.label else ""
+
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{label}{cell_type}"
 
     @property
     def short_name_with_units(self):
-        units = f" ({self.units})" if self.units else ""
+        units = f" in {self.units}" if self.units else ""
         return f"{self.short_name}{units}"
 
     @property
@@ -102,10 +104,13 @@ class MeasurementTechnique(OrmBase):
     def long_name_with_subject_type(self):
         parts = [self.long_name]
 
-        if self.subjectType != 'metabolite':
-            parts.append(self.subject_short_name)
+        if self.studyTechnique.label:
+            parts.append(f"({self.studyTechnique.label})")
 
-        return ' per '.join(parts)
+        if self.subjectType != 'metabolite':
+            parts.append(f"per {self.subject_short_name}")
+
+        return ' '.join(parts)
 
     @property
     def subject_short_name(self):
@@ -130,12 +135,13 @@ class MeasurementTechnique(OrmBase):
 
     def csv_column_name(self, subject_name=None):
         cell_type = f"{self.cellType} " if self.cellType else ""
+        label = f" ({self.studyTechnique.label})" if self.studyTechnique.label else ""
 
         if self.subjectType == 'bioreplicate':
-            return f"Community {cell_type}{TECHNIQUE_SHORT_NAMES[self.type]}"
+            return f"Community {cell_type}{TECHNIQUE_SHORT_NAMES[self.type]}{label}"
 
         elif self.subjectType == 'metabolite':
-            return subject_name
+            return f"{subject_name}{label}"
 
         elif self.subjectType == 'strain':
             if self.type == '16s':
@@ -149,7 +155,7 @@ class MeasurementTechnique(OrmBase):
             else:
                 raise ValueError(f"Incompatible type and subjectType: {self.type}, {self.subjectType}")
 
-            return f"{subject_name} {cell_type}{suffix}"
+            return f"{subject_name} {cell_type}{suffix}{label}"
 
     def get_grouped_contexts(self):
         grouper = lambda mc: (mc.bioreplicate, mc.compartment)

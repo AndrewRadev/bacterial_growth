@@ -587,7 +587,7 @@ def _get_expected_column_names(submission_form):
     metabolite_columns = set()
 
     # Validate column presence:
-    for study_technique in submission.build_techniques():
+    for index, study_technique in enumerate(submission.build_techniques()):
         for measurement_technique in study_technique.measurementTechniques:
             if measurement_technique.subjectType == 'bioreplicate':
                 column = measurement_technique.csv_column_name()
@@ -609,7 +609,7 @@ def _get_expected_column_names(submission_form):
                         strain_columns.add(f"{column} STD")
 
             elif measurement_technique.subjectType == 'metabolite':
-                for metabolite in submission_form.fetch_all_metabolites():
+                for metabolite in submission_form.fetch_metabolites_for_technique(index):
                     column = measurement_technique.csv_column_name(metabolite.name)
                     metabolite_columns.add(column)
                     if study_technique.includeStd:
@@ -617,6 +617,8 @@ def _get_expected_column_names(submission_form):
 
             else:
                 raise ValueError(f"Unexpected measurement_technique subjectType: {measurement_technique.subjectType}")
+
+    print(metabolite_columns)
 
     return community_columns, strain_columns, metabolite_columns
 
