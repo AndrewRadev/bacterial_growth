@@ -1,4 +1,4 @@
-from markupsafe import Markup
+from markupsafe import Markup, escape
 
 
 def flatten(collection):
@@ -7,7 +7,7 @@ def flatten(collection):
 
 def join_tag(collection, tag_name):
     text = f"<{tag_name}>"
-    text += f"</{tag_name}>, <{tag_name}>".join(collection)
+    text += f"</{tag_name}>, <{tag_name}>".join([escape(item) for item in collection])
     text += f"</{tag_name}>"
 
     return Markup(text)

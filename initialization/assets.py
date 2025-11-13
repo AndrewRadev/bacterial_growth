@@ -24,6 +24,7 @@ def init_assets(app):
         '../app/view/js/vendor/popper-core-2.11.8.js',
         '../app/view/js/vendor/tippy-6.3.7.js',
         '../app/view/js/vendor/js-cookie-3.0.5.js',
+        '../app/view/js/vendor/underscore-umd-1.13.7.js',
         # Internal libraries:
         '../app/view/js/lib/forms.js',
         '../app/view/js/lib/util.js',
