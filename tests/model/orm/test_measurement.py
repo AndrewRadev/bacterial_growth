@@ -50,7 +50,6 @@ class TestMeasurement(DatabaseTest):
         """)
 
         measurements = Measurement.insert_from_csv_string(self.db_session, study, growth_data)
-        print(measurements)
 
         # FC measurement
         self.assertEqual(
