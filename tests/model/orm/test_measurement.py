@@ -37,9 +37,9 @@ class TestMeasurement(DatabaseTest):
         b2 = self.create_bioreplicate(name='b2', experimentId=experiment.publicId)
         self.create_compartment(studyId=study.publicId, name='c1')
 
-        t_fc = self.create_measurement_technique(studyId=study.publicId, subjectType='bioreplicate', type='fc')
-        t_od = self.create_measurement_technique(studyId=study.publicId, subjectType='bioreplicate', type='od')
-        t_ph = self.create_measurement_technique(studyId=study.publicId, subjectType='bioreplicate', type='ph')
+        mt_fc = self.create_measurement_technique(subjectType='bioreplicate', type='fc', study_technique={'studyId': study.publicId})
+        mt_od = self.create_measurement_technique(subjectType='bioreplicate', type='od', study_technique={'studyId': study.publicId})
+        mt_ph = self.create_measurement_technique(subjectType='bioreplicate', type='ph', study_technique={'studyId': study.publicId})
 
         growth_data = util.trim_lines("""
             Biological Replicate,Compartment,Time,Community FC,Community OD,Community pH
@@ -50,10 +50,11 @@ class TestMeasurement(DatabaseTest):
         """)
 
         measurements = Measurement.insert_from_csv_string(self.db_session, study, growth_data)
+        print(measurements)
 
         # FC measurement
         self.assertEqual(
-            [(m.timeInHours, m.subjectId, m.value) for m in measurements if m.technique.id == t_fc.id],
+            [(m.timeInHours, m.subjectId, m.value) for m in measurements if m.technique.id == mt_fc.id],
             [
                 (2.0, b1.id, Decimal('1234567890.000')),
                 (4.0, b1.id, Decimal('234567890.000')),
@@ -64,7 +65,7 @@ class TestMeasurement(DatabaseTest):
 
         # OD measurements
         self.assertEqual(
-            [(m.timeInHours, m.subjectId, m.value) for m in measurements if m.technique.id == t_od.id],
+            [(m.timeInHours, m.subjectId, m.value) for m in measurements if m.technique.id == mt_od.id],
             [
                 (2.0, b1.id, Decimal('0.900')),
                 (4.0, b1.id, Decimal('0.800')),
@@ -75,7 +76,7 @@ class TestMeasurement(DatabaseTest):
 
         # pH measurements
         self.assertEqual(
-            [m.value for m in measurements if m.technique.id == t_ph.id],
+            [m.value for m in measurements if m.technique.id == mt_ph.id],
             [Decimal('7.400'), Decimal('7.500'), Decimal('7.600'), Decimal('7.600')]
         )
 
@@ -96,7 +97,7 @@ class TestMeasurement(DatabaseTest):
         ).metabolite.id
 
         self.create_measurement_technique(
-            studyId=study.publicId,
+            study_technique={'studyId': study.publicId},
             subjectType='metabolite',
             type='Metabolite',
             metaboliteIds=[glucose_id, trehalose_id],
@@ -135,18 +136,15 @@ class TestMeasurement(DatabaseTest):
         s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study.publicId)
         s2 = self.create_strain(name='R. intestinalis',     studyId=study.publicId)
 
-        t_fc = self.create_measurement_technique(
-            studyId=study.publicId,
+        mt_fc = self.create_measurement_technique(
+            study_technique={'studyId': study.publicId},
             subjectType='strain',
             type='fc',
-            units='Cells/mL',
         )
-        t_16s = self.create_measurement_technique(
-            studyId=study.publicId,
+        mt_16s = self.create_measurement_technique(
+            study_technique={'studyId': study.publicId},
             subjectType='strain',
             type='16s',
-            units='reads',
-            includeStd=True,
         )
 
         header = ",".join([
@@ -181,7 +179,7 @@ class TestMeasurement(DatabaseTest):
             [
                 (m.timeInSeconds, int(m.subjectId), m.value)
                 for m in sorted(measurements, key=lambda m: (m.timeInSeconds, m.subjectId))
-                if m.technique.id == t_16s.id
+                if m.technique.id == mt_16s.id
             ],
             [
                 (3600, s1.id, Decimal('100.234')), (3600, s2.id, Decimal('200.456')),
@@ -195,7 +193,7 @@ class TestMeasurement(DatabaseTest):
             [
                 (m.timeInSeconds, int(m.subjectId), m.value)
                 for m in sorted(measurements, key=lambda m: (m.timeInHours, m.subjectId))
-                if m.technique.id == t_fc.id
+                if m.technique.id == mt_fc.id
             ],
             [
                 (3600, s1.id, Decimal('100.00')), (3600, s2.id, Decimal('200.00')),
@@ -212,7 +210,7 @@ class TestMeasurement(DatabaseTest):
         b2 = self.create_bioreplicate(name='b2', experimentId=experiment.publicId)
         b3 = self.create_bioreplicate(name='b3', experimentId=experiment.publicId)
         self.create_compartment(studyId=study.publicId, name='c1')
-        t_fc = self.create_measurement_technique(studyId=study.publicId, subjectType='bioreplicate', type='fc')
+        mt_fc = self.create_measurement_technique(subjectType='bioreplicate', type='fc', study_technique={'studyId': study.publicId})
 
         growth_data = util.trim_lines("""
             Biological Replicate,Compartment,Time,Community FC
@@ -227,7 +225,7 @@ class TestMeasurement(DatabaseTest):
         measurements = Measurement.insert_from_csv_string(self.db_session, study, growth_data)
 
         self.assertEqual(
-            [(m.timeInHours, m.bioreplicate.name, m.value) for m in measurements if m.technique.id == t_fc.id],
+            [(m.timeInHours, m.bioreplicate.name, m.value) for m in measurements if m.technique.id == mt_fc.id],
             [
                 # Second point is present with a None value, because the previous one is present as well:
                 (2.0, 'b1', Decimal('1234567890.000')),
@@ -259,18 +257,17 @@ class TestMeasurement(DatabaseTest):
         s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study.publicId)
 
         self.create_measurement_technique(
-            studyId=study.publicId,
+            study_technique={'studyId': study.publicId},
             subjectType='metabolite',
             type='Metabolite',
             metaboliteIds=[glucose_id, trehalose_id],
             units='mM',
         )
         self.create_measurement_technique(
-            studyId=study.publicId,
+            study_technique={'studyId': study.publicId, 'includeStd': True},
             subjectType='strain',
             type='16s',
             units='reads',
-            includeStd=True,
         )
 
         self.db_session.commit()

@@ -27,9 +27,9 @@
     <label class="full">
       <span>Measurement technique:</span>
       <select name="techniqueId" class="form-input-blue full">
-        {% for technique in study.measurementTechniques if technique.is_growth: %}
-          <option value="{{ technique.id }}" data-subject-type="{{ technique.subjectType }}">
-          {{- technique.long_name_with_subject_type -}}
+        {% for measurement_technique in study.measurementTechniques if measurement_technique.is_growth: %}
+          <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
+          {{- measurement_technique.long_name_with_subject_type -}}
           </option>
         {% endfor %}
       </select>
