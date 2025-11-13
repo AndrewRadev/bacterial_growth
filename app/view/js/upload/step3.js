@@ -112,9 +112,9 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
     if (subjectType == 'bioreplicate') {
       subject = 'Community';
     } else if (subjectType == 'strain') {
-      subject = '&lt;strain name&gt;';
+      subject = '<strain name>';
     } else if (subjectType == 'metabolite') {
-      subject = '&lt;metabolite name&gt;';
+      subject = '<metabolite name>';
       columnName = null;
     }
 
@@ -135,6 +135,8 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
     previewTableBody.push('<td>...</td>');
 
     for (let columnName of columnNames) {
+      columnName = _.escape(columnName);
+
       previewTableHeader.push(`<th>${columnName}</th>`);
       previewTableBody.push('<td align="center">...</td>');
 

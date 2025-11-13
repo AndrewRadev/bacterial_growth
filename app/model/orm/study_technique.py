@@ -63,8 +63,9 @@ class StudyTechnique(OrmBase):
     @property
     def short_name_with_units(self):
         units = f" in {self.units}" if self.units else ""
+        label = f" ({self.label})" if self.label else ""
 
-        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
+        return f"{self.short_name}{label}{units}"
 
     @property
     def short_name_with_subject_type(self):
