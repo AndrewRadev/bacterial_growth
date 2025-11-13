@@ -191,7 +191,7 @@ def init_admin(app):
         column_searchable_list = ['name']
         column_exclude_list = ['description']
         form_excluded_columns = [
-            'measurements', 'measurementContexts', 'measurementTechniques',
+            'measurements', 'measurementContexts', 'studyTechniques', 'measurementTechniques',
             'studyUsers', 'experiments', 'strains', 'communities', 'compartments',
             'modelingRequests', 'modelingResults', 'bioreplicates',
             'studyMetabolites', 'metabolites',
