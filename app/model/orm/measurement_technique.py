@@ -15,6 +15,7 @@ from app.model.orm.orm_base import OrmBase
 from app.model.lib.techniques import (
     TECHNIQUE_SHORT_NAMES,
     TECHNIQUE_LONG_NAMES,
+    TECHNIQUE_SUBJECT_NAMES,
 )
 
 
@@ -82,24 +83,9 @@ class MeasurementTechnique(OrmBase):
         return f"{TECHNIQUE_SHORT_NAMES[self.type]}{label}{cell_type}"
 
     @property
-    def short_name_with_units(self):
-        units = f" in {self.units}" if self.units else ""
-        return f"{self.short_name}{units}"
-
-    @property
-    def short_name_with_subject_type(self):
-        parts = [self.short_name]
-
-        if self.subjectType != 'metabolite':
-            parts.append(self.subject_short_name)
-
-        return ' per '.join(parts)
-
-    @property
     def long_name(self):
         return TECHNIQUE_LONG_NAMES[self.type]
 
-    # TODO (2025-11-04) Can be removed in favor of using label
     @property
     def long_name_with_subject_type(self):
         parts = [self.long_name]
@@ -108,16 +94,9 @@ class MeasurementTechnique(OrmBase):
             parts.append(f"({self.studyTechnique.label})")
 
         if self.subjectType != 'metabolite':
-            parts.append(f"per {self.subject_short_name}")
+            parts.append(f"per {TECHNIQUE_SUBJECT_NAMES[self.subjectType]}")
 
         return ' '.join(parts)
-
-    @property
-    def subject_short_name(self):
-        match self.subjectType:
-            case 'bioreplicate': return 'community'
-            case 'strain': return 'strain'
-            case 'metabolite': return 'metabolite'
 
     @property
     def is_growth(self):

@@ -22,7 +22,7 @@ from app.model.lib.submission_process import (
     _save_compartments,
     _save_communities,
     _save_experiments,
-    _save_measurement_techniques,
+    _save_study_techniques,
     _create_average_measurements,
 )
 from tests.database_test import DatabaseTest
@@ -448,11 +448,11 @@ class TestSubmissionProcess(DatabaseTest):
 
         study = _save_study(self.db_session, submission_form)
 
-        techniques = _save_measurement_techniques(self.db_session, submission_form, study)
+        techniques = _save_study_techniques(self.db_session, submission_form, study)
         self.db_session.flush()
 
         self.assertEqual(len(techniques), 3)
-        self.assertEqual(techniques, study.measurementTechniques)
+        self.assertEqual(techniques, study.studyTechniques)
         self.assertEqual({m.name for m in study.metabolites}, {'pyruvate', 'butyrate'})
 
     def test_average_measurement_creation(self):
@@ -462,7 +462,7 @@ class TestSubmissionProcess(DatabaseTest):
         c1 = self.create_compartment()
         self.create_experiment_compartment(compartmentId=c1.id, experimentId=experiment.publicId)
 
-        mt = self.create_measurement_technique(subjectType='bioreplicate', studyId=study.publicId)
+        mt = self.create_measurement_technique(subjectType='bioreplicate', study_technique={'studyId': study.publicId})
 
         b1 = self.create_bioreplicate(name="b1", experimentId=experiment.publicId)
         mc1 = self.create_measurement_context(

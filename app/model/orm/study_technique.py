@@ -14,6 +14,7 @@ from app.model.orm.orm_base import OrmBase
 from app.model.lib.techniques import (
     TECHNIQUE_SHORT_NAMES,
     TECHNIQUE_LONG_NAMES,
+    TECHNIQUE_SUBJECT_NAMES,
 )
 
 
@@ -69,12 +70,12 @@ class StudyTechnique(OrmBase):
 
     @property
     def short_name_with_subject_type(self):
-        parts = [self.short_name]
+        result = self.short_name
 
         if self.subjectType != 'metabolite':
-            parts.append(self.subject_short_name)
+            result += f" per {TECHNIQUE_SUBJECT_NAMES[self.subjectType]}"
 
-        return ' per '.join(parts)
+        return result
 
     @property
     def long_name(self):
@@ -85,16 +86,9 @@ class StudyTechnique(OrmBase):
         result = self.long_name
 
         if self.subjectType != 'metabolite':
-            result += f" per {self.subject_short_name}"
+            result += f" per {TECHNIQUE_SUBJECT_NAMES[self.subjectType]}"
 
         if self.label and self.label != '':
             result += f" ({self.label})"
 
         return result
-
-    @property
-    def subject_short_name(self):
-        match self.subjectType:
-            case 'bioreplicate': return 'community'
-            case 'strain': return 'strain'
-            case 'metabolite': return 'metabolite'

@@ -19,3 +19,10 @@ TECHNIQUE_LONG_NAMES = {
     'metabolite': 'Metabolites',
 }
 "Human-readable long names of techniques"
+
+TECHNIQUE_SUBJECT_NAMES = {
+    'bioreplicate': 'community',
+    'strain':       'strain',
+    'metabolite':   'metabolite',
+}
+"Human-readable technique subject names keyed by subject type"
