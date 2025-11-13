@@ -236,8 +236,7 @@ class SubmissionForm:
     def technique_descriptions(self):
         ordering = ('bioreplicate', 'strain', 'metabolite')
         study_techniques = self.submission.build_techniques()
-        measurement_techniques = [mt for st in study_techniques for mt in st.measurementTechniques]
-        sorted_techniques = sorted(measurement_techniques, key=lambda t: ordering.index(t.subjectType))
+        sorted_techniques = sorted(study_techniques, key=lambda t: ordering.index(t.subjectType))
 
         for (subject_type, grouped_techniques) in itertools.groupby(sorted_techniques, lambda t: t.subjectType):
             match subject_type:
