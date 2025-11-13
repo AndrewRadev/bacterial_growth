@@ -19,7 +19,6 @@ def init_assets(app):
         # External libraries:
         '../app/view/js/vendor/jquery-3.7.1.js',
         '../app/view/js/vendor/jquery.scrollTo-2.1.3.js',
-        '../app/view/js/vendor/jquery-throttle-debounce-1.1.js',
         '../app/view/js/vendor/select2-4.0.13.js',
         '../app/view/js/vendor/popper-core-2.11.8.js',
         '../app/view/js/vendor/tippy-6.3.7.js',
