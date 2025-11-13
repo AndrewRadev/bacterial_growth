@@ -6,7 +6,10 @@
         {% if type == 'Metabolite': %}
           <li class="complete">
             <span class="icon"></span>
-            <span>{{ techniques[0].metaboliteIds|length }} Metabolites measured:</span>
+            <span>
+              {{ techniques[0].measurementTechniques|map(attribute="metaboliteIds")|flatten|length }}
+              Metabolites measured:
+            </span>
             <span class="truncate">
               {{ submission_form.fetch_all_metabolites()|map(attribute="name")|join_tag('strong') }}
             </span>
