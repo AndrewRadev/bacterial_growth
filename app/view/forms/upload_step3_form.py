@@ -5,7 +5,7 @@ from wtforms import (
     SelectMultipleField,
     StringField,
 )
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
 from app.view.forms.base_form import BaseForm
 from app.model.orm import StudyTechnique
@@ -19,7 +19,7 @@ class UploadStep3Form(BaseForm):
 
         type          = StringField('type',        validators=[DataRequired()])
         subjectType   = StringField('subjectType', validators=[DataRequired()])
-        label         = StringField('label')
+        label         = StringField('label',       validators=[Length(max=100)])
         units         = StringField('units')
         description   = StringField('description')
         metaboliteIds = SelectMultipleField('metaboliteIds', choices=[], validate_choice=False)
