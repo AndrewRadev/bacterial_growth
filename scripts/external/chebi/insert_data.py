@@ -15,7 +15,8 @@ with open(data_dump) as f:
     # Number of lines minus the header
     metabolite_count = len(f.readlines()) - 1
 
-long_task = LongTask(total_count=metabolite_count)
+batch_size = 100
+long_task = LongTask(total_count=metabolite_count, max_samples=batch_size * 5)
 
 all_file_ids = set()
 
@@ -24,6 +25,7 @@ with get_session() as db_session:
 
     with open(data_dump) as f:
         reader = csv.DictReader(f)
+        data_to_insert = []
 
         for row in reader:
             chebi_id = f"CHEBI:{row['chebiId']}"
@@ -52,12 +54,17 @@ with get_session() as db_session:
                         db_session.commit()
                 else:
                     print(f"[{progress}] Working on: {(chebi_id, name)}: Insert")
-                    metabolite = Metabolite(
-                        chebiId=chebi_id,
-                        name=name,
-                        averageMass=mass,
-                    )
-                    db_session.add(metabolite)
+                    # Accumulate taxa for a batch-insert
+                    data_to_insert.append({'chebiId': chebi_id, 'name': name, 'averageMass': mass})
+
+                if len(data_to_insert) >= batch_size:
+                    db_session.execute(sql.insert(Metabolite), data_to_insert)
                     db_session.commit()
+                    data_to_insert = []
+
+        # Final insert of any leftovers after the loop:
+        if len(data_to_insert) > 0:
+            db_session.execute(sql.insert(Metabolite), data_to_insert)
+            db_session.commit()
 
     print(f"Missing IDs in the file: {all_db_ids.difference(all_file_ids)}")

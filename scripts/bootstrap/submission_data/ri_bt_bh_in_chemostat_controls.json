@@ -56,6 +56,14 @@
         "CHEBI:32816",
         "CHEBI:422"
       ]
+    },
+    {
+      "type": "ph",
+      "units": "",
+      "includeStd": false,
+      "description": "",
+      "subjectType": "bioreplicate",
+      "metaboliteIds": []
     }
   ],
   "communities": [

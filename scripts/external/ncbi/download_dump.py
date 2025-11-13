@@ -2,6 +2,7 @@ import os
 import sys
 import csv
 from pathlib import Path
+from datetime import datetime, UTC
 
 from long_task_printer import print_with_time
 
@@ -86,3 +87,7 @@ with print_with_time("Generating filtered NCBI data dump"):
         writer.writeheader()
         for (ncbi_id, name) in sorted(identifiers):
             writer.writerow({'ncbiId': ncbi_id, 'name': name})
+
+# Record time of this update:
+with open('var/external_data/last_ncbi_update.txt', 'w') as f:
+    f.write(datetime.now(UTC).isoformat())

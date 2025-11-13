@@ -163,6 +163,7 @@ class TestApiPages(PageTest):
             bioreplicateId=bioreplicate.id,
             subjectId=bioreplicate.id,
             subjectType='bioreplicate',
+            subjectName=bioreplicate.name,
         )
         for i in range(1, 4):
             self.create_measurement(
@@ -188,6 +189,8 @@ class TestApiPages(PageTest):
         self.assertEqual(response_json['techniqueUnits'], '')
         self.assertEqual(response_json['bioreplicateName'], 'B1')
         self.assertEqual(response_json['measurementCount'], 3)
+        self.assertEqual(response_json['subject']['type'], 'bioreplicate')
+        self.assertEqual(response_json['subject']['name'], 'B1')
 
     def test_non_published_measurement_endpoints(self):
         study        = self.create_study(publishedAt=None)
@@ -217,8 +220,8 @@ class TestApiPages(PageTest):
     def test_bioreplicate_csv(self):
         study        = self.create_study(publishedAt=datetime.now(UTC))
         experiment   = self.create_experiment(studyId=study.publicId)
-        bioreplicate = self.create_bioreplicate(experimentId=experiment.publicId)
-        strain       = self.create_strain(studyId=study.publicId)
+        bioreplicate = self.create_bioreplicate(name='B1', experimentId=experiment.publicId)
+        strain       = self.create_strain(name='Roseburia', studyId=study.publicId)
 
         for subject, subject_type in ((bioreplicate, 'bioreplicate'), (strain, 'strain')):
             measurement_context = self.create_measurement_context(
@@ -226,6 +229,8 @@ class TestApiPages(PageTest):
                 bioreplicateId=bioreplicate.id,
                 subjectId=subject.id,
                 subjectType=subject_type,
+                subjectName=subject.name,
+                subjectExternalId=subject.externalId,
             )
             for i in range(1, 4):
                 self.create_measurement(
@@ -241,9 +246,25 @@ class TestApiPages(PageTest):
 
         response_df = self._get_csv(response)
 
-        self.assertEqual(response_df.columns.tolist(), ['measurementContextId', 'time', 'value', 'std'])
+        self.assertEqual(response_df.columns.tolist(), [
+            'measurementContextId',
+            'subjectType',
+            'subjectName',
+            'subjectExternalId',
+            'time',
+            'value',
+            'std',
+        ])
         self.assertEqual(response_df['time'].tolist(), [1, 2, 3, 1, 2, 3])
         self.assertEqual(response_df['value'].tolist(), [10, 20, 30, 10, 20, 30])
+        self.assertEqual(response_df['subjectType'].tolist(), [
+            'bioreplicate', 'bioreplicate', 'bioreplicate',
+            'strain', 'strain', 'strain',
+        ])
+        self.assertEqual(response_df['subjectName'].tolist(), [
+            'B1', 'B1', 'B1',
+            'Roseburia', 'Roseburia', 'Roseburia',
+        ])
         self.assertTrue(response_df['std'].isna().all())
 
     def test_bioreplicate_json(self):

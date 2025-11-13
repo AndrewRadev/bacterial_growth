@@ -12,7 +12,7 @@
         </h3>
 
         {% if result.description: %}
-          <p>{{ result.description }}</p>
+          <p>{{ result.description|urlize(target="_blank", nofollow=true) }}</p>
         {% endif %}
 
         <p>
@@ -39,7 +39,7 @@
           <tr>
             <td>
               <ul>
-                {% for technique_name in result.measurementTechniques|map(attribute="short_name")|unique: %}
+                {% for technique_name in result.measurementTechniques|map(attribute="short_name_with_subject_type")|unique: %}
                   <li>{{ technique_name }}</li>
                 {% endfor %}
               </ul>

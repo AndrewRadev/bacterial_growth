@@ -64,7 +64,7 @@ class Measurement(OrmBase):
         return self.context.subjectType
 
     @classmethod
-    def insert_from_csv_string(Self, db_session, study, csv_string, subject_type):
+    def insert_from_csv_string(Self, db_session, study, csv_string):
         from app.model.orm import MeasurementContext
 
         reader = csv.DictReader(StringIO(csv_string), dialect='unix')
@@ -72,8 +72,6 @@ class Measurement(OrmBase):
         bioreplicates_by_name = group_by_unique_name(study.bioreplicates)
         compartments_by_name  = group_by_unique_name(study.compartments)
         context_cache = {}
-
-        measurements = []
 
         for row in reader:
             bioreplicate = bioreplicates_by_name[row['Biological Replicate'].strip()]
@@ -90,20 +88,19 @@ class Measurement(OrmBase):
             time_in_seconds = convert_time(row['Time'], source=study.timeUnits, target='s')
 
             for technique in study.measurementTechniques:
-                if technique.subjectType != subject_type:
-                    continue
-
-                if subject_type == 'bioreplicate':
+                if technique.subjectType == 'bioreplicate':
                     subjects = [bioreplicate]
-                elif subject_type == 'strain':
+                elif technique.subjectType == 'strain':
                     subjects = study.strains
-                elif subject_type == 'metabolite':
+                elif technique.subjectType == 'metabolite':
                     subjects = study.metabolites
                 else:
                     raise KeyError(f"Unexpected subject type: {subject_type}")
 
                 for subject in subjects:
                     value_column_name = technique.csv_column_name(subject.name)
+                    if value_column_name not in row:
+                        continue
 
                     value = row[value_column_name]
                     if value == '':
@@ -114,7 +111,7 @@ class Measurement(OrmBase):
                         std = None
 
                     # Create a measurement context only if it doesn't already exist:
-                    context_key = (bioreplicate.id, compartment.id, technique.id, subject.id, subject_type)
+                    context_key = (bioreplicate.id, compartment.id, technique.id, subject.id, technique.subjectType)
                     if context_key not in context_cache:
                         context = MeasurementContext(
                             # Relationships:
@@ -123,10 +120,13 @@ class Measurement(OrmBase):
                             compartment=compartment,
                             # Subject:
                             subjectId=subject.id,
-                            subjectType=subject_type,
+                            subjectType=technique.subjectType,
+                            subjectName=subject.name,
+                            subjectExternalId=subject.externalId,
                             # Technique:
                             techniqueId=technique.id,
                         )
+                        db_session.add(context)
                         context_cache[context_key] = context
 
                     context = context_cache[context_key]
@@ -137,9 +137,8 @@ class Measurement(OrmBase):
                         value=value,
                         std=std,
                     )
-                    measurements.append(measurement)
+                    db_session.add(measurement)
 
-        db_session.add_all(measurements)
         db_session.commit()
 
         # Prune measurement contexts that only have empty values:

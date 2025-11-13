@@ -36,3 +36,11 @@ class Strain(OrmBase):
 
     def __lt__(self, other):
         return self.name < other.name
+
+    @property
+    def externalId(self):
+        """
+        For compatibility with other subjects of measurements.
+        The strain's (or parent strain's) NCBI id, e.g. "NCBI:1234"
+        """
+        return f"NCBI:{self.NCBId}"

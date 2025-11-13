@@ -21,6 +21,7 @@ def init_template_filters(app):
     app.template_filter('relative_time')(time.relative_time)
     app.template_filter('relative_date')(time.relative_date)
     app.template_filter('map_scientific')(numbers.map_scientific)
+    app.template_filter('humanize_number')(numbers.humanize_number)
 
     app.template_filter('ncbi_url')(urls.ncbi_url)
     app.template_filter('chebi_url')(urls.chebi_url)
