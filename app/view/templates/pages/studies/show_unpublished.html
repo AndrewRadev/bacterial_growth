@@ -13,7 +13,7 @@
       <h1>{{ study.name }}</h1>
 
       {% if study.description: %}
-        <p>{{ study.description|urlize(target="_blank", nofollow=true) }}</p>
+        {{ study.description|format_text }}
       {% endif %}
 
       <p>

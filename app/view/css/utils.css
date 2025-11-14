@@ -66,6 +66,9 @@
 
 .small {
   font-size: 14px;
+  p {
+    margin-top: 0;
+  }
 }
 
 code.inline {

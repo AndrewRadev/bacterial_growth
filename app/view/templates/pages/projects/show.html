@@ -33,9 +33,7 @@
               [{{ study.publicId }}] {{ study.name }}
             </a>
 
-            <p>
-              {{ study.description|urlize(target="_blank", nofollow=true) }}
-            </p>
+            {{ study.description|format_text }}
           </li>
         {% endfor %}
       </ul>
