@@ -6,7 +6,7 @@
     (from {{ strain.NCBId|ncbi_url|external_link("NCBI:{}".format(strain.NCBId)) }})
     {%- if strain.description: -%}
       <div class="small">
-        {{ strain.description|urlize(target="_blank", nofollow=true) }}
+        {{ strain.description|format_text }}
       </div>
     {% endif %}
   {% endif %}

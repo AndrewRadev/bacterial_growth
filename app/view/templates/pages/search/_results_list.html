@@ -12,7 +12,7 @@
         </h3>
 
         {% if result.description: %}
-          <p>{{ result.description|urlize(target="_blank", nofollow=true) }}</p>
+          {{ result.description|format_text(first_paragraph=True) }}
         {% endif %}
 
         <p>
