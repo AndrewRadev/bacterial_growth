@@ -62,8 +62,8 @@ class Study(OrmBase):
     communities:  Mapped[List['Community']]   = owner_relationship()
     compartments: Mapped[List['Compartment']] = owner_relationship()
 
-    measurementTechniques: Mapped[List['MeasurementTechnique']] = owner_relationship(
-        order_by='MeasurementTechnique.subjectTypeOrdering, MeasurementTechnique.typeOrdering',
+    studyTechniques: Mapped[List['StudyTechnique']] = owner_relationship(
+        order_by='StudyTechnique.subjectTypeOrdering, StudyTechnique.typeOrdering',
     )
 
     measurementContexts: Mapped[List['MeasurementContext']] = owner_relationship()
@@ -71,6 +71,12 @@ class Study(OrmBase):
 
     bioreplicates: Mapped[List['Bioreplicate']] = relationship(
         secondary='Experiments',
+        viewonly=True,
+    )
+
+    measurementTechniques: Mapped[List['MeasurementTechnique']] = relationship(
+        order_by='MeasurementTechnique.subjectTypeOrdering, MeasurementTechnique.typeOrdering',
+        secondary='StudyTechniques',
         viewonly=True,
     )
 

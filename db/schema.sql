@@ -215,17 +215,17 @@ CREATE TABLE MeasurementTechniques (
   units varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `description` text,
   includeStd tinyint(1) NOT NULL DEFAULT '0',
-  studyUniqueId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   metaboliteIds json DEFAULT (json_array()),
-  strainIds json DEFAULT (json_array()),
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  studyTechniqueId int DEFAULT NULL,
+  cellType varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   PRIMARY KEY (id),
-  KEY MeasurementTechniques_studyUniqueId (studyUniqueId),
   KEY MeasurementTechniques_studyId (studyId),
+  KEY MeasurementTechniques_studyTechniqueId (studyTechniqueId),
   CONSTRAINT MeasurementTechniques_studyId FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT MeasurementTechniques_studyUniqueId FOREIGN KEY (studyUniqueId) REFERENCES Studies (uuid) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT MeasurementTechniques_studyTechniqueId FOREIGN KEY (studyTechniqueId) REFERENCES StudyTechniques (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -462,6 +462,30 @@ CREATE TABLE StudyMetabolites (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `StudyTechniques`
+--
+
+DROP TABLE IF EXISTS StudyTechniques;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE StudyTechniques (
+  id int NOT NULL AUTO_INCREMENT,
+  `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `description` text,
+  units varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  includeStd tinyint(1) NOT NULL DEFAULT '0',
+  label varchar(100) DEFAULT NULL,
+  subjectType varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY StudyTechniques_studyId (studyId),
+  CONSTRAINT StudyTechniques_studyId FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `StudyUsers`
 --
 
@@ -636,5 +660,10 @@ INSERT INTO MigrationVersions VALUES
 (64,'2025_07_13_121621_make_orcid_token_nullable','2025-08-20 12:11:25'),
 (65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-21 14:36:17'),
 (67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22'),
-(108,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-11 15:13:01');
+(109,'2025_11_03_160947_create_study_techniques','2025-11-11 18:47:59'),
+(110,'2025_11_03_162139_modify_measurement_techniques','2025-11-11 18:47:59'),
+(112,'2025_11_03_164617_populate_study_techniques','2025-11-12 09:26:51'),
+(113,'2025_11_10_122037_increase_metabolite_name_length','2025-11-12 09:26:51'),
+(114,'2025_11_11_155050_add_subject_name_and_external_id_to_measurement_contexts','2025-11-12 09:26:51'),
+(115,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-12 09:26:51');
 

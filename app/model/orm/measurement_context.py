@@ -87,6 +87,8 @@ class MeasurementContext(OrmBase):
         return execute_into_df(db_session, query)
 
     def get_chart_label(self, db_session):
+        from markupsafe import Markup, escape
+
         subject      = self.get_subject(db_session)
         technique    = self.technique
         bioreplicate = self.bioreplicate
@@ -94,14 +96,14 @@ class MeasurementContext(OrmBase):
         experiment   = bioreplicate.experiment
 
         if technique.subjectType == 'metabolite':
-            label_parts = [f"<b>{subject.name}</b>"]
+            label_parts = [f"<b>{escape(subject.name)}</b>"]
         else:
-            label_parts = [technique.short_name]
+            label_parts = [escape(technique.short_name)]
 
-        if len(experiment.compartments) <= 1:
-            bioreplicate_label = f"<b>{bioreplicate.name}</b>"
-        else:
-            bioreplicate_label = f"<b>{bioreplicate.name}<sub>{compartment.name}</sub></b>"
+        bioreplicate_label = f"<b>{escape(bioreplicate.name)}</b>"
+
+        if len(experiment.compartments) > 1:
+            bioreplicate_label = f"{bioreplicate_label}<sub>{escape(compartment.name)}</sub></b>"
 
         if technique.subjectType == 'bioreplicate':
             label_parts.append('of the')
@@ -118,7 +120,7 @@ class MeasurementContext(OrmBase):
 
         label = ' '.join(label_parts)
 
-        return label
+        return Markup(label)
 
     def get_subject(self, db_session):
         if not hasattr(db_session, '_measurement_subject_cache'):

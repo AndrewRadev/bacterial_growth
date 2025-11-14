@@ -22,69 +22,127 @@
     <input type="hidden" name="{{ prefix }}subjectType" value="bioreplicate" />
 
     <div class="form-row">
+      <label class="full">
+        <div>Type of measurement technique</div>
+        <select
+            name="{{ prefix }}type"
+            class="form-input-full form-input-blue js-type-select js-preview-trigger" />
+          <option value="fc" data-column-name="FC counts" {{ "selected" if data['type'] == 'fc' }}>
+            Flow Cytometry
+          </option>
+          <option value="od" data-column-name="OD" {{ "selected" if data['type'] == 'od' }}>
+            Optical Density (absorbance)
+          </option>
+          <option value="plates" data-column-name="plate counts" {{ "selected" if data['type'] == 'plates' }}>
+            Plate Counts
+          </option>
+          <option value="qpcr" data-column-name="qPCR counts" {{ "selected" if data['type'] == 'qpcr' }}>
+            qPCR
+          </option>
+          <option value="ph" data-column-name="pH" {{ "selected" if data['type'] == 'ph' }}>
+            pH
+          </option>
+        </select>
+      </label>
+
+      <label class="full" data-tooltip="If you have multiple kinds of measurements with the same technique, e.g. Flow Cytometry quantified in two different ways, you can specify a short label to differentiate them">
+        <span>Optional label:</span>
+        <input
+            type="text"
+            name="{{ prefix }}label"
+            maxlength=100
+            class="form-input-full form-input-blue js-label js-preview-trigger"
+            value="{{ data['label'] if data }}" />
+      </label>
+
+      <label class="full">
+        <span>Units:</span>
+        <select
+            name="{{ prefix }}units"
+            class="form-input-full form-input-blue js-unit-select js-preview-trigger" />
+          <optgroup label="Cells per volume">
+            <option value="Cells/mL" {{ "selected" if data['units'] == 'Cells/mL' }}>
+              Cells/mL
+            </option>
+            <option value="Cells/μL" {{ "selected" if data['units'] == 'Cells/μL' }}>
+              Cells/μL
+            </option>
+          </optgroup>
+
+          <optgroup label="CFUs per volume">
+            <option value="CFUs/mL" {{ "selected" if data['units'] == 'CFUs/mL' }}>
+              CFUs/mL
+            </option>
+            <option value="CFUs/μL" {{ "selected" if data['units'] == 'CFUs/μL' }}>
+              CFUs/μL
+            </option>
+          </optgroup>
+
+          <optgroup label="Biomass concentration">
+            <option value="g/L" {{ "selected" if data['units'] == 'g/L' }}>
+              g/L
+            </option>
+          </optgroup>
+
+          <optgroup label="Unitless/unknown">
+            <option value="" {{ "selected" if data['units'] == '' }}>
+              N/A
+            </option>
+          </optgroup>
+        </select>
+      </label>
+    </div>
+
+    <div class="form-row">
       <div class="flex-column flex-gap-6 flex-1">
-        <label class="full">
-          <div>Type of measurement technique</div>
-          <select
-              name="{{ prefix }}type"
-              class="form-input-full form-input-blue js-type-select" />
-            <option value="fc" data-column-name="FC counts" {{ "selected" if data['type'] == 'fc' }}>
-              Flow Cytometry
-            </option>
-            <option value="od" data-column-name="OD" {{ "selected" if data['type'] == 'od' }}>
-              Optical Density (absorbance)
-            </option>
-            <option value="plates" data-column-name="plate counts" {{ "selected" if data['type'] == 'plates' }}>
-              Plate Counts
-            </option>
-            <option value="qpcr" data-column-name="qPCR counts" {{ "selected" if data['type'] == 'qpcr' }}>
-              qPCR
-            </option>
-            <option value="ph" data-column-name="pH" {{ "selected" if data['type'] == 'ph' }}>
-              pH
-            </option>
-          </select>
-        </label>
+        <div
+          class="flex-column flex-gap-6 js-extra-inputs"
+          data-tooltip="If you're not sure whether your measurements include only live cells or count all cells, you can leave the checkboxes blank. Ideally, we recommend marking the relevant types.">
+          <span class="input-label">Types of cells counted:</span>
+          <label>
+            <input
+                type="checkbox"
+                class="js-include-live js-preview-trigger"
+                name="{{ prefix }}includeLive"
+                {{ "checked" if data and data['includeLive'] }} />
+            Live cells
+          </label>
 
-        <label class="full">
-          <span>Units:</span>
-          <select
-              name="{{ prefix }}units"
-              class="form-input-full form-input-blue js-unit-select" />
-            <optgroup label="Cells per volume">
-              <option value="Cells/mL" {{ "selected" if data['units'] == 'Cells/mL' }}>
-                Cells/mL
-              </option>
-              <option value="Cells/μL" {{ "selected" if data['units'] == 'Cells/μL' }}>
-                Cells/μL
-              </option>
-            </optgroup>
+          <label>
+            <input
+                type="checkbox"
+                class="js-include-dead js-preview-trigger"
+                name="{{ prefix }}includeDead"
+                {{ "checked" if data and data['includeDead'] }} />
+            Dead cells
+          </label>
 
-            <optgroup label="CFUs per volume">
-              <option value="CFUs/mL" {{ "selected" if data['units'] == 'CFUs/mL' }}>
-                CFUs/mL
-              </option>
-              <option value="CFUs/μL" {{ "selected" if data['units'] == 'CFUs/μL' }}>
-                CFUs/μL
-              </option>
-            </optgroup>
+          <label>
+            <input
+                type="checkbox"
+                class="js-include-total js-preview-trigger"
+                name="{{ prefix }}includeTotal"
+                {{ "checked" if data and data['includeTotal'] }} />
+            Total cells (live + dead)
+          </label>
+        </div>
 
-            <optgroup label="Biomass concentration">
-              <option value="g/L" {{ "selected" if data['units'] == 'g/L' }}>
-                g/L
-              </option>
-            </optgroup>
+        <div class="flex-column flex-gap-6">
+          <span class="input-label">Extra measurements:</span>
 
-            <optgroup label="Unitless/unknown">
-              <option value="" {{ "selected" if data['units'] == '' }}>
-                N/A
-              </option>
-            </optgroup>
-          </select>
-        </label>
+          <label
+              data-tooltip="If you have multiple technical replicates, you can submit your point estimate as the measurement and add the standard deviation in a separate column.">
+            <input
+                type="checkbox"
+                class="js-include-std js-preview-trigger"
+                name="{{ prefix }}includeStd"
+                {{ "checked" if data and data['includeStd'] }} />
+            Include STD
+          </label>
+        </div>
       </div>
 
-      <label class="flex-2">
+      <label class="flex-column flex-2">
         <div>Description of methodology</div>
         <textarea
             name="{{ prefix }}description"
@@ -94,22 +152,10 @@
       </label>
     </div>
 
-    <div class="form-row" style="margin-top: 10px">
-      <label
-          data-tooltip="If you have multiple technical replicates, you can submit your point estimate as the measurement and add the standard deviation in a separate column.">
-        Include STD:
-        <input
-            type="checkbox"
-            class="js-include-std"
-            name="{{ prefix }}includeStd"
-            {{ "checked" if data and data['includeStd'] }} />
-      </label>
-    </div>
-
     <hr>
 
     <div class="form-row">
-      <div>
+      <div class="preview-container">
         Data spreadsheet preview:
 
         <table class="dataframe-table margin-top-10">
@@ -127,5 +173,4 @@
       </div>
     </div>
   </div>
-
 {% endmacro %}

@@ -26,8 +26,13 @@ _TECHNIQUE_DESCRIPTIONS = {
 }
 
 
-def create_excel(submission, metabolite_names, strain_names):
+def create_excel(submission_form):
     "Create a template data file based on the submission's study design"
+
+    submission = submission_form.submission
+
+    strain_names = [t.name for t in submission_form.fetch_taxa()]
+    strain_names += [s['name'] for s in submission.studyDesign['custom_strains']]
 
     workbook = Workbook()
 
@@ -35,7 +40,6 @@ def create_excel(submission, metabolite_names, strain_names):
     long_time_units = _TIME_UNITS[short_time_units]
 
     headers_common = {
-        # 'Position':           'Predetermine position based on the type of vessel specified before.',
         'Biological Replicate': 'Unique names of individual samples: a bottle, a well in a well-plate, or a mini-bioreactor.',
         'Compartment':          'A compartment within the vessel where growth is measured.',
         'Time':                 f"Measurement time-points in {long_time_units} ({short_time_units}).",
@@ -45,50 +49,53 @@ def create_excel(submission, metabolite_names, strain_names):
     headers_strains       = {**headers_common}
     headers_metabolites   = {**headers_common}
 
-    for technique in submission.build_techniques():
-        subject_type   = technique.subjectType
-        technique_type = technique.type
-        units          = technique.units
+    for index, study_technique in enumerate(submission.build_techniques()):
+        subject_type   = study_technique.subjectType
+        technique_type = study_technique.type
+        units          = study_technique.units
 
-        if subject_type == 'bioreplicate':
-            technique_name = technique.csv_column_name()
-            description = _TECHNIQUE_DESCRIPTIONS[technique_type].format(units=technique.units)
+        for measurement_technique in study_technique.measurementTechniques:
+            if subject_type == 'bioreplicate':
+                technique_name = measurement_technique.csv_column_name()
+                description = _TECHNIQUE_DESCRIPTIONS[technique_type].format(units=study_technique.units)
 
-            headers_bioreplicates[technique_name] = description
+                headers_bioreplicates[technique_name] = description
 
-            if technique.includeStd:
-                title = ' '.join([technique_name, 'STD'])
-                headers_bioreplicates[title] = _TECHNIQUE_DESCRIPTIONS['STD']
+                if study_technique.includeStd:
+                    title = ' '.join([technique_name, 'STD'])
+                    headers_bioreplicates[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
-        elif subject_type == 'strain':
-            for strain_name in strain_names:
-                title = technique.csv_column_name(strain_name)
+            elif subject_type == 'strain':
+                for strain_name in strain_names:
+                    title = measurement_technique.csv_column_name(strain_name)
 
-                description = _TECHNIQUE_DESCRIPTIONS[f"{technique_type}_ps"].format(
-                    strain=strain_name,
-                    units=units,
-                )
-                headers_strains[title] = description
+                    description = _TECHNIQUE_DESCRIPTIONS[f"{technique_type}_ps"].format(
+                        strain=strain_name,
+                        units=units,
+                    )
+                    headers_strains[title] = description
 
-                if technique.includeStd:
-                    title = ' '.join([title, 'STD'])
-                    headers_strains[title] = _TECHNIQUE_DESCRIPTIONS['STD']
+                    if study_technique.includeStd:
+                        title = ' '.join([title, 'STD'])
+                        headers_strains[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
-        elif subject_type == 'metabolite':
-            for metabolite in metabolite_names:
-                title = technique.csv_column_name(metabolite)
-                description = _TECHNIQUE_DESCRIPTIONS['metabolites'].format(
-                    metabolite=metabolite,
-                    units=units,
-                )
-                headers_metabolites[title] = description
+            elif subject_type == 'metabolite':
+                metabolites = submission_form.fetch_metabolites_for_technique(index)
 
-                if technique.includeStd:
-                    title = ' '.join([metabolite, 'STD'])
-                    headers_metabolites[title] = _TECHNIQUE_DESCRIPTIONS['STD']
+                for metabolite in metabolites:
+                    title = measurement_technique.csv_column_name(metabolite.name)
+                    description = _TECHNIQUE_DESCRIPTIONS['metabolites'].format(
+                        metabolite=metabolite.name,
+                        units=units,
+                    )
+                    headers_metabolites[title] = description
 
-        else:
-            raise ValueError(f"Invalid technique subject_type: {subject_type}")
+                    if study_technique.includeStd:
+                        title = ' '.join([metabolite.name, 'STD'])
+                        headers_metabolites[title] = _TECHNIQUE_DESCRIPTIONS['STD']
+
+            else:
+                raise ValueError(f"Invalid technique subject_type: {subject_type}")
 
     # Create sheets for each category of measurement:
     if len(headers_bioreplicates) > 3:

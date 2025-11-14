@@ -16,34 +16,54 @@
   "techniques": [
     {
       "type": "od",
+      "label": "",
       "units": "",
+      "cellTypes": [],
       "includeStd": false,
       "description": "",
+      "includeDead": false,
+      "includeLive": false,
       "subjectType": "bioreplicate",
+      "includeTotal": false,
       "metaboliteIds": []
     },
     {
       "type": "ph",
+      "label": "",
       "units": "",
+      "cellTypes": [],
       "includeStd": false,
       "description": "",
+      "includeDead": false,
+      "includeLive": false,
       "subjectType": "bioreplicate",
+      "includeTotal": false,
       "metaboliteIds": []
     },
     {
       "type": "fc",
+      "label": "",
       "units": "Cells/μL",
+      "cellTypes": [],
       "includeStd": false,
       "description": "DNA-based staining using SYBR Green I (SG; Invitrogen) in combination with propidium iodide (PI; Invitrogen) was applied to quantify and differentiate bacterial cells with intact and damaged cytoplasmic membranes.",
+      "includeDead": false,
+      "includeLive": false,
       "subjectType": "strain",
+      "includeTotal": false,
       "metaboliteIds": []
     },
     {
       "type": "metabolite",
+      "label": "",
       "units": "mM",
+      "cellTypes": [],
       "includeStd": false,
-      "description": "The concentrations of trehalose, glucose, pyruvate, succinate, formate, acetate, lactate, n-butyrate and Neu5Ac were determined by high-performance liquid chromatography (HPLC). Propionate was also measured but not detected in our tests since B. thetaiotaomicron requires vitamin B12 (absent in our medium) to produce propionate via the succinate pathway.\r\n\r\nConcentrations of mucin monomeric sugars galactose, fucose and mannose were relatively quantified by using gas chromatography. Their measurements are shown in mM, but the actual values are in unitless AUC. This should be fixed in a future version of μGrowthDB.",
+      "description": "The concentrations of trehalose, glucose, pyruvate, succinate, formate, acetate, lactate, n-butyrate and Neu5Ac were determined by high-performance liquid chromatography (HPLC). Propionate was also measured but not detected in our tests since B. thetaiotaomicron requires vitamin B12 (absent in our medium) to produce propionate via the succinate pathway.",
+      "includeDead": false,
+      "includeLive": false,
       "subjectType": "metabolite",
+      "includeTotal": false,
       "metaboliteIds": [
         "CHEBI:15361",
         "CHEBI:15740",
@@ -53,8 +73,22 @@
         "CHEBI:24996",
         "CHEBI:26806",
         "CHEBI:27082",
+        "CHEBI:30089"
+      ]
+    },
+    {
+      "type": "metabolite",
+      "label": "mucin sugars",
+      "units": "AUC",
+      "cellTypes": [],
+      "includeStd": false,
+      "description": "Concentrations of mucin monomeric sugars galactose, fucose and mannose were relatively quantified by using gas chromatography. Their measurements are in unitless AUC.",
+      "includeDead": false,
+      "includeLive": false,
+      "subjectType": "metabolite",
+      "includeTotal": false,
+      "metaboliteIds": [
         "CHEBI:28260",
-        "CHEBI:30089",
         "CHEBI:33984",
         "CHEBI:37684"
       ]
@@ -299,7 +333,7 @@
       "name": "WC",
       "volume": 60.0,
       "pressure": 1.0,
-      "initialPh": 5.0,
+      "initialPh": 6.7,
       "mediumUrl": "https://mediadive.dsmz.de/medium/339",
       "mediumName": "Wilkins-Chalgren Anaerobe Broth (WC)",
       "stirringMode": "linear",

@@ -71,7 +71,12 @@ def user_claim_project_action():
     project_uuid = request.form['uuid'].strip()
     user_uuid    = g.current_user.uuid
 
-    project = g.db_session.get(Project, project_uuid)
+    project = g.db_session.scalars(
+        sql.select(Project)
+        .where(Project.uuid == project_uuid)
+        .limit(1)
+    ).one_or_none()
+
     if not project:
         flash(f"A project with this UUID couldn't be found: {repr(project_uuid)}", 'error')
         return redirect(request.referrer)
@@ -103,7 +108,12 @@ def user_claim_study_action():
     study_uuid = request.form['uuid'].strip()
     user_uuid  = g.current_user.uuid
 
-    study = g.db_session.get(Study, study_uuid)
+    study = g.db_session.scalars(
+        sql.select(Study)
+        .where(Study.uuid == study_uuid)
+        .limit(1)
+    ).one_or_none()
+
     if not study:
         flash(f"A study with this UUID couldn't be found: {repr(study_uuid)}", 'error')
         return redirect(request.referrer)

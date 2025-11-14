@@ -7,7 +7,7 @@ from wtforms import (
     StringField,
     URLField,
 )
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Optional, Length
 
 from app.view.forms.base_form import BaseForm
 
@@ -20,8 +20,8 @@ class UploadStep4Form(BaseForm):
 
         name = StringField('name', validators=[DataRequired()])
 
-        mediumName = StringField('mediumName')
-        mediumUrl  = URLField('mediumUrl')
+        mediumName = StringField('mediumName', validators=[Length(max=100)])
+        mediumUrl  = URLField('mediumUrl', validators=[Length(max=100)])
 
         volume        = DecimalField('volume',        validators=[Optional()])
         pressure      = DecimalField('pressure',      validators=[Optional()])

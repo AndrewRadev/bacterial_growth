@@ -12,28 +12,11 @@ from sqlalchemy.orm import (
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
-
-TECHNIQUE_SHORT_NAMES = {
-    'fc':         'FC',
-    'od':         'OD',
-    'plates':     'PC',
-    '16s':        '16S-rRNA reads',
-    'qpcr':       'qPCR',
-    'ph':         'pH',
-    'metabolite': 'Metabolite',
-}
-"Human-readable short names of techniques"
-
-TECHNIQUE_LONG_NAMES = {
-    'fc':         'Flow Cytometry',
-    'od':         'Optical Density',
-    'plates':     'Plate Counts',
-    '16s':        '16S-rRNA reads',
-    'qpcr':       'qPCR',
-    'ph':         'pH',
-    'metabolite': 'Metabolites',
-}
-"Human-readable long names of techniques"
+from app.model.lib.techniques import (
+    TECHNIQUE_SHORT_NAMES,
+    TECHNIQUE_LONG_NAMES,
+    TECHNIQUE_SUBJECT_NAMES,
+)
 
 
 class MeasurementTechnique(OrmBase):
@@ -43,21 +26,29 @@ class MeasurementTechnique(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    type:  Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    units: Mapped[str] = mapped_column(sql.String(100), nullable=False)
-
+    type:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
+    cellType:    Mapped[str] = mapped_column(sql.String(100), nullable=True)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
+    # TODO (2025-11-10) Remove
+    units: Mapped[str] = mapped_column(sql.String(100), nullable=False)
+
+    # TODO (2025-11-10) Remove
     description: Mapped[str]  = mapped_column(sql.String)
-    includeStd:  Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
 
     metaboliteIds: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
+    # TODO (2025-11-10) Remove
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="measurementTechniques")
 
     createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
+
+    studyTechniqueId: Mapped[int] = mapped_column(sql.ForeignKey('StudyTechniques.id'))
+    studyTechnique: Mapped['StudyTechnique'] = relationship(
+        back_populates="measurementTechniques"
+    )
 
     measurementContexts: Mapped[List['MeasurementContext']] = relationship(
         back_populates="technique",
@@ -86,24 +77,10 @@ class MeasurementTechnique(OrmBase):
 
     @property
     def short_name(self):
-        return TECHNIQUE_SHORT_NAMES[self.type]
+        cell_type = f" {self.cellType}" if self.cellType else ""
+        label = f" ({self.studyTechnique.label})" if self.studyTechnique.label else ""
 
-    @property
-    def short_name_with_units(self):
-        if self.units:
-            units = f" ({self.units})"
-        else:
-            units = ""
-        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{units}"
-
-    @property
-    def short_name_with_subject_type(self):
-        parts = [self.short_name]
-
-        if self.subjectType != 'metabolite':
-            parts.append(self.subject_short_name)
-
-        return ' per '.join(parts)
+        return f"{TECHNIQUE_SHORT_NAMES[self.type]}{label}{cell_type}"
 
     @property
     def long_name(self):
@@ -113,17 +90,13 @@ class MeasurementTechnique(OrmBase):
     def long_name_with_subject_type(self):
         parts = [self.long_name]
 
+        if self.studyTechnique.label:
+            parts.append(f"({self.studyTechnique.label})")
+
         if self.subjectType != 'metabolite':
-            parts.append(self.subject_short_name)
+            parts.append(f"per {TECHNIQUE_SUBJECT_NAMES[self.subjectType]}")
 
-        return ' per '.join(parts)
-
-    @property
-    def subject_short_name(self):
-        match self.subjectType:
-            case 'bioreplicate': return 'community'
-            case 'strain': return 'strain'
-            case 'metabolite': return 'metabolite'
+        return ' '.join(parts)
 
     @property
     def is_growth(self):
@@ -140,11 +113,14 @@ class MeasurementTechnique(OrmBase):
         ).all()
 
     def csv_column_name(self, subject_name=None):
+        cell_type = f"{self.cellType} " if self.cellType else ""
+        label = f" ({self.studyTechnique.label})" if self.studyTechnique.label else ""
+
         if self.subjectType == 'bioreplicate':
-            return f"Community {TECHNIQUE_SHORT_NAMES[self.type]}"
+            return f"Community {cell_type}{TECHNIQUE_SHORT_NAMES[self.type]}{label}"
 
         elif self.subjectType == 'metabolite':
-            return subject_name
+            return f"{subject_name}{label}"
 
         elif self.subjectType == 'strain':
             if self.type == '16s':
@@ -158,7 +134,7 @@ class MeasurementTechnique(OrmBase):
             else:
                 raise ValueError(f"Incompatible type and subjectType: {self.type}, {self.subjectType}")
 
-            return f"{subject_name} {suffix}"
+            return f"{subject_name} {cell_type}{suffix}{label}"
 
     def get_grouped_contexts(self):
         grouper = lambda mc: (mc.bioreplicate, mc.compartment)

@@ -111,10 +111,9 @@ def experiment_json(publicId):
                 'biosampleUrl':        b.biosampleUrl,
                 'measurementContexts': [
                     {
-                        'id':             mc.id,
-                        'techniqueType':  mc.technique.type,
-                        'techniqueUnits': mc.technique.units,
-                        'subject':        _render_measurement_subject(mc),
+                        'id': mc.id,
+                        **_measurement_technique_fields(mc.technique),
+                        **_measurement_subject_fields(mc)
                     }
                     for mc in b.measurementContexts
                 ]
@@ -150,9 +149,8 @@ def measurement_context_json(id):
         'studyId':              measurement_context.studyId,
         'bioreplicateId':       measurement_context.bioreplicate.id,
         'bioreplicateName':     measurement_context.bioreplicate.name,
-        'techniqueType':        measurement_context.technique.type,
-        'techniqueUnits':       measurement_context.technique.units,
-        'subject':              _render_measurement_subject(measurement_context),
+        **_measurement_technique_fields(measurement_context.technique),
+        **_measurement_subject_fields(measurement_context),
         'measurementCount':     measurement_count,
         'measurementTimeUnits': 'h',
     }
@@ -182,10 +180,9 @@ def bioreplicate_json(id):
         'measurementTimeUnits': 'h',
         'measurementContexts': [
             {
-                'id':             mc.id,
-                'techniqueType':  mc.technique.type,
-                'techniqueUnits': mc.technique.units,
-                'subject':        _render_measurement_subject(mc),
+                'id': mc.id,
+                **_measurement_technique_fields(mc.technique),
+                **_measurement_subject_fields(mc),
             }
             for mc in bioreplicate.measurementContexts
         ]
@@ -230,8 +227,7 @@ def search_json():
         else:
             return {"error": f"Unknown search parameter: {key}"}, 400
 
-    measurement_contexts    = list(results)
-    measurement_context_ids = [mc.id for mc in measurement_contexts]
+    measurement_contexts = list(results)
 
     experiment_ids = sorted({mc.experiment.publicId for mc in measurement_contexts})
     study_ids      = sorted({mc.experiment.studyId for mc in measurement_contexts})
@@ -247,16 +243,26 @@ def search_json():
                 'studyId':          mc.studyId,
                 'bioreplicateId':   mc.bioreplicate.id,
                 'bioreplicateName': mc.bioreplicate.name,
-                'techniqueType':    mc.technique.type,
-                'techniqueUnits':   mc.technique.units,
-                'subject':          _render_measurement_subject(mc),
+                **_measurement_technique_fields(mc.technique),
+                **_measurement_subject_fields(mc),
             }
             for mc in measurement_contexts
         ]
     }
 
 
-def _render_measurement_subject(measurement_context):
+def _measurement_technique_fields(measurement_technique):
+    fields = {
+        'techniqueType':  measurement_technique.type,
+        'techniqueUnits': measurement_technique.units,
+    }
+    if cell_type := measurement_technique.cellType:
+        fields['techniqueCellType'] = cell_type
+
+    return fields
+
+
+def _measurement_subject_fields(measurement_context):
     subject_type = measurement_context.subjectType
     subject_name = measurement_context.subjectName
     extra_data = {}
@@ -270,9 +276,11 @@ def _render_measurement_subject(measurement_context):
             extra_data = {'chebiId': external_id}
 
     return {
-        'type': subject_type,
-        'name': subject_name,
-        **extra_data,
+        'subject': {
+            'type': subject_type,
+            'name': subject_name,
+            **extra_data,
+        }
     }
 
 

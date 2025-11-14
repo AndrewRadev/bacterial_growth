@@ -16,7 +16,7 @@ def init_template_filters(app):
     New template filters should be defined there and linked here, to avoid
     non-trivial (testable) code living in the "initialization" module.
     """
-
+    app.template_filter('flatten')(lists.flatten)
     app.template_filter('join_tag')(lists.join_tag)
     app.template_filter('relative_time')(time.relative_time)
     app.template_filter('relative_date')(time.relative_date)
