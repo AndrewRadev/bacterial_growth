@@ -5,7 +5,7 @@
       <select name="experimentId" class="form-input-blue full">
         {% for experiment in study.experiments: %}
           <option value="{{ experiment.publicId }}">
-            {{- experiment.name }}: {{ experiment.description -}}
+            {{- experiment.name }}: {{ experiment.description|truncate(80) -}}
           </option>
         {% endfor %}
       </select>
