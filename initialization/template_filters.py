@@ -3,6 +3,7 @@ from app.view.filters import (
     numbers,
     time,
     urls,
+    text,
 )
 
 
@@ -27,5 +28,7 @@ def init_template_filters(app):
     app.template_filter('chebi_url')(urls.chebi_url)
     app.template_filter('external_link')(urls.external_link)
     app.template_filter('help_link')(urls.help_link)
+
+    app.template_filter('format_text')(text.format_text)
 
     return app

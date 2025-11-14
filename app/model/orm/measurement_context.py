@@ -97,6 +97,8 @@ class MeasurementContext(OrmBase):
 
         if technique.subjectType == 'metabolite':
             label_parts = [f"<b>{escape(subject.name)}</b>"]
+            if self.technique.studyTechnique.label:
+                label_parts.append(f"<b>({escape(self.technique.studyTechnique.label)})</b>")
         else:
             label_parts = [escape(technique.short_name)]
 
