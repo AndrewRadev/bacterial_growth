@@ -60,14 +60,18 @@ with print_with_time("Fetching data from ChEBI API"):
             entities = response.json()
 
             for chebi_id, entity in entities.items():
+                if entity['id_type'] != 'PRIMARY_ID':
+                    continue
+
                 if not entity['data']:
                     continue
 
                 chemical_data = entity['data'].get('chemical_data', None) or {}
+                mass = chemical_data.get('mass', None)
 
                 data[int(chebi_id)] = {
                     'name':        entity['data']['ascii_name'],
-                    'averageMass': chemical_data.get('mass', None),
+                    'averageMass': mass,
                 }
 
 with print_with_time("Creating data dump"):
