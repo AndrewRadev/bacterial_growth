@@ -34,7 +34,7 @@ A change in the environment of an experiment is encoded within the application a
 
 Consists of one or more members. Each experiment needs to have at least one community, unless it consists of a control without any microbial community.
 
-Microbial strains within a community always reference an NCBI identifier (<https://www.ncbi.nlm.nih.gov/datasets/>). A custom strain needs to be annotated with its NCBI taxon.
+Microbial strains within a community always reference an NCBI identifier (<https://www.ncbi.nlm.nih.gov/datasets/>). A custom strain needs to be annotated with its closest taxonomic parent that can be found in NCBI.
 
 ## Perturbation
 
@@ -42,4 +42,4 @@ Refers to a deliberate disturbance or alteration applied to a specific experimen
 
 ## Measurement
 
-A single observation of cell or metabolite abundance, or of an environmental value (pH), at a particular time point. A group of measurements of a single "subject" within a single compartment can be plotted on a chart.
+A single observation of cell or metabolite abundance, or of an environmental value (pH), at a particular time point. A "**measurement context**" is a group of sequential measurements of a single "subject" within a single compartment and can be plotted on a chart.
