@@ -1,6 +1,6 @@
 {% extends '_layout.html' %}
 
-{% block title %}: Metabolite with ChEBId:{{ metabolite.chebiId }}{% endblock %}
+{% block title %}: Metabolite {{ metabolite.chebiId }}{% endblock %}
 
 {% block content %}
   <div class="container">
@@ -47,6 +47,12 @@
           It was taken from the ChEBI database.
         {% endif %}
       </p>
+
+      {% if last_chebi_update: %}
+        <p class="help">
+          ChEBI data last updated on <strong>{{ last_chebi_update }}</strong>
+        </p>
+      {% endif %}
 
       <p>{{ metabolite.chebiId|chebi_url|external_link(metabolite.chebiId) }}</p>
     </article>

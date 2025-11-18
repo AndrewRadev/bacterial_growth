@@ -5,6 +5,7 @@ import sqlalchemy as sql
 
 from db import get_connection
 from app.model.orm import Metabolite, StudyMetabolite
+from app.model.lib.util import read_timestamp_date
 
 
 def metabolite_show_page(chebiId):
@@ -27,11 +28,14 @@ def metabolite_show_page(chebiId):
         },
     )
 
+    last_chebi_update = read_timestamp_date('var/external_data/last_chebi_update.txt')
+
     return render_template(
         'pages/metabolites/show.html',
         metabolite=metabolite,
         study_count=study_count,
         search_url=search_url,
+        last_chebi_update=last_chebi_update,
     )
 
 
