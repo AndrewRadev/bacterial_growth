@@ -8,6 +8,7 @@ import shutil
 from io import BytesIO
 from pathlib import Path
 from typing import Optional, Iterable
+from datetime import datetime, UTC
 
 import requests
 
@@ -115,6 +116,22 @@ def untar(path: Path, target_dir: Path, file_list: list[str]):
     with tarfile.open(tar_path, 'r') as tar_f:
         for filename in file_list:
             tar_f.extract(filename, path=target_dir)
+
+
+def read_timestamp_date(path):
+    """
+    Reads the contents of a file, if it exists, and interpret them as a
+    timestamp. Returns the time formatted as a date.
+    """
+    timestamp = None
+    timestamp_path = Path(path)
+
+    if timestamp_path.exists():
+        content = timestamp_path.read_text().strip()
+        if content != '':
+            timestamp = datetime.fromisoformat(content).strftime("%B %d, %Y")
+
+    return timestamp
 
 
 def _one_or_error(key, iterator):
