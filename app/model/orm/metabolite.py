@@ -23,10 +23,12 @@ class Metabolite(OrmBase):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    chebiId: Mapped[str] = mapped_column(sql.String(100),  nullable=False)
-    name:    Mapped[str] = mapped_column(sql.String(1024), nullable=False)
+    chebiId:    Mapped[str] = mapped_column(sql.String(100),  nullable=False)
+    name:       Mapped[str] = mapped_column(sql.String(1024), nullable=False)
+    definition: Mapped[str] = mapped_column(sql.String)
 
     averageMass: Mapped[Decimal] = mapped_column(sql.Numeric(10, 5))
+    massIsEstimation: Mapped[bool] = mapped_column(sql.Boolean, default=False)
 
     studyMetabolites: Mapped[List['StudyMetabolite']] = relationship(
         back_populates="metabolite"

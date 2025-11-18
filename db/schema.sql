@@ -262,6 +262,8 @@ CREATE TABLE Metabolites (
   `name` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   id int NOT NULL AUTO_INCREMENT,
   averageMass decimal(10,5) DEFAULT NULL,
+  `definition` text COLLATE utf8mb4_bin,
+  massIsEstimation tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   UNIQUE KEY Metabolites_chebiId (chebiId)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
@@ -665,5 +667,6 @@ INSERT INTO MigrationVersions VALUES
 (112,'2025_11_03_164617_populate_study_techniques','2025-11-12 09:26:51'),
 (113,'2025_11_10_122037_increase_metabolite_name_length','2025-11-12 09:26:51'),
 (114,'2025_11_11_155050_add_subject_name_and_external_id_to_measurement_contexts','2025-11-12 09:26:51'),
-(115,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-12 09:26:51');
+(115,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-12 09:26:51'),
+(117,'2025_11_18_125634_add_more_fields_to_metabolites','2025-11-18 11:58:18');
 
