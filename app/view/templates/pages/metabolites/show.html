@@ -1,0 +1,54 @@
+{% extends '_layout.html' %}
+
+{% block title %}: Metabolite with ChEBId:{{ metabolite.chebiId }}{% endblock %}
+
+{% block content %}
+  <div class="container">
+    <article>
+      <h2>
+        {{ metabolite['name'] }}
+      </h2>
+
+      {% if metabolite.definition: %}
+        <p>{{ metabolite.definition|safe }}</p>
+      {% endif %}
+
+      <p>
+        Average mass:
+
+        {% if metabolite.averageMass: %}
+          {{ metabolite.averageMass }}
+
+          {% if metabolite.massIsEstimation: %}
+            (estimated)
+          {% endif %}
+        {% else: %}
+          Unknown
+        {% endif %}
+      </p>
+
+      <p>
+        {% if study_count > 0: %}
+          Measured in <strong>{{ study_count }}</strong> studies:
+          <a href="{{ search_url }}">Search</a>.
+        {% else: %}
+          Not currently measured in any studies.
+        {% endif %}
+      </p>
+
+      <p class="help">
+        The mass of this metabolite is used when converting between mass
+        concentration and molar concentration.
+
+        {% if metabolite.massIsEstimation: %}
+          This metabolite represents a collection of other compounds, so its
+          mass was estimated as their average. See ChEBI for more information.
+        {% else: %}
+          It was taken from the ChEBI database.
+        {% endif %}
+      </p>
+
+      <p>{{ metabolite.chebiId|chebi_url|external_link(metabolite.chebiId) }}</p>
+    </article>
+  </div>
+{% endblock %}

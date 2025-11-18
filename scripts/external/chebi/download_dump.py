@@ -13,7 +13,10 @@ from app.model.lib.util import download_file
 base_dir = Path('var/external_data/chebi/')
 base_dir.mkdir(exist_ok=True)
 
-output_path  = base_dir / 'data_dump.csv'
+output_path = base_dir / 'data_dump.csv'
+raw_data_path = base_dir / 'raw_data'
+
+raw_data_path.mkdir(exist_ok=True)
 
 target_chebi_ids = {
     # dihydrogen (hydrogen molecule):
@@ -50,7 +53,7 @@ page_size      = 100
 with print_with_time("Fetching data from ChEBI API"):
     long_task = LongTask(total_count=(len(target_chebi_ids) // page_size))
 
-    for chebi_ids in itertools.batched(sorted(target_chebi_ids), page_size):
+    for index, chebi_ids in enumerate(itertools.batched(sorted(target_chebi_ids), page_size)):
         with long_task.measure() as progress:
             print(progress)
 
@@ -59,6 +62,9 @@ with print_with_time("Fetching data from ChEBI API"):
             })
             entities = response.json()
 
+            with open(raw_data_path / f'batch_{index:03}.json', 'w') as f:
+                json.dump(entities, f, indent=2)
+
             for chebi_id, entity in entities.items():
                 if entity['id_type'] != 'PRIMARY_ID':
                     continue
@@ -66,19 +72,21 @@ with print_with_time("Fetching data from ChEBI API"):
                 if not entity['data']:
                     continue
 
+                definition    = entity['data'].get('definition', None)
                 chemical_data = entity['data'].get('chemical_data', None) or {}
-                mass = chemical_data.get('mass', None)
+                mass          = chemical_data.get('mass', None)
 
                 data[int(chebi_id)] = {
                     'name':        entity['data']['ascii_name'],
                     'averageMass': mass,
+                    'definition':  definition,
                 }
 
 with print_with_time("Creating data dump"):
     with open(output_path, 'w') as f:
         writer = csv.DictWriter(
             f,
-            fieldnames=['chebiId', 'name', 'averageMass'],
+            fieldnames=['chebiId', 'name', 'averageMass', 'definition'],
             dialect='unix',
             quoting=csv.QUOTE_MINIMAL,
         )

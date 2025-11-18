@@ -2,8 +2,9 @@
 
 To have metabolites for use with completion, these scripts fetch information from ChEBI and insert it into the database:
 
-- `download_dump.py`: Fetches and processes the data into `var/external_data/chebi/data_dump.csv`.
-- `insert_data.py`: Iterates over the above file and inserts the entries into the database.
+- `download_dump.py`: Fetches and processes the data into `var/external_data/chebi/data_dump.csv`. Stores raw data from the chebi API in JSON files under `var/external_data/chebi/raw_data/`.
+- `extract_massless_compounds.py`: Uses the raw data to find compounds that don't have a mass, but whose mass could be derived from its "child" compounds.
+- `insert_data.py`: Iterates over the above files and inserts the entries into the database.
 
 ## Downloading
 

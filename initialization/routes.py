@@ -97,8 +97,9 @@ def init_routes(app):
     app.add_url_rule("/experiment/<string:publicId>/", view_func=experiment_pages.experiment_show_page)
     app.add_url_rule("/project/<string:publicId>", view_func=project_pages.project_show_page)
 
-    app.add_url_rule("/strains/completion/",     view_func=strain_pages.taxa_completion_json)
-    app.add_url_rule("/metabolites/completion/", view_func=metabolite_pages.metabolites_completion_json)
+    app.add_url_rule("/strains/completion/",           view_func=strain_pages.taxa_completion_json)
+    app.add_url_rule("/metabolites/<string:chebiId>/", view_func=metabolite_pages.metabolite_show_page)
+    app.add_url_rule("/metabolites/completion/",       view_func=metabolite_pages.metabolites_completion_json)
 
     app.add_url_rule("/perturbation/<int:id>", view_func=perturbation_pages.perturbation_show_page)
 
