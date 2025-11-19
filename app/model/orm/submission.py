@@ -1,6 +1,8 @@
 from typing import Optional
 from datetime import datetime, UTC
 from pathlib import Path
+import shutil
+import subprocess
 
 import simplejson as json
 import sqlalchemy as sql
@@ -120,3 +122,17 @@ class Submission(OrmBase):
         # Record a changelog entry
         with open(base_dir / 'changes.log', 'a') as f:
             print(f"[{timestamp.isoformat()}] {message}", file=f)
+
+        # Zip data for batch downloads
+        if zip_exe := shutil.which('zip'):
+            f'zip {self.study.publicId}.zip -r {self.study.publicId}/'
+
+            subprocess.run(
+                [zip_exe, f"{self.study.publicId}.zip", '-r', f"{self.study.publicId}/"],
+                cwd=f"static/export/"
+            )
+
+            subprocess.run(
+                [zip_exe, f"all_studies.zip", '-r', f"{self.study.publicId}/"],
+                cwd=f"static/export/"
+            )
