@@ -48,12 +48,13 @@ def persist_submission_to_database(submission_form):
 
         _clear_study(study)
 
+        _save_study_techniques(db_trans_session, submission_form, study)
         _save_compartments(db_trans_session, submission_form, study)
         _save_communities(db_trans_session, submission_form, study, user_uuid)
         _save_experiments(db_trans_session, submission_form, study)
-        _save_study_techniques(db_trans_session, submission_form, study)
 
         db_trans_session.flush()
+
         _save_measurements(db_trans_session, study, submission_form)
 
         for experiment in study.experiments:
@@ -305,6 +306,13 @@ def _save_communities(db_session, submission_form, study, user_uuid):
 
     study.communities = communities
 
+    # If any of the techniques have an "unknown" column, create an appropriate
+    # strain:
+    if any([st.includeUnknown for st in study.studyTechniques]):
+        strain = _build_strain(db_session, "unknown", submission, study, user_uuid)
+        db_session.add(strain)
+        db_session.flush()
+
     return communities
 
 
@@ -424,8 +432,6 @@ def _save_measurements(db_session, study, submission_form):
 
     data_xls = submission.dataFile.content
     sheets = pd.read_excel(io.BytesIO(data_xls), sheet_name=None)
-
-    community_columns, strain_columns, metabolite_columns = _get_expected_column_names(submission_form)
 
     for _, df in sheets.items():
         Measurement.insert_from_csv_string(db_session, study, df.to_csv(index=False))
@@ -602,6 +608,12 @@ def _get_expected_column_names(submission_form):
                     if study_technique.includeStd:
                         strain_columns.add(f"{column} STD")
 
+                if study_technique.includeUnknown:
+                    column = measurement_technique.csv_column_name("Unknown")
+                    strain_columns.add(column)
+                    if study_technique.includeStd:
+                        strain_columns.add(f"{column} STD")
+
                 for strain in submission.studyDesign['custom_strains']:
                     column = measurement_technique.csv_column_name(strain['name'])
                     strain_columns.add(column)
@@ -651,6 +663,14 @@ def _build_strain(db_session, identifier, submission, study, user_uuid):
             'name':        custom_strain_data['name'],
             'NCBId':       custom_strain_data['species'],
             'description': custom_strain_data['description'],
+            'defined':     False,
+            **strain_params,
+        }
+    elif identifier == 'unknown':
+        strain_params = {
+            'name':        "Unknown",
+            'NCBId':       0,
+            'description': "Unknown measurements",
             'defined':     False,
             **strain_params,
         }

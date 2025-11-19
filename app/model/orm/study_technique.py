@@ -28,7 +28,9 @@ class StudyTechnique(OrmBase):
     type:        Mapped[str] = mapped_column(sql.String(100), nullable=False)
     subjectType: Mapped[str] = mapped_column(sql.String(100), nullable=False)
     units:       Mapped[str] = mapped_column(sql.String(100), nullable=False)
-    includeStd:  Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
+
+    includeStd:     Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
+    includeUnknown: Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=False)
 
     label:       Mapped[str] = mapped_column(sql.String(100))
     description: Mapped[str] = mapped_column(sql.String)
