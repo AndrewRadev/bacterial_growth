@@ -85,12 +85,12 @@
     <div class="form-row" style="margin-top: 10px">
       <label
           data-tooltip="If you have multiple technical replicates, you can submit your point estimate as the measurement and add the standard deviation in a separate column.">
-        Include STD:
         <input
             type="checkbox"
-            class="js-include-std"
+            class="js-include-std js-preview-trigger"
             name="{{ prefix }}includeStd"
             {{ "checked" if data and data['includeStd'] }} />
+        Include STD
       </label>
     </div>
 
