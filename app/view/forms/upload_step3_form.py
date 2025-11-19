@@ -24,7 +24,8 @@ class UploadStep3Form(BaseForm):
         description   = StringField('description')
         metaboliteIds = SelectMultipleField('metaboliteIds', choices=[], validate_choice=False)
 
-        includeStd = BooleanField('includeStd')
+        includeStd     = BooleanField('includeStd')
+        includeUnknown = BooleanField('includeUnknown')
 
         includeLive  = BooleanField('includeLive')
         includeDead  = BooleanField('includeDead')

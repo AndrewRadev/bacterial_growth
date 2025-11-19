@@ -481,6 +481,7 @@ CREATE TABLE StudyTechniques (
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  includeUnknown tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   KEY StudyTechniques_studyId (studyId),
   CONSTRAINT StudyTechniques_studyId FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
@@ -668,5 +669,6 @@ INSERT INTO MigrationVersions VALUES
 (113,'2025_11_10_122037_increase_metabolite_name_length','2025-11-12 09:26:51'),
 (114,'2025_11_11_155050_add_subject_name_and_external_id_to_measurement_contexts','2025-11-12 09:26:51'),
 (115,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-12 09:26:51'),
-(117,'2025_11_18_125634_add_more_fields_to_metabolites','2025-11-18 11:58:18');
+(117,'2025_11_18_125634_add_more_fields_to_metabolites','2025-11-18 11:58:18'),
+(121,'2025_11_19_173702_add_include_unknown_flag_to_study_techniques','2025-11-19 16:41:50');
 

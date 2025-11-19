@@ -111,7 +111,13 @@ class Measurement(OrmBase):
                         std = None
 
                     # Create a measurement context only if it doesn't already exist:
-                    context_key = (bioreplicate.id, compartment.id, technique.id, subject.id, technique.subjectType)
+                    context_key = (
+                        bioreplicate.id,
+                        compartment.id,
+                        technique.id,
+                        subject.id,
+                        technique.subjectType,
+                    )
                     if context_key not in context_cache:
                         context = MeasurementContext(
                             # Relationships:

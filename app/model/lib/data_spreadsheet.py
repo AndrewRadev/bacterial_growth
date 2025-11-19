@@ -66,7 +66,12 @@ def create_excel(submission_form):
                     headers_bioreplicates[title] = _TECHNIQUE_DESCRIPTIONS['STD']
 
             elif subject_type == 'strain':
-                for strain_name in strain_names:
+                if study_technique.includeUnknown:
+                    technique_strain_names = [*strain_names, "Unknown"]
+                else:
+                    technique_strain_names = strain_names
+
+                for strain_name in technique_strain_names:
                     title = measurement_technique.csv_column_name(strain_name)
 
                     description = _TECHNIQUE_DESCRIPTIONS[f"{technique_type}_ps"].format(
