@@ -50,7 +50,11 @@ server {
   location /static/export/ {
     # Wherever the root of your application is:
     root /path/to/mgrowthdb/;
+
     autoindex on;
+
+    # Show rounded file sizes:
+    autoindex_exact_size off;
   }
 }
 ```
