@@ -110,6 +110,16 @@
                 {{ "checked" if data and data['includeStd'] }} />
             Include STD
           </label>
+
+          <label
+              data-tooltip="If there are measurements that can't be assigned to any known strains, you can include them as a separate column of measurements">
+            <input
+                type="checkbox"
+                class="js-include-unknown js-preview-trigger"
+                name="{{ prefix }}includeUnknown"
+                {{ "checked" if data and data['includeUnknown'] }} />
+            Include unknown
+          </label>
         </div>
       </div>
 

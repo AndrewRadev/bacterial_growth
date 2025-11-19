@@ -92,8 +92,9 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
   function updatePreview($container, subjectType) {
     let $typeSelect = $container.find('.js-type-select');
 
-    let columnName = $typeSelect.find('option:selected').data('columnName');
-    let includeStd = $container.find('.js-include-std').is(':checked');
+    let columnName     = $typeSelect.find('option:selected').data('columnName');
+    let includeStd     = $container.find('.js-include-std').is(':checked');
+    let includeUnknown = $container.find('.js-include-unknown').is(':checked');
 
     let label = $.trim($container.find('.js-label').val())
     if (label == '') {
@@ -142,6 +143,20 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
 
       if (includeStd) {
         let stdColumnName = [columnName, 'STD'].filter(Boolean).join(' ');
+
+        previewTableHeader.push(`<th>${stdColumnName}</th>`);
+        previewTableBody.push('<td align="center">...</td>');
+      }
+    }
+
+    if (includeUnknown) {
+      let unknownColumnName = ['Unknown', columnName, label].filter(Boolean).join(' ');
+
+      previewTableHeader.push(`<th>${unknownColumnName}</th>`);
+      previewTableBody.push('<td align="center">...</td>');
+
+      if (includeStd) {
+        let stdColumnName = [unknownColumnName, 'STD'].filter(Boolean).join(' ');
 
         previewTableHeader.push(`<th>${stdColumnName}</th>`);
         previewTableBody.push('<td align="center">...</td>');
