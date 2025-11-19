@@ -40,9 +40,17 @@ server {
     proxy_redirect off;
   }
 
+  # Render static files directly, instead of going through python:
   location /static/ {
     # Wherever the root of your application is:
     root /path/to/mgrowthdb/;
+  }
+
+  # Show contents of "export" directory where bulk exports are located:
+  location /static/export/ {
+    # Wherever the root of your application is:
+    root /path/to/mgrowthdb/;
+    autoindex on;
   }
 }
 ```
