@@ -91,7 +91,7 @@
       </p>
 
       <h3>
-        Visualize and analyze growth data
+        Visualize, analyze, and download growth data
       </h3>
 
       <p>
@@ -99,13 +99,16 @@
         across experiments in any published study. They can also collect data
         traces in different studies and investigate them in our
         "<a href="{{ url_for('comparison_show_page') }}">Comparison view</a>".
-        For further analysis, the raw data can be downloaded from studies' "export" pages.
       </p>
 
       <p>
         Study owners can fit select growth models to their data through the web interface, courtesy of the
         {{ "https://cran.r-project.org/web/packages/growthrates/"|external_link("growthrates R package") }}.
         Growth parameters can be downloaded in CSV format.
+      </p>
+
+      <p>
+        For further analysis, the raw data can be downloaded from studies' "export" pages. A batch data dump is available as well with the raw study design and uploaded data files: <a href="/static/export/">Batch export</a>.
       </p>
 
       <p>
