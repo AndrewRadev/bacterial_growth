@@ -26,7 +26,10 @@ def search_index_page():
     template_clause = SearchFormClause()
     results = []
 
-    if g.current_user:
+    if g.current_user and g.current_user.isAdmin:
+        # Noop, show everything
+        publish_clause = Study.publicId.isnot(None)
+    elif g.current_user:
         publish_clause = sql.or_(
             Study.isPublished,
             StudyUser.userUniqueID == g.current_user.uuid
