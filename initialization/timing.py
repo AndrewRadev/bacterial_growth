@@ -68,4 +68,4 @@ def _log_db_timing(conn, cursor, statement, parameters, context, executemany):
 
     if os.getenv('TIME'):
         logger = current_app.logger.getChild('timing')
-        logger.info(f"[{duration_ms}ms] Query: {statement}")
+        logger.info(f"[{duration_ms}ms] Query: {' '.join(statement.split('\n'))}")
