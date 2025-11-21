@@ -72,8 +72,25 @@ class Submission(OrmBase):
         return self.completed_step_count == 7
 
     def build_techniques(self):
-        from app.model.orm import MeasurementTechnique
-        return [MeasurementTechnique(**m) for m in self.studyDesign['techniques']]
+        from app.model.orm import StudyTechnique, MeasurementTechnique
+
+        study_techniques = []
+
+        for technique_data in self.studyDesign['techniques']:
+            cell_types = technique_data.get('cellTypes', [])
+            study_technique = StudyTechnique(**StudyTechnique.filter_keys(technique_data))
+
+            for cell_type in cell_types:
+                mt = MeasurementTechnique(**MeasurementTechnique.filter_keys(technique_data), cellType=cell_type)
+                study_technique.measurementTechniques.append(mt)
+
+            if len(cell_types) == 0:
+                mt = MeasurementTechnique(**MeasurementTechnique.filter_keys(technique_data))
+                study_technique.measurementTechniques.append(mt)
+
+            study_techniques.append(study_technique)
+
+        return study_techniques
 
     def export_data(self, message, timestamp=None):
         assert(self.study is not None)

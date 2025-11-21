@@ -46,12 +46,12 @@
 
       <p>
         <ol>
-          {% for technique in study.measurementTechniques: %}
+          {% for technique in study.studyTechniques: %}
             <li>
               <strong>
                 {{ technique.long_name_with_subject_type }}
                 {% if technique.units != '' %}
-                  ({{ technique.units }})
+                  in {{ technique.units }}
                 {% endif %}
               </strong>
               {% if technique.description != '': %}
@@ -195,7 +195,7 @@
                               📈
                             </a>
 
-                            {{ measurement_context.get_chart_label(g.db_session)|safe }}
+                            {{ measurement_context.get_chart_label(g.db_session) }}
 
                             <a
                                 href="{{ url_for('measurement_context_csv', id=measurement_context.id) }}"

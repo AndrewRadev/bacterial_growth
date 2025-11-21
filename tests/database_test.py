@@ -23,6 +23,7 @@ from app.model.orm import (
     Strain,
     Study,
     StudyMetabolite,
+    StudyTechnique,
     StudyUser,
     Submission,
     Taxon,
@@ -202,14 +203,29 @@ class DatabaseTest(unittest.TestCase):
 
         return self._create_orm_record(Measurement, params)
 
-    def create_measurement_technique(self, **params):
+    def create_study_technique(self, **params):
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+
+        params = {
+            'type': 'fc',
+            'subjectType': 'bioreplicate',
+            'studyId': study_id,
+            'units': '',
+            **params,
+        }
+
+        return self._create_orm_record(StudyTechnique, params)
+
+    def create_measurement_technique(self, **params):
+        study_id           = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+        study_technique_id = self._get_or_create_dependency(params, 'studyTechniqueId', ('study_technique', 'id'))
 
         params = {
             'type': 'fc',
             'subjectType': 'bioreplicate',
             'units': '',
             'studyId': study_id,
+            'studyTechniqueId': study_technique_id,
             **params,
         }
 

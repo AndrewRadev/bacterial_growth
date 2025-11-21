@@ -39,6 +39,7 @@ from app.model.orm import (
     Strain,
     Study,
     StudyMetabolite,
+    StudyTechnique,
     StudyUser,
     Submission,
     SubmissionBackup,
@@ -190,7 +191,7 @@ def init_admin(app):
         column_searchable_list = ['name']
         column_exclude_list = ['description']
         form_excluded_columns = [
-            'measurements', 'measurementContexts', 'measurementTechniques',
+            'measurements', 'measurementContexts', 'studyTechniques', 'measurementTechniques',
             'studyUsers', 'experiments', 'strains', 'communities', 'compartments',
             'modelingRequests', 'modelingResults', 'bioreplicates',
             'studyMetabolites', 'metabolites',
@@ -253,6 +254,7 @@ def init_admin(app):
     class ModelingResultView(AppView):
         column_exclude_list = ['rSummary']
 
+    admin.add_view(AppView(StudyTechnique,            db_session, category="Measurements"))
     admin.add_view(AppView(MeasurementTechnique,      db_session, category="Measurements"))
     admin.add_view(AppView(MeasurementContext,        db_session, category="Measurements"))
     admin.add_view(AppView(Measurement,               db_session, category="Measurements"))

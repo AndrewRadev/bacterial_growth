@@ -33,7 +33,7 @@ class OrmBase(DeclarativeBase):
 
     def _asdict(self):
         return {
-            c.name: "<BLOB>" if isinstance(c.type, sql.LargeBinary) else getattr(self, c.name)
+            c.name: "<BLOB>" if isinstance(c.type, sql.LargeBinary) else getattr(self, c.name, None)
             for c in inspect(type(self)).c
         }
 

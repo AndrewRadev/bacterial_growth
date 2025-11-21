@@ -10,11 +10,9 @@ def up(conn):
 
 
 def down(conn):
-    query = """
-        ALTER TABLE Metabolites
-        MODIFY name varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL
-    """
-    conn.execute(sql.text(query))
+    # Do nothing, so we avoid truncating data. The "up" migration can still run
+    # just fine.
+    pass
 
 
 if __name__ == "__main__":

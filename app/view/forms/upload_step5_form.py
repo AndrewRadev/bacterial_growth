@@ -10,7 +10,7 @@ from wtforms import (
     TextAreaField,
     URLField,
 )
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, ValidationError, Length
 
 from app.view.forms.base_form import BaseForm
 
@@ -25,8 +25,8 @@ class UploadStep5Form(BaseForm):
             class Meta:
                 csrf = False
 
-            name         = StringField('name', validators=[DataRequired()])
-            position     = StringField('position')
+            name         = StringField('name', validators=[DataRequired(), Length(max=100)])
+            position     = StringField('position', validators=[Length(max=100)])
             biosampleUrl = URLField('biosampleUrl')
 
             isControl = BooleanField('isControl')
@@ -48,7 +48,7 @@ class UploadStep5Form(BaseForm):
             newCommunityName       = SelectField('newCommunityName',       choices=[], validate_choice=False)
 
         publicId       = HiddenField('publicId')
-        name           = StringField('name', validators=[DataRequired()])
+        name           = StringField('name', validators=[DataRequired(), Length(max=100)])
         description    = TextAreaField('description', validators=[DataRequired()])
         timepointCount = IntegerField('timepointCount', validators=[DataRequired()])
 

@@ -97,7 +97,7 @@ def upload_step3_page():
         return _step3_partial(upload_form, submission_form)
 
     if request.method == 'POST':
-        submission_form.update_study_design(upload_form.data)
+        submission_form.update_techniques(upload_form.data)
 
         if upload_form.validate():
             session['submission_id'] = submission_form.save()
@@ -224,17 +224,7 @@ def upload_step6_page():
 
 def download_data_template_xlsx():
     submission_form = _init_submission_form(step=6)
-    submission      = submission_form.submission
-
-    metabolite_names = [m.name for m in submission_form.fetch_all_metabolites()]
-    strain_names = [t.name for t in submission_form.fetch_taxa()]
-    strain_names += [s['name'] for s in submission.studyDesign['custom_strains']]
-
-    spreadsheet = data_spreadsheet.create_excel(
-        submission,
-        metabolite_names,
-        strain_names,
-    )
+    spreadsheet = data_spreadsheet.create_excel(submission_form)
 
     return send_file(
         io.BytesIO(spreadsheet),

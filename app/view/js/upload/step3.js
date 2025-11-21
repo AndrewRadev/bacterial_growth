@@ -23,14 +23,19 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
     initializeSubform: function($subform) {
       let subjectType = $subform.data('subjectType');
 
-      // Specific types of measurements require specific units:
       $subform.on('change', '.js-type-select', function() {
         let $typeSelect = $(this);
+
+        // Specific types of measurements require specific units:
         updateUnitSelect($subform, $typeSelect);
+
+        // Specific types of measurements have different input options
+        updateExtraInputs($subform, $typeSelect);
       });
+      updateExtraInputs($subform, $subform.find('.js-type-select'));
 
       // When the type or unit of measurement change, generate preview:
-      $subform.on('change', '.js-type-select,.js-unit-select,.js-include-std', function() {
+      $subform.on('change', '.js-preview-trigger', function() {
         updatePreview($subform, subjectType);
       });
       updatePreview($subform, subjectType);
@@ -70,43 +75,77 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
       $unitsSelect.val('CFUs/mL');
     } else if (type == 'fc') {
       $unitsSelect.val('Cells/mL');
-    } else {
     }
   }
 
+  function updateExtraInputs($container, $typeSelect) {
+    let type = $typeSelect.val();
+
+    if (type == 'fc' || type == '16s' || type == 'qpcr') {
+      $container.find('.js-extra-inputs').show()
+    } else {
+      $container.find('.js-extra-inputs').hide().find(':checkbox').prop('checked', false);
+    }
+  }
+
+
   function updatePreview($container, subjectType) {
     let $typeSelect = $container.find('.js-type-select');
-    let $stdCheckbox = $container.find('.js-include-std');
 
     let columnName = $typeSelect.find('option:selected').data('columnName');
-    let includeStd = $stdCheckbox.is(':checked');
+    let includeStd = $container.find('.js-include-std').is(':checked');
+
+    let label = $.trim($container.find('.js-label').val())
+    if (label == '') {
+      label = null;
+    } else {
+      label = '(' + label + ')'
+    }
+
+    let cellTypes = [];
+    if ($container.find('.js-include-live').is(':checked')) cellTypes.push('live');
+    if ($container.find('.js-include-dead').is(':checked')) cellTypes.push('dead');
+    if ($container.find('.js-include-total').is(':checked')) cellTypes.push('total');
+
     let subject = null;
 
     if (subjectType == 'bioreplicate') {
       subject = 'Community';
     } else if (subjectType == 'strain') {
-      subject = '&lt;strain name&gt;';
+      subject = '<strain name>';
     } else if (subjectType == 'metabolite') {
-      subject = '&lt;metabolite name&gt;';
+      subject = '<metabolite name>';
       columnName = null;
     }
 
-    columnName = [subject, columnName].filter(Boolean).join(' ');
+    let columnNames = []
+
+    if (cellTypes.length == 0) {
+      columnNames.push([subject, columnName, label].filter(Boolean).join(' '));
+    } else {
+      for (let cellType of cellTypes) {
+        columnNames.push([subject, cellType, columnName, label].filter(Boolean).join(' '));
+      }
+    }
 
     let previewTableHeader = [];
     let previewTableBody   = [];
 
     previewTableHeader.push('<th>...</th>');
-    previewTableHeader.push(`<th>${columnName}</th>`);
-
     previewTableBody.push('<td>...</td>');
-    previewTableBody.push('<td align="center">...</td>');
 
-    if (includeStd) {
-      let stdColumnName = [columnName, 'STD'].filter(Boolean).join(' ');
+    for (let columnName of columnNames) {
+      columnName = _.escape(columnName);
 
-      previewTableHeader.push(`<th>${stdColumnName}</th>`);
+      previewTableHeader.push(`<th>${columnName}</th>`);
       previewTableBody.push('<td align="center">...</td>');
+
+      if (includeStd) {
+        let stdColumnName = [columnName, 'STD'].filter(Boolean).join(' ');
+
+        previewTableHeader.push(`<th>${stdColumnName}</th>`);
+        previewTableBody.push('<td align="center">...</td>');
+      }
     }
 
     previewTableHeader.push('<th>...</th>');

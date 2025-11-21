@@ -2,11 +2,14 @@
 
   <ul class="upload-status">
     {% if submission.studyDesign['techniques']|length > 0: %}
-      {% for (type, techniques) in submission_form.technique_descriptions(): %}
+      {% for (type, study_techniques) in submission_form.technique_descriptions(): %}
         {% if type == 'Metabolite': %}
           <li class="complete">
             <span class="icon"></span>
-            <span>{{ techniques[0].metaboliteIds|length }} Metabolites measured:</span>
+            <span>
+              {{ study_techniques[0].measurementTechniques|map(attribute="metaboliteIds")|flatten|length }}
+              Metabolites measured:
+            </span>
             <span class="truncate">
               {{ submission_form.fetch_all_metabolites()|map(attribute="name")|join_tag('strong') }}
             </span>
@@ -14,9 +17,9 @@
         {% else: %}
           <li class="complete">
             <span class="icon"></span>
-            <span>{{ techniques|length }} {{ type }} measurements:</span>
+            <span>{{ study_techniques|length }} {{ type }} measurements:</span>
             <span class="truncate">
-              {{ techniques|map(attribute="short_name_with_units")|join_tag('strong') }}
+              {{ study_techniques|map(attribute="short_name_with_units")|join_tag('strong') }}
             </span>
           </li>
         {% endif %}
