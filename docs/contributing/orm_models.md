@@ -456,3 +456,37 @@ WHERE "Study"."publishableAt" <= :publishableAt_1
 The template `:publishableAt_1` is going to be interpolated with the value of `datetime.now(UTC)` at the time the function was invoked.
 
 This is convenient to give a simple name to a computed expression, valid on both individual objects and for database queries, but it might be impractical if the expression is too complicated. The full documentation describes how to define *different* behaviour at the class and instance level, but at this time, the codebase doesn't make use of that to avoid unnecessary complexity.
+
+### Ordering by custom expressions
+
+SQLAlchemy documentation: <https://docs.sqlalchemy.org/en/20/orm/mapping_api.html#sqlalchemy.orm.column_property>.
+
+You can define a custom SQL expression as a virtual "column" and use it as an ordering mechanism. For example:
+
+```python
+import sqlalchemy as sql
+
+class MeasurementContext(OrmBase):
+    # ...
+    subjectTypeOrdering = column_property(sql.case(
+        ('bioreplicate', 0),
+        ('strain', 1),
+        ('metabolite', 2),
+        else_=3,
+    ), deferred=True)
+```
+
+By doing this, you can order by `MeasurementContext.subjectTypeOrdering` to group records by their subject type in the given order. The case-building has been extracted as a shared method to make it easier:
+
+```python
+import sqlalchemy as sql
+
+class MeasurementContext(OrmBase):
+    # ...
+    subjectTypeOrdering = column_property(OrmBase.list_ordering(
+        subjectType,
+        ('bioreplicate', 'strain', 'metabolite'),
+    ), deferred=True)
+```
+
+Note the usage of `deferred=True`. This ensures that this value is not selected when fetching records, but only for ordering. If you don't include it, it won't be a big issue, but it's unnecessary work for a column that won't be used.

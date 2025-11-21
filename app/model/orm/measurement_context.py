@@ -65,7 +65,7 @@ class MeasurementContext(OrmBase):
     subjectTypeOrdering = column_property(OrmBase.list_ordering(
         subjectType,
         ('bioreplicate', 'strain', 'metabolite'),
-    ))
+    ), deferred=True)
 
     def get_df(self, db_session):
         from app.model.orm import Measurement
