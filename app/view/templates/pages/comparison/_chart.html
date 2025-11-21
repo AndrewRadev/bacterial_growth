@@ -34,7 +34,6 @@
       {% set experiment   = bioreplicate.experiment %}
       {% set compartment  = measurement_context.compartment %}
       {% set technique    = measurement_context.technique %}
-      {% set subject      = measurement_context.get_subject(g.db_session) %}
 
       <div class="flex-row context-row js-row" data-context-id="{{ measurement_context.id }}">
         <div class="left flex-row" data-tooltip="Move data trace to the left axis">

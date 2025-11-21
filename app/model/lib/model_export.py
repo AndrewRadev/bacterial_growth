@@ -39,7 +39,7 @@ def export_model_csv(db_session, study):
             'bioreplicate': measurement_context.bioreplicate.name,
             'compartment':  measurement_context.compartment.name,
             'subject_type': measurement_context.subjectType,
-            'subject_name': subject.name,
+            'subject_name': measurement_context.subjectName,
             'model_type':   modeling_result.model_name,
             # Inputs:
             'input_pointCount': params['inputs'].get('pointCount', None),

@@ -60,7 +60,6 @@ class ComparativeChartForm:
 
         for measurement_context in self.measurement_contexts:
             technique = measurement_context.technique
-            subject = measurement_context.get_subject(self.db_session)
 
             if measurement_context.id in self.right_axis_ids:
                 axis = 'right'
@@ -76,6 +75,7 @@ class ComparativeChartForm:
             label = measurement_context.get_chart_label(self.db_session)
 
             if technique.subjectType == 'metabolite':
+                subject = measurement_context.get_subject(self.db_session)
                 metabolite_mass = subject.averageMass
             else:
                 metabolite_mass = None

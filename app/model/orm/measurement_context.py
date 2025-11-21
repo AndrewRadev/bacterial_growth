@@ -89,14 +89,13 @@ class MeasurementContext(OrmBase):
     def get_chart_label(self, db_session):
         from markupsafe import Markup, escape
 
-        subject      = self.get_subject(db_session)
         technique    = self.technique
         bioreplicate = self.bioreplicate
         compartment  = self.compartment
         experiment   = bioreplicate.experiment
 
         if technique.subjectType == 'metabolite':
-            label_parts = [f"<b>{escape(subject.name)}</b>"]
+            label_parts = [f"<b>{escape(self.subjectName)}</b>"]
             if self.technique.studyTechnique.label:
                 label_parts.append(f"<b>({escape(self.technique.studyTechnique.label)})</b>")
         else:
@@ -116,7 +115,7 @@ class MeasurementContext(OrmBase):
             label_parts.append(bioreplicate_label)
         else:
             label_parts.append('of')
-            label_parts.append(f"<b>{subject.name}</b>")
+            label_parts.append(f"<b>{self.subjectName}</b>")
             label_parts.append('in')
             label_parts.append(bioreplicate_label)
 
