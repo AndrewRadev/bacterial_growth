@@ -26,6 +26,14 @@ def search_index_page():
     template_clause = SearchFormClause()
     results = []
 
+    if g.current_user:
+        publish_clause = sql.or_(
+            Study.isPublished,
+            StudyUser.userUniqueID == g.current_user.uuid
+        )
+    else:
+        publish_clause = Study.isPublished
+
     if form.data['clauses'] and form.data['clauses'][0]['value']:
         if not form.data['clauses'][0]['option']:
             form.data
@@ -36,24 +44,7 @@ def search_index_page():
             studyId for (studyId,)
             in g.db_conn.execute(sql.text(query), value_dict)
         ]
-
-        if len(studyIds) == 0:
-            message = "Couldn't find a study with these parameters."
-            return render_template(
-                "pages/search/index.html",
-                form=form,
-                error=message,
-                template_clause=template_clause,
-            )
     else:
-        if g.current_user:
-            publish_clause = sql.or_(
-                Study.isPublished,
-                StudyUser.userUniqueID == g.current_user.uuid
-            )
-        else:
-            publish_clause = Study.isPublished
-
         # TODO (2025-04-15) Extract, test with multiple users
         studyIds = g.db_session.scalars(
             sql.select(Study.publicId)
@@ -66,13 +57,23 @@ def search_index_page():
     if studyIds:
         results = g.db_session.scalars(
             sql.select(Study)
+            .distinct()
             .where(Study.publicId.in_(studyIds))
+            .where(publish_clause)
             .order_by(Study.createdAt.desc())
-        )
+        ).all()
 
-    return render_template(
-        "pages/search/index.html",
-        form=form,
-        template_clause=template_clause,
-        results=results,
-    )
+    if results:
+        return render_template(
+            "pages/search/index.html",
+            form=form,
+            template_clause=template_clause,
+            results=results,
+        )
+    else:
+        return render_template(
+            "pages/search/index.html",
+            form=form,
+            template_clause=template_clause,
+            error="Couldn't find a study with these parameters.",
+        )

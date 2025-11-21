@@ -5,10 +5,17 @@
   {% for result in results: %}
     <li>
       <div class="search-result">
-        <h3>
+        <h3 class="flex-row flex-gap-10">
           <a href="{{ url_for('study_show_page', publicId=result.publicId) }}">
             [{{ result.publicId }}] {{ result.name }}
           </a>
+
+          {% if not result.isPublished: %}
+            <span
+              class="icon icon-invisible"
+              data-tooltip="This study is not published yet. You're seeing it because you uploaded it or you have permission to manage it.">
+            </span>
+          {% endif %}
         </h3>
 
         {% if result.description: %}
