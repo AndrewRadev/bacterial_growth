@@ -172,7 +172,6 @@
                     <ul class="measurement-techniques">
                       {% for measurement_context in bioreplicate.measurementContexts: %}
                         <li class="measurement-context-container">
-                          {% set subject      = measurement_context.get_subject(g.db_session) %}
                           {% set measurements = measurement_context.measurements %}
                           {% set technique    = measurement_context.technique %}
 
