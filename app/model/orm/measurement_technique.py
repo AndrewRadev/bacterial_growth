@@ -64,13 +64,13 @@ class MeasurementTechnique(OrmBase):
     typeOrdering = column_property(OrmBase.list_ordering(
         type,
         TECHNIQUE_SHORT_NAMES.keys(),
-    ))
+    ), deferred=True)
 
     # Order records based on their subject type
     subjectTypeOrdering = column_property(OrmBase.list_ordering(
         subjectType,
         ('bioreplicate', 'strain', 'metabolite'),
-    ))
+    ), deferred=True)
 
     def __lt__(self, other):
         return self.id < other.id

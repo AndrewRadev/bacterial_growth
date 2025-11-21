@@ -51,13 +51,13 @@ class StudyTechnique(OrmBase):
     typeOrdering = column_property(OrmBase.list_ordering(
         type,
         TECHNIQUE_SHORT_NAMES.keys(),
-    ))
+    ), deferred=True)
 
     # Order records based on their subject type
     subjectTypeOrdering = column_property(OrmBase.list_ordering(
         subjectType,
         ('bioreplicate', 'strain', 'metabolite'),
-    ))
+    ), deferred=True)
 
     @property
     def short_name(self):
