@@ -73,12 +73,19 @@
                   {% else: %}
                     {{ bioreplicate.name }}<sub>{{ compartment.name }}</sub>
                   {% endif %}
+
+                  {% if bioreplicate.calculationType == 'average': %}
+                    <span
+                        class="icon icon-inline icon-calculated">
+                    </span>
+                  {% endif %}
                 </h4>
               </div>
             {% endif %}
 
             {% for measurement_context in contexts: %}
               {% set subjectType = measurement_context.subjectType %}
+              {% set subjectName = measurement_context.subjectName %}
               {% set key = "measurementContext|{}".format(measurement_context.id) %}
 
               <div
@@ -94,9 +101,16 @@
                     class="js-measurement-toggle" />
                 <label for="{{ key }}">
                   {% if subjectType == 'bioreplicate' and experiment.compartments|length > 1: %}
-                    {{ measurement_context.subjectName }}<sub>{{ measurement_context.compartment.name }}</sub>
+                    {{ subjectName }}<sub>{{ measurement_context.compartment.name }}</sub>
                   {% else: %}
-                    {{ measurement_context.subjectName }}
+                    {{ subjectName }}
+                  {% endif %}
+
+                  {% if subjectType == 'strain' and subjectName == 'Unknown': %}
+                    <span
+                        class="icon icon-inline icon-unknown-strain"
+                        data-tooltip="This data represents measurements (reads/counts) of subjects that couldn't be identified">
+                    </span>
                   {% endif %}
                 </label>
               </div>
