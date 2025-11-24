@@ -64,6 +64,7 @@ def init_assets(app):
         '../app/view/css/fonts.css',
         '../app/view/css/main.css',
         '../app/view/css/sidebar.css',
+        '../app/view/css/home.css',
         '../app/view/css/search.css',
         '../app/view/css/upload.css',
         '../app/view/css/export.css',

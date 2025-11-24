@@ -166,5 +166,7 @@ make html
 - SVG Spinners: <https://github.com/n3r4zzurr0/svg-spinners>
 - Web icons: <https://github.com/tabler/tabler-icons>
 - Freepik icons:
-    - Bacteria: <a href="http://www.freepik.com">Designed by macrovector_official / Freepik</a>
-    - Test tube: <a href="http://www.freepik.com">Designed by Alvaro_cabrera / Freepik</a>
+    - Bacteria: <a href="https://www.freepik.com/free-vector/bacteria-icons-set_4425882.htm">Designed by macrovector_official / Freepik</a>
+    - Test tube: <a href="https://www.freepik.com/free-vector/black-white-chemical-test-tubes-icons_798687.htm">Designed by Alvaro_cabrera / Freepik</a>
+    - Office icons: <a href="https://www.freepik.com/free-vector/business-office-stationery-icons-set-smartphone-tablet-notebook-computer-isolated-vector-illustration_1158166.htm">Designed by macrovector on Freepik</a>
+
