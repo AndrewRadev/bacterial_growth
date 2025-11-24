@@ -7,6 +7,9 @@ from jinja2.utils import urlize
 
 
 def format_text(text, first_paragraph=False):
+    if not text:
+        return text
+
     text = text.strip()
     text = urlize(text, target="_blank", rel="noreferrer nofollow")
 
