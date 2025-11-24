@@ -75,7 +75,10 @@
 
       <ul>
         {% for strain in custom_strains: %}
-          <li>{{ render_strain_link(strain) }}</li>
+          <li>
+            [<a href="{{ url_for('study_show_page', publicId=strain.study.publicId) }}">{{ strain.study.publicId }}</a>]
+            {{ render_strain_link(strain) }}
+          </li>
         {% endfor %}
       </ul>
     {% endif %}
