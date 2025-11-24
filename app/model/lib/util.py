@@ -129,7 +129,7 @@ def read_timestamp_date(path):
     if timestamp_path.exists():
         content = timestamp_path.read_text().strip()
         if content != '':
-            timestamp = datetime.fromisoformat(content).strftime("%B %d, %Y")
+            timestamp = datetime.fromisoformat(content).strftime("%b %d, %Y")
 
     return timestamp
 
