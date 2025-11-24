@@ -13,6 +13,7 @@ import sqlalchemy as sql
 
 from app.model.orm import (
     Bioreplicate,
+    Community,
     Experiment,
     MeasurementContext,
     ModelingRequest,
@@ -35,11 +36,20 @@ def study_show_page(publicId):
         publicId,
         check_user_visibility=False,
         sql_options=(
+            sql.orm.selectinload(Study.experiments, Experiment.compartments),
+            sql.orm.selectinload(Study.experiments, Experiment.community, Community.strains),
+            sql.orm.selectinload(Study.experiments, Experiment.perturbations),
             sql.orm.selectinload(
                 Study.experiments,
                 Experiment.bioreplicates,
                 Bioreplicate.measurementContexts,
                 MeasurementContext.measurements,
+            ),
+            sql.orm.selectinload(
+                Study.experiments,
+                Experiment.bioreplicates,
+                Bioreplicate.measurementContexts,
+                MeasurementContext.technique,
             ),
         )
     )
