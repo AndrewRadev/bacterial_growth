@@ -6,14 +6,15 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from app.model.orm.orm_base import OrmBase
 
 
-# TODO (2025-10-09) Rename to StudyStrain or something
-class Strain(OrmBase):
+class StudyStrain(OrmBase):
     "A microbial strain used in a particular study"
 
+    # TODO (2025-10-09) Rename to StudyStrains
     __tablename__ = 'Strains'
 
     id: Mapped[int] = mapped_column(sql.Integer, primary_key=True)
@@ -36,6 +37,14 @@ class Strain(OrmBase):
 
     def __lt__(self, other):
         return self.name < other.name
+
+    @hybrid_property
+    def isUnknown(self):
+        return self.NCBId == 0
+
+    @hybrid_property
+    def notUnknown(self):
+        return self.NCBId != 0
 
     @property
     def externalId(self):

@@ -11,8 +11,8 @@ from app.model.orm import (
     Compartment,
     Experiment,
     Project,
-    Strain,
     Study,
+    StudyStrain,
 )
 from app.view.forms.submission_form import SubmissionForm
 from app.model.lib.submission_process import (
@@ -219,9 +219,9 @@ class TestSubmissionProcess(DatabaseTest):
         self.assertEqual(3, self.db_session.scalar(sql.func.count(Community.id)))
 
         # Check existence of strains:
-        s_ri     = self.db_session.scalar(sql.select(Strain).where(Strain.NCBId == t_ri.ncbiId))
-        s_bh     = self.db_session.scalar(sql.select(Strain).where(Strain.NCBId == t_bh.ncbiId))
-        s_custom = self.db_session.scalar(sql.select(Strain).where(Strain.name == 'Custom strain'))
+        s_ri     = self.db_session.scalar(sql.select(StudyStrain).where(StudyStrain.NCBId == t_ri.ncbiId))
+        s_bh     = self.db_session.scalar(sql.select(StudyStrain).where(StudyStrain.NCBId == t_bh.ncbiId))
+        s_custom = self.db_session.scalar(sql.select(StudyStrain).where(StudyStrain.name == 'Custom strain'))
 
         c_full, c_ri, c_blank = communities
         self.assertEqual(set(c_full.strains), {s_ri, s_bh, s_custom})

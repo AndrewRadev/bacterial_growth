@@ -12,9 +12,9 @@ from app.model.orm import (
     Experiment,
     Measurement,
     Metabolite,
-    Strain,
     Study,
     StudyMetabolite,
+    StudyStrain,
     Taxon,
 )
 from app.model.lib.util import read_timestamp_date
@@ -42,9 +42,10 @@ def static_home_page():
     metabolite_count = g.db_session.scalars(sql.select(sql.func.count(Metabolite.id))).one()
 
     study_taxa_count = g.db_session.scalars(
-        sql.select(sql.func.count(sql.distinct(Strain.NCBId)))
+        sql.select(sql.func.count(sql.distinct(StudyStrain.NCBId)))
         .join(Study)
         .where(Study.isPublished)
+        .where(StudyStrain.notUnknown)
     ).one()
 
     study_metabolite_count = g.db_session.scalars(

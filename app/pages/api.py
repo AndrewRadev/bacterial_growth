@@ -12,8 +12,8 @@ from app.model.orm import (
     MeasurementContext,
     Metabolite,
     Project,
-    Strain,
     Study,
+    StudyStrain,
 )
 
 
@@ -210,8 +210,8 @@ def search_json():
         if key == 'strainNcbiIds':
             values = value.split(',')
             study_strain_ids = g.db_session.scalars(
-                sql.select(Strain.id)
-                .where(Strain.NCBId.in_(values)),
+                sql.select(StudyStrain.id)
+                .where(StudyStrain.NCBId.in_(values)),
             ).all()
             results.update(_contexts_by_subject('strain', study_strain_ids))
 

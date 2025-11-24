@@ -17,8 +17,8 @@ from werkzeug.exceptions import NotFound
 from app.model.orm import (
     Project,
     ProjectUser,
-    Strain,
     Study,
+    StudyStrain,
     StudyUser,
     User,
 )
@@ -31,10 +31,11 @@ def user_show_page():
         raise LoginRequired()
 
     custom_strains = g.db_session.scalars(
-        sql.select(Strain)
+        sql.select(StudyStrain)
         .where(
-            Strain.userUniqueID == g.current_user.uuid,
-            Strain.defined.is_(False),
+            StudyStrain.userUniqueID == g.current_user.uuid,
+            StudyStrain.defined.is_(False),
+            StudyStrain.notUnknown,
         )
         .order_by(Strain.name.desc())
     ).all()

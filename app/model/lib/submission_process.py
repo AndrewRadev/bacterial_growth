@@ -19,9 +19,9 @@ from app.model.orm import (
     Perturbation,
     Project,
     ProjectUser,
-    Strain,
     Study,
     StudyMetabolite,
+    StudyStrain,
     StudyUser,
     Taxon,
 )
@@ -677,7 +677,7 @@ def _build_strain(db_session, identifier, submission, study, user_uuid):
     else:
         raise ValueError(f"Strain identifier {repr(identifier)} has an unexpected prefix")
 
-    return Strain(**strain_params)
+    return StudyStrain(**strain_params)
 
 
 def _format_row_list_error(row_list):

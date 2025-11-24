@@ -54,7 +54,7 @@
 
             <td>
               <ul>
-                {% for strain in result.strains: %}
+                {% for strain in result.strains if strain.notUnknown: %}
                   <li>{{ render_strain_link(strain) }}</li>
                 {% endfor %}
               </ul>

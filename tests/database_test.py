@@ -20,9 +20,9 @@ from app.model.orm import (
     ModelingRequest,
     Perturbation,
     Project,
-    Strain,
     Study,
     StudyMetabolite,
+    StudyStrain,
     StudyTechnique,
     StudyUser,
     Submission,
@@ -175,7 +175,7 @@ class DatabaseTest(unittest.TestCase):
             **params,
         }
 
-        return self._create_orm_record(Strain, params)
+        return self._create_orm_record(StudyStrain, params)
 
     def create_study_metabolite(self, **params):
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))

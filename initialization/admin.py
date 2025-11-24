@@ -36,9 +36,9 @@ from app.model.orm import (
     Perturbation,
     Project,
     ProjectUser,
-    Strain,
     Study,
     StudyMetabolite,
+    StudyStrain,
     StudyTechnique,
     StudyUser,
     Submission,
@@ -227,7 +227,7 @@ def init_admin(app):
     admin.add_view(StudyView(Study,                 db_session, category="Studies"))
     admin.add_view(SubmissionView(Submission,       db_session, category="Studies"))
     admin.add_view(SubmissionView(SubmissionBackup, db_session, category="Studies"))
-    admin.add_view(AppView(Strain,                  db_session, category="Studies"))
+    admin.add_view(AppView(StudyStrain,             db_session, category="Studies"))
     admin.add_view(AppView(StudyMetabolite,         db_session, category="Studies"))
     admin.add_view(ExcelFileView(ExcelFile,         db_session, category="Studies"))
 
