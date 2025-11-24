@@ -18,5 +18,5 @@ class CommunityStrain(OrmBase):
     communityId: Mapped[int] = mapped_column(sql.ForeignKey('Communities.id'))
     strainId:    Mapped[int] = mapped_column(sql.ForeignKey('Strains.id'))
 
-    community: Mapped['Community'] = relationship(back_populates='communityStrains')
-    strain:    Mapped['Strain']    = relationship(back_populates='communityStrains')
+    community: Mapped['Community']   = relationship(back_populates='communityStrains')
+    strain:    Mapped['StudyStrain'] = relationship(back_populates='communityStrains')

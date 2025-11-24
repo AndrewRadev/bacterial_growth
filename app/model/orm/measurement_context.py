@@ -131,12 +131,12 @@ class MeasurementContext(OrmBase):
         if cache_key in db_session._measurement_subject_cache:
             return db_session._measurement_subject_cache[cache_key]
 
-        from app.model.orm import Metabolite, Strain, Bioreplicate
+        from app.model.orm import Metabolite, StudyStrain, Bioreplicate
 
         if self.subjectType == 'metabolite':
             SubjectClass = Metabolite
         elif self.subjectType == 'strain':
-            SubjectClass = Strain
+            SubjectClass = StudyStrain
         elif self.subjectType == 'bioreplicate':
             SubjectClass = Bioreplicate
         else:

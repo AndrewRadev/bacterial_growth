@@ -55,9 +55,9 @@ class Study(OrmBase):
     publishedAt:      Mapped[datetime] = mapped_column(UtcDateTime, nullable=True)
     embargoExpiresAt: Mapped[datetime] = mapped_column(UtcDateTime, nullable=True)
 
-    studyUsers:  Mapped[List['StudyUser']]  = owner_relationship()
-    experiments: Mapped[List['Experiment']] = owner_relationship()
-    strains:     Mapped[List['Strain']]     = owner_relationship(order_by='Strain.name')
+    studyUsers:  Mapped[List['StudyUser']]   = owner_relationship()
+    experiments: Mapped[List['Experiment']]  = owner_relationship()
+    strains:     Mapped[List['StudyStrain']] = owner_relationship(order_by='StudyStrain.name')
 
     communities:  Mapped[List['Community']]   = owner_relationship()
     compartments: Mapped[List['Compartment']] = owner_relationship()

@@ -28,7 +28,7 @@ class Community(OrmBase):
         back_populates='community',
         cascade='all, delete-orphan',
     )
-    strains: Mapped[List['Strain']] = relationship(
+    strains: Mapped[List['StudyStrain']] = relationship(
         secondary='CommunityStrains',
         viewonly=True,
     )
