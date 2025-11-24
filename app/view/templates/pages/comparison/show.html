@@ -58,7 +58,7 @@
                   {{ "data-axis-right" if measurement_context.id in chart_form.right_axis_ids }}
                   class="js-measurement-toggle" />
               <label for="{{ key }}">
-                {{ experiment.name }}: {{ measurement_context.get_chart_label(g.db_session)|safe }}
+                {{ experiment.name }}: {{ measurement_context.get_chart_label() }}
               </label>
             </div>
           {% endfor %}
