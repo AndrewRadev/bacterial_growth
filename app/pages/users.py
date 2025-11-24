@@ -37,7 +37,7 @@ def user_show_page():
             StudyStrain.defined.is_(False),
             StudyStrain.notUnknown,
         )
-        .order_by(Strain.name.desc())
+        .order_by(StudyStrain.name.desc())
     ).all()
 
     return render_template(
