@@ -419,6 +419,11 @@ form.simple-form {
   flex-shrink: 0;
 }
 
+.icon-inline {
+  display: inline-block;
+  vertical-align: bottom;
+}
+
 .icon.icon-edit           { background-image: url('/static/images/icons/edit.svg'); }
 .icon.icon-remove         { background-image: url('/static/images/icons/red-minus.svg'); }
 .icon.icon-delete         { background-image: url('/static/images/icons/square-red-minus.svg'); }
@@ -433,3 +438,5 @@ form.simple-form {
 .icon.icon-right          { background-image: url('/static/images/icons/chevrons-right.svg'); }
 .icon.icon-orcid          { background-image: url('/static/images/icons/orcid-authenticated.svg'); }
 .icon.icon-invisible      { background-image: url('/static/images/icons/red-eye.svg'); }
+.icon.icon-unknown-strain { background-image: url('/static/images/icons/progress-help.svg'); }
+.icon.icon-calculated     { background-image: url('/static/images/icons/calculator.svg'); }
