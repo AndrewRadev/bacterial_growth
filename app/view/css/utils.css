@@ -78,6 +78,18 @@ code.inline {
   padding: 0 6px;
 }
 
+a.external::after {
+  content: '';
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 0.1em;
+  background-size: 100%;
+  background-image: url("/static/images/external-link.svg");
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
 .truncate {
   overflow-x: hidden;
   text-overflow: ellipsis;
