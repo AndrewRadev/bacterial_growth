@@ -72,7 +72,7 @@ class ComparativeChartForm:
             if log_transform:
                 df = apply_log_transform(df)
 
-            label = measurement_context.get_chart_label(self.db_session)
+            label = measurement_context.get_chart_label()
 
             if technique.subjectType == 'metabolite':
                 subject = measurement_context.get_subject(self.db_session)

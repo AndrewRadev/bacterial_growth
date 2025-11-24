@@ -201,7 +201,7 @@
                               📈
                             </a>
 
-                            {{ measurement_context.get_chart_label(g.db_session) }}
+                            {{ measurement_context.get_chart_label() }}
 
                             <a
                                 href="{{ url_for('measurement_context_csv', id=measurement_context.id) }}"

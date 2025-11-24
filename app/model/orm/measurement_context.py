@@ -86,7 +86,7 @@ class MeasurementContext(OrmBase):
 
         return execute_into_df(db_session, query)
 
-    def get_chart_label(self, db_session):
+    def get_chart_label(self):
         from markupsafe import Markup, escape
 
         technique    = self.technique
