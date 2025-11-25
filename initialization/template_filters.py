@@ -30,5 +30,6 @@ def init_template_filters(app):
     app.template_filter('help_link')(urls.help_link)
 
     app.template_filter('format_text')(text.format_text)
+    app.template_filter('highlight')(text.highlight)
 
     return app
