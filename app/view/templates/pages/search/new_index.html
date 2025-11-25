@@ -1,0 +1,50 @@
+{% from 'utils/_form_errors.html' import render_form_errors %}
+{% from 'pages/search/_new_results_list.html' import render_results_list %}
+
+{% extends '_layout.html' %}
+
+{% block title %}: Search{% endblock %}
+
+{% block content %}
+  <div class="container search-page">
+    <div style="font-size: 14px; float: right">
+      {{ "searching"|help_link("❓ Help", css_class="white-button small-button") }}
+    </div>
+
+    <h1>
+      <span class="icon icon-emoji">🔍</span>
+      Search Bacterial Growth Studies
+    </h1>
+
+    <article>
+      <p class="help">
+        Start typing a textual query to find studies whose titles and
+        descriptions include it. Pick known strains or metabolites measured in
+        the study from the completion boxes.
+      </p>
+
+      <form action="{{ url_for('new_search_index_page') }}" class="simple-form margin-top-10">
+        <div class="form-row full">
+          <input
+              type="text"
+              name="q"
+              value="{{ request.args.get('q') or '' }}"
+              placeholder="Text included in the study"
+              class="form-input-full form-input-blue" />
+
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+
+      {% if studies: %}
+        <ol class="results-list">
+          {{ render_results_list(studies, offset, q_words) }}
+        </ol>
+      {% elif error: %}
+        <p>
+          <div class="error-message">{{ error }}</div>
+        </p>
+      {% endif %}
+    </article>
+  </div>
+{% endblock %}

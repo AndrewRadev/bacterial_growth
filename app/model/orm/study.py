@@ -102,6 +102,10 @@ class Study(OrmBase):
         return self.publishedAt != None
 
     @property
+    def nameWithId(self):
+        return f"[{self.publicId}] {self.name}"
+
+    @property
     def isPublishable(self):
         now = datetime.now(UTC)
 
