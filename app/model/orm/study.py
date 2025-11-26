@@ -100,7 +100,7 @@ class Study(OrmBase):
 
     @hybrid_property
     def isPublished(self):
-        return self.publishedAt != None
+        return self.publishedAt.isnot(None)
 
     @property
     def nameWithId(self):

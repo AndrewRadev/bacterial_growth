@@ -1,13 +1,13 @@
 {% from 'utils/_dataframe.html' import render_dataframe %}
 {% from 'utils/_strain_link.html' import render_strain_link %}
 
-{% macro render_results_list(studies, offset, q_words) %}
+{% macro render_results_list(studies, offset, query_words) %}
   {% for study in studies: %}
     <li>
       <div class="search-study">
         <h3 class="flex-row flex-gap-10">
           <a href="{{ url_for('study_show_page', publicId=study.publicId) }}">
-            {{ study.nameWithId|highlight(q_words) }}
+            {{ study.nameWithId|highlight(query_words) }}
           </a>
 
           {% if not study.isPublished: %}
@@ -19,7 +19,7 @@
         </h3>
 
         {% if study.description: %}
-          {{ study.description|highlight(q_words)|format_text(first_paragraph=True) }}
+          {{ study.description|highlight(query_words)|format_text(first_paragraph=True) }}
         {% endif %}
 
         <p>

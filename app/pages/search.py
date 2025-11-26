@@ -17,63 +17,28 @@ from app.model.orm import (
     Study,
     StudyUser,
 )
+from app.model.lib.study_search import StudySearch
 
 _PER_PAGE = 10
 
 
 def new_search_index_page():
-    query = request.args.get('q', '').strip().lower()
-
-    results = []
-    error   = None
-
-    if g.current_user and g.current_user.isAdmin:
-        # Noop, show everything
-        publish_clause = Study.publicId.isnot(None)
-    elif g.current_user:
-        publish_clause = sql.or_(
-            Study.isPublished,
-            StudyUser.userUniqueID == g.current_user.uuid
-        )
-    else:
-        publish_clause = Study.isPublished
-
-    base_db_query = (
-        sql.select(Study)
-        .distinct()
-        .join(StudyUser, isouter=True)
-        .where(publish_clause)
-        .order_by(Study.createdAt.desc())
-        .limit(_PER_PAGE)
+    search = StudySearch(
+        g.db_session,
+        user=g.current_user,
+        query=request.args.get('q'),
     )
 
-    if len(query):
-        query = _replace_public_id_references(query)
-        q_words = query.split()
+    studies = search.get_results()
 
-        like_expr = '%' + '%'.join(q_words) + '%'
-
-        db_query = (
-            base_db_query
-            .where(
-                sql.or_(
-                    Study.name.ilike(like_expr),
-                    Study.publicId.in_(q_words),
-                )
-            )
-        )
+    if studies:
+        error = None
     else:
-        q_words = []
-        db_query = base_db_query
-
-    studies = g.db_session.scalars(db_query).all()
-
-    if not results:
         error = "Couldn't find a study with these parameters."
 
     return render_template(
         "pages/search/new_index.html",
-        q_words=q_words,
+        query_words=search.query_words,
         studies=studies,
         error=error,
     )
@@ -139,25 +104,3 @@ def search_index_page():
             template_clause=template_clause,
             error="Couldn't find a study with these parameters.",
         )
-
-def _replace_public_id_references(text):
-    text = re.sub(r'\bSMGDB0*(\d+)', _replace_study_reference,      text, flags=re.IGNORECASE)
-    # text = re.sub(r'\bPMGDB0*(\d+)', _replace_project_reference,    text, flags=re.IGNORECASE)
-    # text = re.sub(r'\bEMGDB0*(\d+)', _replace_experiment_reference, text, flags=re.IGNORECASE)
-
-    return text
-
-
-def _replace_study_reference(m):
-    base_url = request.host_url
-    return f"SMGDB{int(m[1]):08d}"
-
-
-# def _replace_project_reference(m):
-#     base_url = request.host_url
-#     return f"PMGDB{int(m[1]):06d}"
-
-
-# def _replace_experiment_reference(m):
-#     base_url = request.host_url
-#     return f"EMGDB{int(m[1]):09d}"
