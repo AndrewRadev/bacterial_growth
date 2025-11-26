@@ -1,9 +1,9 @@
 {% macro render_strain_link(strain, strong=False) %}
   {% if strain.defined: %}
-    {{ strain.NCBId|ncbi_url|external_link(strain.name) }}
+    {{ strain.ncbiId|ncbi_url|external_link(strain.name) }}
   {% else: %}
     {{ strain.name }}
-    (from {{ strain.NCBId|ncbi_url|external_link("NCBI:{}".format(strain.NCBId)) }})
+    (from {{ strain.ncbiId|ncbi_url|external_link("NCBI:{}".format(strain.ncbiId)) }})
     {%- if strain.description: -%}
       <div class="small">
         {{ strain.description|format_text }}

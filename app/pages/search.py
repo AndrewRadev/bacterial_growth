@@ -29,7 +29,7 @@ def new_search_index_page():
         query=request.args.get('q'),
     )
 
-    studies = search.get_results()
+    studies = search.fetch_results()
 
     if studies:
         error = None
