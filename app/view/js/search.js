@@ -9,6 +9,41 @@ Page('.search-page', function($page) {
     $checkbox.prop('checked', true);
   }
 
+  // Initialize selection of strains
+  let $strainSelect = $page.find('.js-strain-select');
+  $strainSelect.select2({
+    width: '100%',
+    theme: 'custom',
+    ajax: {
+      url: '/strains/study-completion/',
+      dataType: 'json',
+      delay: 150,
+      cache: true,
+      transport: select2TransportWithLoader($strainSelect),
+    },
+    templateResult: select2Highlighter,
+  });
+
+  // Initialize selection of metabolites
+  $page.find('.js-metabolite-select').each(function() {
+    let $select = $(this);
+
+    $select.select2({
+      multiple: true,
+      theme: 'custom',
+      width: '100%',
+      ajax: {
+        url: '/metabolites/study-completion/',
+        dataType: 'json',
+        delay: 100,
+        cache: true,
+      },
+      templateResult: select2Highlighter,
+    });
+
+    $select.trigger('change');
+  });
+
   $page.on('change', '#advanced-search-input', function(e) {
     let checkbox = $(e.currentTarget);
 

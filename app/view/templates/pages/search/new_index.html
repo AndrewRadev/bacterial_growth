@@ -17,22 +17,41 @@
     </h1>
 
     <article>
-      <p class="help">
-        Start typing a textual query to find studies whose titles and
-        descriptions include it. Pick known strains or metabolites measured in
-        the study from the completion boxes.
-      </p>
-
       <form action="{{ url_for('new_search_index_page') }}" class="simple-form margin-top-10">
         <div class="form-row full">
-          <input
-              type="text"
-              name="q"
-              value="{{ request.args.get('q') or '' }}"
-              placeholder="Text included in the study"
-              class="form-input-full form-input-blue" />
+          <label class="full">
+            <span>By study title or description:</span>
+            <input
+                type="text"
+                name="q"
+                value="{{ request.args.get('q') or '' }}"
+                placeholder="Text included in the study"
+                class="form-input-full form-input-blue" />
+          </label>
 
-          <input type="submit" value="Search" />
+          <input class="flex-end" type="submit" value="🔍 Search" />
+
+          <a href="{{ url_for('new_search_index_page') }}" class="flex-end white-button">🧹 Clear</a>
+        </div>
+
+        <div class="form-row full">
+          <label class="flex-1">
+            <span>By microbial strain:</span>
+            <select
+                name="ncbiIds"
+                multiple="multiple"
+                class="strain-select js-strain-select">
+            </select>
+          </label>
+
+          <label class="flex-1">
+            <span>By metabolite:</span>
+            <select
+                name="chebiIds"
+                multiple="multiple"
+                class="metabolite-select js-metabolite-select">
+            </select>
+          </label>
         </div>
       </form>
 
