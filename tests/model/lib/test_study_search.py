@@ -109,14 +109,14 @@ class TestStudySearch(DatabaseTest):
         trehalose = self.create_metabolite(name="trehalose")
 
         s1 = self.create_study()
-        self.create_study_metabolite(studyId=s1.publicId, chebi_id=glucose.chebiId)
+        self.create_study_metabolite(studyId=s1.publicId, chebiId=glucose.chebiId)
 
         s2 = self.create_study()
-        self.create_study_metabolite(studyId=s2.publicId, chebi_id=trehalose.chebiId)
+        self.create_study_metabolite(studyId=s2.publicId, chebiId=trehalose.chebiId)
 
         s3 = self.create_study()
-        self.create_study_metabolite(studyId=s3.publicId, chebi_id=glucose.chebiId)
-        self.create_study_metabolite(studyId=s3.publicId, chebi_id=trehalose.chebiId)
+        self.create_study_metabolite(studyId=s3.publicId, chebiId=glucose.chebiId)
+        self.create_study_metabolite(studyId=s3.publicId, chebiId=trehalose.chebiId)
 
         # No connected metabolites:
         s4 = self.create_study()

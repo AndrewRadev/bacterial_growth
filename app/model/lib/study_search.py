@@ -63,7 +63,7 @@ class StudySearch():
             db_query = db_query.where(StudyStrain.ncbiId.in_(self.ncbiIds))
 
         if self.chebiIds:
-            db_query = db_query.where(StudyMetabolite.chebi_id.in_(self.chebiIds))
+            db_query = db_query.where(StudyMetabolite.chebiId.in_(self.chebiIds))
 
         return self.db_session.scalars(db_query).all()
 
