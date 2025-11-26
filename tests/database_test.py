@@ -164,14 +164,14 @@ class DatabaseTest(unittest.TestCase):
 
     def create_study_strain(self, **params):
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
-        self.ncbi_id = getattr(self, 'ncbi_id', 0) + 1
+        ncbi_id  = self._get_or_create_dependency(params, 'ncbiId', ('taxon', 'ncbiId'))
 
         params = {
             'name':        'Member 1',
             'description': 'Member 1',
             'studyId':     study_id,
             'defined':     True,
-            'ncbiId':      self.ncbi_id,
+            'ncbiId':      ncbi_id,
             **params,
         }
 

@@ -22,12 +22,14 @@ class StudyStrain(OrmBase):
     description: Mapped[str]  = mapped_column(sql.String)
 
     defined: Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=True)
-    ncbiId:  Mapped[int]  = mapped_column(sql.Integer)
+    ncbiId:  Mapped[int]  = mapped_column(sql.ForeignKey("Taxa.ncbiId"))
 
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="strains")
 
     userUniqueID: Mapped[str] = mapped_column(sql.String(100))
+
+    taxon: Mapped['Taxon'] = relationship(back_populates="studyStrains")
 
     communityStrains: Mapped[List['CommunityStrain']] = relationship(
         back_populates='strain',
@@ -36,6 +38,8 @@ class StudyStrain(OrmBase):
 
     @staticmethod
     def search_by_name(db_session, term, page=1, per_page=10):
+        from app.model.orm import Taxon
+
         term   = term.lower().strip()
         limit  = per_page
         offset = (page - 1) * per_page
@@ -49,14 +53,15 @@ class StudyStrain(OrmBase):
 
         results = db_session.execute(
             sql.select(
-                StudyStrain.ncbiId,
-                StudyStrain.name,
+                Taxon.ncbiId,
+                Taxon.name,
             )
             .distinct()
-            .where(sql.func.lower(StudyStrain.name).like(term_pattern))
+            .join(StudyStrain)
+            .where(sql.func.lower(Taxon.name).like(term_pattern))
             .order_by(
-                sql.func.locate(first_word, sql.func.lower(StudyStrain.name)).asc(),
-                sql.func.lower(StudyStrain.name).asc()
+                sql.func.locate(first_word, sql.func.lower(Taxon.name)).asc(),
+                sql.func.lower(Taxon.name).asc()
             )
             .limit(limit)
             .offset(offset)
@@ -65,8 +70,8 @@ class StudyStrain(OrmBase):
         results = [{'id': row[0], 'text': f"{row[1]} (NCBI:{row[0]})"} for row in results]
 
         total_count = db_session.scalars(
-            sql.select(sql.func.count(StudyStrain.name.distinct()))
-            .where(sql.func.lower(StudyStrain.name).like(term_pattern))
+            sql.select(sql.func.count(Taxon.name.distinct()))
+            .where(sql.func.lower(Taxon.name).like(term_pattern))
         ).one()
         has_more = (page * per_page < total_count)
 
