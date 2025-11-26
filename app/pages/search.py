@@ -27,6 +27,9 @@ def new_search_index_page():
         g.db_session,
         user=g.current_user,
         query=request.args.get('q'),
+        ncbiIds=request.args.get('ncbiIds', []),
+        chebiIds=request.args.get('chebiIds', []),
+        per_page=_PER_PAGE,
     )
 
     studies = search.fetch_results()
