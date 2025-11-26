@@ -102,6 +102,35 @@ class TestStudySearch(DatabaseTest):
         # search = StudySearch(self.db_session, user=admin, ncbiIds=[roseburia.ncbiId, blautia.ncbiId])
         # self._assertEqualPublicIds(search.fetch_results(), [s3])
 
+    def test_metabolite_query(self):
+        admin = self.create_user(isAdmin=True)
+
+        glucose   = self.create_metabolite(name="glucose")
+        trehalose = self.create_metabolite(name="trehalose")
+
+        s1 = self.create_study()
+        self.create_study_metabolite(studyId=s1.publicId, chebi_id=glucose.chebiId)
+
+        s2 = self.create_study()
+        self.create_study_metabolite(studyId=s2.publicId, chebi_id=trehalose.chebiId)
+
+        s3 = self.create_study()
+        self.create_study_metabolite(studyId=s3.publicId, chebi_id=glucose.chebiId)
+        self.create_study_metabolite(studyId=s3.publicId, chebi_id=trehalose.chebiId)
+
+        # No connected metabolites:
+        s4 = self.create_study()
+
+        search = StudySearch(self.db_session, user=admin, chebiIds=[glucose.chebiId])
+        self._assertEqualPublicIds(search.fetch_results(), [s3, s1])
+
+        search = StudySearch(self.db_session, user=admin, chebiIds=[trehalose.chebiId])
+        self._assertEqualPublicIds(search.fetch_results(), [s3, s2])
+
+        # TODO (2025-11-26) AND query for metabolites
+        # search = StudySearch(self.db_session, user=admin, ncbiIds=[glucose.chebiId, trehalose.chebiId])
+        # self._assertEqualPublicIds(search.fetch_results(), [s3])
+
     def _assertEqualPublicIds(self, list1, list2):
         get_public_id = lambda s: s.publicId
         self.assertEqual(

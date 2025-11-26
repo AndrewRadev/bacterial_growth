@@ -4,6 +4,7 @@ import sqlalchemy as sql
 
 from app.model.orm import (
     Study,
+    StudyMetabolite,
     StudyStrain,
     StudyUser,
 )
@@ -16,6 +17,7 @@ class StudySearch():
         user=None,
         query=None,
         ncbiIds=None,
+        chebiIds=None,
         per_page=10,
     ):
         self.db_session = db_session
@@ -23,6 +25,7 @@ class StudySearch():
         self.query      = (query or '').strip().lower()
         self.per_page   = per_page
         self.ncbiIds    = ncbiIds or []
+        self.chebiIds   = chebiIds or []
 
         self.query_words = []
 
@@ -34,6 +37,7 @@ class StudySearch():
             .distinct()
             .join(StudyUser, isouter=True)
             .join(StudyStrain, isouter=True)
+            .join(StudyMetabolite, isouter=True)
             .where(publish_clause)
             .order_by(Study.publicId.desc())
             .limit(self.per_page)
@@ -57,6 +61,9 @@ class StudySearch():
 
         if self.ncbiIds:
             db_query = db_query.where(StudyStrain.ncbiId.in_(self.ncbiIds))
+
+        if self.chebiIds:
+            db_query = db_query.where(StudyMetabolite.chebi_id.in_(self.chebiIds))
 
         return self.db_session.scalars(db_query).all()
 
