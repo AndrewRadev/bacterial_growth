@@ -36,8 +36,6 @@ class StudySearch():
             sql.select(Study)
             .distinct()
             .join(StudyUser, isouter=True)
-            .join(StudyStrain, isouter=True)
-            .join(StudyMetabolite, isouter=True)
             .where(publish_clause)
             .order_by(Study.publicId.desc())
             .limit(self.per_page)
@@ -60,10 +58,10 @@ class StudySearch():
             self.query_words = []
 
         if self.ncbiIds:
-            db_query = db_query.where(StudyStrain.ncbiId.in_(self.ncbiIds))
+            db_query = db_query.join(StudyStrain).where(StudyStrain.ncbiId.in_(self.ncbiIds))
 
         if self.chebiIds:
-            db_query = db_query.where(StudyMetabolite.chebiId.in_(self.chebiIds))
+            db_query = db_query.join(StudyMetabolite).where(StudyMetabolite.chebiId.in_(self.chebiIds))
 
         return self.db_session.scalars(db_query).all()
 

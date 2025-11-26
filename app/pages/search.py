@@ -27,8 +27,8 @@ def new_search_index_page():
         g.db_session,
         user=g.current_user,
         query=request.args.get('q'),
-        ncbiIds=request.args.get('ncbiIds', []),
-        chebiIds=request.args.get('chebiIds', []),
+        ncbiIds=request.args.getlist('ncbiIds'),
+        chebiIds=request.args.getlist('chebiIds'),
         per_page=_PER_PAGE,
     )
 

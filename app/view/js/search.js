@@ -15,7 +15,7 @@ Page('.search-page', function($page) {
     width: '100%',
     theme: 'custom',
     ajax: {
-      url: '/strains/study-completion/',
+      url: '/strains/completion/?with-studies=1',
       dataType: 'json',
       delay: 150,
       cache: true,
@@ -33,7 +33,7 @@ Page('.search-page', function($page) {
       theme: 'custom',
       width: '100%',
       ajax: {
-        url: '/metabolites/study-completion/',
+        url: '/metabolites/completion/?with-studies=1',
         dataType: 'json',
         delay: 100,
         cache: true,
