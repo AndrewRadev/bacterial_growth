@@ -674,4 +674,5 @@ INSERT INTO MigrationVersions VALUES
 (79,'2025_11_26_151231_rename_ncbi_id_in_study_strains','2025-11-26 14:13:39'),
 (81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20'),
 (83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13');
+(81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20');
 
