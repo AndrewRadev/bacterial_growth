@@ -46,40 +46,37 @@ class Metabolite(OrmBase):
         return self.chebiId
 
     @staticmethod
-    def search_by_name(db_conn, term, page=1, per_page=10):
+    def search_by_name(db_session, term, page=1, per_page=10):
         term = term.lower().strip()
         if len(term) <= 0:
             return [], 0
 
+        limit  = per_page
+        offset = (page - 1) * per_page
+
         term_pattern = '%' + '%'.join(term.split()) + '%'
         first_word = term.split()[0]
 
-        query = """
-            SELECT
-                chebiId AS id,
-                CONCAT(name, ' (', chebiId, ')') AS text
-            FROM Metabolites
-            WHERE LOWER(name) LIKE :term_pattern
-            ORDER BY
-                LOCATE(:first_word, LOWER(name)) ASC,
-                LOWER(name) ASC
-            LIMIT :per_page
-            OFFSET :offset
-        """
-        results = db_conn.execute(sql.text(query), {
-            'first_word': first_word,
-            'term_pattern': term_pattern,
-            'per_page': per_page,
-            'offset': (page - 1) * per_page,
-        }).all()
-        results = [row._asdict() for row in results]
+        results = db_session.execute(
+            sql.select(
+                Metabolite.chebiId,
+                Metabolite.name,
+            )
+            .where(sql.func.lower(Metabolite.name).like(term_pattern))
+            .order_by(
+                sql.func.locate(first_word, sql.func.lower(Metabolite.name)).asc(),
+                sql.func.lower(Metabolite.name).asc()
+            )
+            .limit(limit)
+            .offset(offset)
+        ).all()
 
-        count_query = """
-            SELECT COUNT(*)
-            FROM Metabolites
-            WHERE LOWER(name) LIKE :term_pattern
-        """
-        total_count = db_conn.execute(sql.text(count_query), {'term_pattern': term_pattern}).scalar()
+        results = [{'id': row[0], 'text': f"{row[1]} ({row[0]})"} for row in results]
+
+        total_count = db_session.scalars(
+            sql.select(sql.func.count(Metabolite.chebiId))
+            .where(sql.func.lower(Metabolite.name).like(term_pattern))
+        ).one()
         has_more = (page * per_page < total_count)
 
         return results, has_more

@@ -13,23 +13,23 @@ class TestTaxon(DatabaseTest):
         self.create_taxon(ncbiId="3", name="Brevibacterium linens")
 
         # Results only consider the prefix
-        results, _ = Taxon.search_by_name(self.db_conn, 'Vibrio')
+        results, _ = Taxon.search_by_name(self.db_session, 'Vibrio')
         self.assertEqual(
             ['Vibrio pelagius (NCBI:1)'],
             [r['text'] for r in results]
         )
 
         # Matches are case-insensitive:
-        results, _ = Taxon.search_by_name(self.db_conn, 'Vib')
+        results, _ = Taxon.search_by_name(self.db_session, 'Vib')
         self.assertEqual(
             sorted(['Vibrio pelagius (NCBI:1)']),
             sorted([r['text'] for r in results])
         )
 
-        results, _ = Taxon.search_by_name(self.db_conn, '')
+        results, _ = Taxon.search_by_name(self.db_session, '')
         self.assertEqual([], [r['text'] for r in results])
 
-        results, _ = Taxon.search_by_name(self.db_conn, ' ')
+        results, _ = Taxon.search_by_name(self.db_session, ' ')
         self.assertEqual([], [r['text'] for r in results])
 
     def test_search_by_multiple_words(self):
@@ -37,14 +37,14 @@ class TestTaxon(DatabaseTest):
         self.create_taxon(ncbiId="2", name="Salmonella enterica serovar Moscow")
 
         # Words are searched separately:
-        results, _ = Taxon.search_by_name(self.db_conn, 'salmonella infantis')
+        results, _ = Taxon.search_by_name(self.db_session, 'salmonella infantis')
         self.assertEqual(
             ['Salmonella enterica serovar Infantis (NCBI:1)'],
             [r['text'] for r in results]
         )
 
         # Words are searched in order:
-        results, _ = Taxon.search_by_name(self.db_conn, 'infantis salmonella')
+        results, _ = Taxon.search_by_name(self.db_session, 'infantis salmonella')
         self.assertEqual(
             [],
             [r['text'] for r in results]
@@ -57,30 +57,30 @@ class TestTaxon(DatabaseTest):
         self.create_taxon(name="Test 4 bar")
 
         # Two per page, two pages:
-        results, has_more = Taxon.search_by_name(self.db_conn, 'Test', page=1, per_page=2)
+        results, has_more = Taxon.search_by_name(self.db_session, 'Test', page=1, per_page=2)
         self.assertEqual(len(results), 2)
         self.assertTrue(has_more)
 
-        results, has_more = Taxon.search_by_name(self.db_conn, 'Test', page=2, per_page=2)
+        results, has_more = Taxon.search_by_name(self.db_session, 'Test', page=2, per_page=2)
         self.assertEqual(len(results), 2)
         self.assertFalse(has_more)
 
         # Three per page, two pages:
-        results, has_more = Taxon.search_by_name(self.db_conn, 'Test', page=1, per_page=3)
+        results, has_more = Taxon.search_by_name(self.db_session, 'Test', page=1, per_page=3)
         self.assertEqual(len(results), 3)
         self.assertTrue(has_more)
 
-        results, has_more = Taxon.search_by_name(self.db_conn, 'Test', page=2, per_page=3)
+        results, has_more = Taxon.search_by_name(self.db_session, 'Test', page=2, per_page=3)
         self.assertEqual(len(results), 1)
         self.assertFalse(has_more)
 
         # Page ten, no results:
-        results, has_more = Taxon.search_by_name(self.db_conn, 'Test', page=10, per_page=3)
+        results, has_more = Taxon.search_by_name(self.db_session, 'Test', page=10, per_page=3)
         self.assertEqual(len(results), 0)
         self.assertFalse(has_more)
 
         # Pagination correctly takes into account two-word searches:
-        results, has_more = Taxon.search_by_name(self.db_conn, 'Test foo', page=1, per_page=1)
+        results, has_more = Taxon.search_by_name(self.db_session, 'Test foo', page=1, per_page=1)
         self.assertEqual(len(results), 1)
         self.assertTrue(has_more)
 

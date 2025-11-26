@@ -3,10 +3,12 @@ import re
 import sqlalchemy as sql
 
 from app.model.orm import (
+    Metabolite,
     Study,
     StudyMetabolite,
     StudyStrain,
     StudyUser,
+    Taxon,
 )
 
 
@@ -64,6 +66,18 @@ class StudySearch():
             db_query = db_query.join(StudyMetabolite).where(StudyMetabolite.chebiId.in_(self.chebiIds))
 
         return self.db_session.scalars(db_query).all()
+
+    def fetch_taxa(self):
+        return self.db_session.scalars(
+            sql.select(Taxon)
+            .where(Taxon.ncbiId.in_(self.ncbiIds))
+        ).all()
+
+    def fetch_metabolites(self):
+        return self.db_session.scalars(
+            sql.select(Metabolite)
+            .where(Metabolite.chebiId.in_(self.chebiIds))
+        ).all()
 
     def _build_publish_clause(self):
         if self.user and self.user.isAdmin:

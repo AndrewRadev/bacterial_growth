@@ -41,7 +41,7 @@ def new_search_index_page():
 
     return render_template(
         "pages/search/new_index.html",
-        query_words=search.query_words,
+        search=search,
         studies=studies,
         error=error,
     )

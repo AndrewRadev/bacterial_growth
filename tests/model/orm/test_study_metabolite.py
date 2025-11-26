@@ -1,0 +1,88 @@
+import tests.init  # noqa: F401
+
+import unittest
+
+from app.model.orm import StudyMetabolite
+from tests.database_test import DatabaseTest
+
+
+class TestStudyMetabolite(DatabaseTest):
+    def test_search_basic(self):
+        self.create_study_metabolite(metabolite=dict(chebiId="CHEBI:1", name="glucose"))
+        self.create_study_metabolite(metabolite=dict(chebiId="CHEBI:2", name="trehalose"))
+        self.create_study_metabolite(metabolite=dict(chebiId="CHEBI:3", name="lactate"))
+
+        results, _ = StudyMetabolite.search_by_name(self.db_conn, 'glucose')
+        self.assertEqual(
+            ['glucose (CHEBI:1)'],
+            [r['text'] for r in results]
+        )
+
+        # Matches are case-insensitive:
+        results, _ = StudyMetabolite.search_by_name(self.db_conn, 'Ose')
+        self.assertEqual(
+            sorted(['glucose (CHEBI:1)', 'trehalose (CHEBI:2)']),
+            sorted([r['text'] for r in results])
+        )
+
+        # By default, we fetch all records:
+        all_records = sorted([
+            'glucose (CHEBI:1)',
+            'trehalose (CHEBI:2)',
+            'lactate (CHEBI:3)',
+        ])
+
+        results, _ = StudyMetabolite.search_by_name(self.db_conn, '')
+        self.assertEqual(all_records, sorted([r['text'] for r in results]))
+
+        results, _ = StudyMetabolite.search_by_name(self.db_conn, ' ')
+        self.assertEqual(all_records, sorted([r['text'] for r in results]))
+
+    def test_search_ordering_by_prefix_match(self):
+        self.create_study_metabolite(metabolite=dict(chebiId="CHEBI:1", name="glucose"))
+        self.create_study_metabolite(metabolite=dict(chebiId="CHEBI:2", name="d-gluconic acid"))
+
+        # Matches at the beginning of the word are first:
+        results, _ = StudyMetabolite.search_by_name(self.db_conn, 'gluc')
+        self.assertEqual(
+            ['glucose (CHEBI:1)', 'd-gluconic acid (CHEBI:2)'],
+            [r['text'] for r in results]
+        )
+
+    def test_pagination(self):
+        self.create_study_metabolite(metabolite=dict(name="Test 1 foo"))
+        self.create_study_metabolite(metabolite=dict(name="Test 2 foo"))
+        self.create_study_metabolite(metabolite=dict(name="Test 3 bar"))
+        self.create_study_metabolite(metabolite=dict(name="Test 4 bar"))
+
+        # Two per page, two pages:
+        results, has_more = StudyMetabolite.search_by_name(self.db_conn, 'Test', page=1, per_page=2)
+        self.assertEqual(len(results), 2)
+        self.assertTrue(has_more)
+
+        results, has_more = StudyMetabolite.search_by_name(self.db_conn, 'Test', page=2, per_page=2)
+        self.assertEqual(len(results), 2)
+        self.assertFalse(has_more)
+
+        # Three per page, two pages:
+        results, has_more = StudyMetabolite.search_by_name(self.db_conn, 'Test', page=1, per_page=3)
+        self.assertEqual(len(results), 3)
+        self.assertTrue(has_more)
+
+        results, has_more = StudyMetabolite.search_by_name(self.db_conn, 'Test', page=2, per_page=3)
+        self.assertEqual(len(results), 1)
+        self.assertFalse(has_more)
+
+        # Page ten, no results:
+        results, has_more = StudyMetabolite.search_by_name(self.db_conn, 'Test', page=10, per_page=3)
+        self.assertEqual(len(results), 0)
+        self.assertFalse(has_more)
+
+        # Pagination correctly takes into account two-word searches:
+        results, has_more = StudyMetabolite.search_by_name(self.db_conn, 'Test foo', page=1, per_page=1)
+        self.assertEqual(len(results), 1)
+        self.assertTrue(has_more)
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -41,6 +41,9 @@
                 name="ncbiIds"
                 multiple="multiple"
                 class="strain-select js-strain-select">
+              {% for taxon in search.fetch_taxa(): %}
+                <option value="{{ taxon.ncbiId }}" selected="selected">{{ taxon.name }} (NCBI:{{ taxon.ncbiId }})</option>
+              {% endfor %}
             </select>
           </label>
 
@@ -50,6 +53,9 @@
                 name="chebiIds"
                 multiple="multiple"
                 class="metabolite-select js-metabolite-select">
+              {% for metabolite in search.fetch_metabolites(): %}
+                <option value="{{ metabolite.chebiId }}" selected>{{ metabolite.name }} ({{ metabolite.chebiId }})</option>
+              {% endfor %}
             </select>
           </label>
         </div>
@@ -57,7 +63,7 @@
 
       {% if studies: %}
         <ol class="results-list">
-          {{ render_results_list(studies, offset, query_words) }}
+          {{ render_results_list(studies, offset, search.query_words) }}
         </ol>
       {% elif error: %}
         <p>
