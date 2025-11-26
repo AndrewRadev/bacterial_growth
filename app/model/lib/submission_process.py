@@ -418,7 +418,7 @@ def _save_study_techniques(db_session, submission_form, study):
             if measurement_technique.metaboliteIds:
                 for chebiId in measurement_technique.metaboliteIds:
                     db_session.add(StudyMetabolite(
-                        chebi_id=chebiId,
+                        chebiId=chebiId,
                         study=study,
                     ))
         techniques.append(study_technique)
