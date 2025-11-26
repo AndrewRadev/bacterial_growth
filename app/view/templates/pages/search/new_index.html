@@ -38,7 +38,7 @@
 
       {% if studies: %}
         <ol class="results-list">
-          {{ render_results_list(studies, offset, q_words) }}
+          {{ render_results_list(studies, offset, query_words) }}
         </ol>
       {% elif error: %}
         <p>

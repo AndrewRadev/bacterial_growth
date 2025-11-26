@@ -9,6 +9,6 @@
   }
 
   .highlight {
-    background-color: #fafa44;
+    background-color: var(--light-blue);;
   }
 }
