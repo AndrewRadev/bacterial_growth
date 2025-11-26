@@ -183,7 +183,7 @@ class DatabaseTest(unittest.TestCase):
 
         params = {
             'studyId': study_id,
-            'chebi_id': chebi_id,
+            'chebiId': chebi_id,
             **params,
         }
 

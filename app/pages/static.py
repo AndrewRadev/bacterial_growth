@@ -49,7 +49,7 @@ def static_home_page():
     ).one()
 
     study_metabolite_count = g.db_session.scalars(
-        sql.select(sql.func.count(sql.distinct(StudyMetabolite.chebi_id)))
+        sql.select(sql.func.count(sql.distinct(StudyMetabolite.chebiId)))
         .join(Study)
         .where(Study.isPublished)
     ).one()
