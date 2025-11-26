@@ -84,7 +84,7 @@ class TestApiPages(PageTest):
         )
         self.create_measurement_context(
             bioreplicateId=bioreplicate.id,
-            subjectId=self.create_strain(name='Roseburia').id,
+            subjectId=self.create_study_strain(name='Roseburia').id,
             subjectType='strain',
         )
         self.create_measurement_context(
@@ -221,7 +221,7 @@ class TestApiPages(PageTest):
         study        = self.create_study(publishedAt=datetime.now(UTC))
         experiment   = self.create_experiment(studyId=study.publicId)
         bioreplicate = self.create_bioreplicate(name='B1', experimentId=experiment.publicId)
-        strain       = self.create_strain(name='Roseburia', studyId=study.publicId)
+        strain       = self.create_study_strain(name='Roseburia', studyId=study.publicId)
 
         for subject, subject_type in ((bioreplicate, 'bioreplicate'), (strain, 'strain')):
             measurement_context = self.create_measurement_context(
@@ -302,8 +302,8 @@ class TestApiPages(PageTest):
         b3 = self.create_bioreplicate(experimentId=self.create_experiment(studyId=s2.publicId).publicId)
         b4 = self.create_bioreplicate(experimentId=self.create_experiment(studyId=s2.publicId).publicId)
 
-        roseburia = self.create_strain(name='Roseburia')
-        blautia   = self.create_strain(name='Blautia')
+        roseburia = self.create_study_strain(name='Roseburia')
+        blautia   = self.create_study_strain(name='Blautia')
 
         glucose   = self.create_metabolite(name="glucose")
         trehalose = self.create_metabolite(name="trehalose")
@@ -342,7 +342,7 @@ class TestApiPages(PageTest):
         self.db_session.commit()
 
         # Searching by strain:
-        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={roseburia.NCBId}")
+        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={roseburia.ncbiId}")
         self.assertEqual(response.status, '200 OK')
         response_json = self._get_json(response)
 
@@ -351,7 +351,7 @@ class TestApiPages(PageTest):
         mc_ids = sorted([mc['id'] for mc in response_json['measurementContexts']])
         self.assertEqual(mc_ids, sorted([mc1.id, mc3.id]))
 
-        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={blautia.NCBId}")
+        response = self.client.get(f"/api/v1/search.json?strainNcbiIds={blautia.ncbiId}")
         self.assertEqual(response.status, '200 OK')
         response_json = self._get_json(response)
 
@@ -373,7 +373,7 @@ class TestApiPages(PageTest):
         self.assertEqual(mc_ids, sorted([mc5.id]))
 
         # Searching by both strain and metabolite returns both matches (strain OR metabolite):
-        strain_query = blautia.NCBId
+        strain_query = blautia.ncbiId
         metabolite_query = trehalose.chebiId.removeprefix("CHEBI:")
 
         response = self.client.get(f"/api/v1/search.json?strainNcbiIds={strain_query}&metaboliteChebiIds={metabolite_query}")
@@ -387,7 +387,7 @@ class TestApiPages(PageTest):
         self.assertEqual(mc_ids, sorted([mc2.id, mc5.id]))
 
         # Searching by multiple strains and metabolites returns all matches:
-        strain_query = f"{blautia.NCBId},{roseburia.NCBId}"
+        strain_query = f"{blautia.ncbiId},{roseburia.ncbiId}"
         metabolite_query = ','.join([
             glucose.chebiId.removeprefix("CHEBI:"),
             trehalose.chebiId.removeprefix("CHEBI:"),

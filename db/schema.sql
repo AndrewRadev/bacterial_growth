@@ -397,28 +397,6 @@ CREATE TABLE Projects (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `Strains`
---
-
-DROP TABLE IF EXISTS Strains;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE Strains (
-  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  defined tinyint(1) DEFAULT '0',
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  id int NOT NULL AUTO_INCREMENT,
-  NCBId int DEFAULT NULL,
-  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
-  assemblyGenBankId varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  userUniqueID varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  PRIMARY KEY (id),
-  KEY fk_1 (studyId),
-  CONSTRAINT Strains_fk_1 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `Studies`
 --
 
@@ -460,6 +438,28 @@ CREATE TABLE StudyMetabolites (
   KEY fk_3 (studyId),
   CONSTRAINT MetabolitePerExperiment_fk_1 FOREIGN KEY (chebi_id) REFERENCES Metabolites (chebiId) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT MetabolitePerExperiment_fk_3 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StudyStrains`
+--
+
+DROP TABLE IF EXISTS StudyStrains;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE StudyStrains (
+  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  defined tinyint(1) DEFAULT '0',
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  id int NOT NULL AUTO_INCREMENT,
+  ncbiId int DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
+  assemblyGenBankId varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  userUniqueID varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY fk_1 (studyId),
+  CONSTRAINT Strains_fk_1 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -661,14 +661,16 @@ INSERT INTO MigrationVersions VALUES
 (62,'2025_07_09_124639_remove_deprecated_experiment_id','2025-08-20 12:11:25'),
 (63,'2025_07_10_183310_make_subject_id_not_null','2025-08-20 12:11:25'),
 (64,'2025_07_13_121621_make_orcid_token_nullable','2025-08-20 12:11:25'),
-(65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-21 14:36:17'),
-(67,'2025_10_21_163448_add_dilution_rate','2025-10-21 14:36:22'),
-(109,'2025_11_03_160947_create_study_techniques','2025-11-11 18:47:59'),
-(110,'2025_11_03_162139_modify_measurement_techniques','2025-11-11 18:47:59'),
-(112,'2025_11_03_164617_populate_study_techniques','2025-11-12 09:26:51'),
-(113,'2025_11_10_122037_increase_metabolite_name_length','2025-11-12 09:26:51'),
-(114,'2025_11_11_155050_add_subject_name_and_external_id_to_measurement_contexts','2025-11-12 09:26:51'),
-(115,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-12 09:26:51'),
-(117,'2025_11_18_125634_add_more_fields_to_metabolites','2025-11-18 11:58:18'),
-(121,'2025_11_19_173702_add_include_unknown_flag_to_study_techniques','2025-11-19 16:41:50');
+(65,'2025_10_20_124103_make_last_login_at_nullable','2025-10-20 10:52:18'),
+(66,'2025_10_21_163448_add_dilution_rate','2025-10-21 16:31:56'),
+(70,'2025_11_10_122037_increase_metabolite_name_length','2025-11-10 11:29:23'),
+(71,'2025_11_11_155050_add_subject_name_and_external_id_to_measurement_contexts','2025-11-12 11:06:25'),
+(72,'2025_11_11_160439_populate_subject_name_and_external_id','2025-11-12 11:06:28'),
+(73,'2025_11_03_160947_create_study_techniques','2025-11-13 14:05:49'),
+(74,'2025_11_03_162139_modify_measurement_techniques','2025-11-13 14:05:50'),
+(75,'2025_11_03_164617_populate_study_techniques','2025-11-13 14:05:50'),
+(76,'2025_11_18_125634_add_more_fields_to_metabolites','2025-11-18 14:20:52'),
+(77,'2025_11_19_173702_add_include_unknown_flag_to_study_techniques','2025-11-20 14:00:51'),
+(79,'2025_11_26_151231_rename_ncbi_id_in_study_strains','2025-11-26 14:13:39'),
+(81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20');
 

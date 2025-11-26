@@ -50,9 +50,9 @@ class TestPerturbation(PageTest):
         self.assertIn("initial temperature : from 37.00 to 40.00", response_text)
 
     def test_community_changes(self):
-        s1 = self.create_strain(name="Blautia")
-        s2 = self.create_strain(name="Roseburia")
-        s3 = self.create_strain(name="Bacteroides")
+        s1 = self.create_study_strain(name="Blautia")
+        s2 = self.create_study_strain(name="Roseburia")
+        s3 = self.create_study_strain(name="Bacteroides")
 
         c1 = self.create_community(name="C1")
         self.create_community_strain(communityId=c1.id, strainId=s1.id)

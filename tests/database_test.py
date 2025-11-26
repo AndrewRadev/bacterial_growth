@@ -162,7 +162,7 @@ class DatabaseTest(unittest.TestCase):
 
         return self._create_orm_record(Bioreplicate, params)
 
-    def create_strain(self, **params):
+    def create_study_strain(self, **params):
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
         self.ncbi_id = getattr(self, 'ncbi_id', 0) + 1
 
@@ -171,7 +171,7 @@ class DatabaseTest(unittest.TestCase):
             'description': 'Member 1',
             'studyId':     study_id,
             'defined':     True,
-            'NCBId':       self.ncbi_id,
+            'ncbiId':      self.ncbi_id,
             **params,
         }
 
@@ -300,7 +300,7 @@ class DatabaseTest(unittest.TestCase):
 
     def create_community_strain(self, **params):
         community_id = self._get_or_create_dependency(params, 'communityId', ('community', 'id'))
-        strain_id    = self._get_or_create_dependency(params, 'strainId', ('strain', 'id'))
+        strain_id    = self._get_or_create_dependency(params, 'strainId', ('study_strain', 'id'))
 
         params = {
             'communityId': community_id,

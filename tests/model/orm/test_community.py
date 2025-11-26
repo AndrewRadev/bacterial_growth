@@ -9,8 +9,8 @@ from tests.database_test import DatabaseTest
 class TestCommunity(DatabaseTest):
     def test_successful_creation(self):
         study = self.create_study()
-        strain1 = self.create_strain(studyId=study.publicId)
-        strain2 = self.create_strain(studyId=study.publicId)
+        strain1 = self.create_study_strain(studyId=study.publicId)
+        strain2 = self.create_study_strain(studyId=study.publicId)
 
         community = Community(studyId=study.publicId, name="Test community")
         self.db_session.add(community)
@@ -24,9 +24,9 @@ class TestCommunity(DatabaseTest):
         self.assertEqual(community.strains, [strain1, strain2])
 
     def test_describe_differences(self):
-        strain1 = self.create_strain(name="Roseburia")
-        strain2 = self.create_strain(name="Blautia")
-        strain3 = self.create_strain(name="Bacteroides")
+        strain1 = self.create_study_strain(name="Roseburia")
+        strain2 = self.create_study_strain(name="Blautia")
+        strain3 = self.create_study_strain(name="Bacteroides")
 
         c1 = self.create_community()
         c2 = self.create_community()

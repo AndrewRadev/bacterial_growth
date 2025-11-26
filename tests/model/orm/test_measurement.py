@@ -12,7 +12,7 @@ import app.model.lib.util as util
 class TestMeasurement(DatabaseTest):
     def test_successful_creation(self):
         study = self.create_study()
-        strain = self.create_strain(studyId=study.publicId)
+        strain = self.create_study_strain(studyId=study.publicId)
         context = self.create_measurement_context(subjectType='strain', subjectId=strain.id, studyId=study.publicId)
 
         measurement = Measurement(
@@ -132,8 +132,8 @@ class TestMeasurement(DatabaseTest):
 
         self.create_compartment(name='c1', studyId=study.publicId)
 
-        s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study.publicId)
-        s2 = self.create_strain(name='R. intestinalis',     studyId=study.publicId)
+        s1 = self.create_study_strain(name='B. thetaiotaomicron', studyId=study.publicId)
+        s2 = self.create_study_strain(name='R. intestinalis',     studyId=study.publicId)
 
         mt_fc = self.create_measurement_technique(
             study_technique={'studyId': study.publicId},
@@ -253,7 +253,7 @@ class TestMeasurement(DatabaseTest):
             studyId=study.publicId,
             metabolite={'name': 'trehalose'},
         ).metabolite.id
-        s1 = self.create_strain(name='B. thetaiotaomicron', studyId=study.publicId)
+        s1 = self.create_study_strain(name='B. thetaiotaomicron', studyId=study.publicId)
 
         self.create_measurement_technique(
             study_technique={'studyId': study.publicId},

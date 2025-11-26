@@ -14,8 +14,7 @@ from app.model.orm.orm_base import OrmBase
 class StudyStrain(OrmBase):
     "A microbial strain used in a particular study"
 
-    # TODO (2025-10-09) Rename to StudyStrains
-    __tablename__ = 'Strains'
+    __tablename__ = 'StudyStrains'
 
     id: Mapped[int] = mapped_column(sql.Integer, primary_key=True)
 
@@ -23,7 +22,7 @@ class StudyStrain(OrmBase):
     description: Mapped[str]  = mapped_column(sql.String)
 
     defined: Mapped[bool] = mapped_column(sql.Boolean, nullable=False, default=True)
-    NCBId:   Mapped[int]  = mapped_column(sql.Integer)
+    ncbiId:  Mapped[int]  = mapped_column(sql.Integer)
 
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
     study: Mapped['Study'] = relationship(back_populates="strains")
@@ -40,11 +39,11 @@ class StudyStrain(OrmBase):
 
     @hybrid_property
     def isUnknown(self):
-        return self.NCBId == 0
+        return self.ncbiId == 0
 
     @hybrid_property
     def notUnknown(self):
-        return self.NCBId != 0
+        return self.ncbiId != 0
 
     @property
     def externalId(self):
@@ -52,4 +51,4 @@ class StudyStrain(OrmBase):
         For compatibility with other subjects of measurements.
         The strain's (or parent strain's) NCBI id, e.g. "NCBI:1234"
         """
-        return f"NCBI:{self.NCBId}"
+        return f"NCBI:{self.ncbiId}"
