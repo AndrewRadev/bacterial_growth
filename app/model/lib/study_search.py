@@ -4,26 +4,36 @@ import sqlalchemy as sql
 
 from app.model.orm import (
     Study,
+    StudyStrain,
     StudyUser,
 )
 
 
 class StudySearch():
-    def __init__(self, db_session, user=None, query=None, per_page=10):
+    def __init__(
+        self,
+        db_session,
+        user=None,
+        query=None,
+        ncbiIds=None,
+        per_page=10,
+    ):
         self.db_session = db_session
         self.user       = user
         self.query      = (query or '').strip().lower()
         self.per_page   = per_page
+        self.ncbiIds    = ncbiIds or []
 
         self.query_words = []
 
-    def get_results(self):
+    def fetch_results(self):
         publish_clause = self._build_publish_clause()
 
         db_query = (
             sql.select(Study)
             .distinct()
             .join(StudyUser, isouter=True)
+            .join(StudyStrain, isouter=True)
             .where(publish_clause)
             .order_by(Study.publicId.desc())
             .limit(self.per_page)
@@ -44,6 +54,9 @@ class StudySearch():
             )
         else:
             self.query_words = []
+
+        if self.ncbiIds:
+            db_query = db_query.where(StudyStrain.ncbiId.in_(self.ncbiIds))
 
         return self.db_session.scalars(db_query).all()
 
