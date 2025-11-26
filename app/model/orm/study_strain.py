@@ -34,6 +34,44 @@ class StudyStrain(OrmBase):
         cascade='all, delete-orphan',
     )
 
+    @staticmethod
+    def search_by_name(db_session, term, page=1, per_page=10):
+        term   = term.lower().strip()
+        limit  = per_page
+        offset = (page - 1) * per_page
+
+        if term:
+            term_pattern = '%'.join(term.split()) + '%'
+            first_word = term.split()[0]
+        else:
+            term_pattern = '%'
+            first_word = ''
+
+        results = db_session.execute(
+            sql.select(
+                StudyStrain.ncbiId,
+                StudyStrain.name,
+            )
+            .distinct()
+            .where(sql.func.lower(StudyStrain.name).like(term_pattern))
+            .order_by(
+                sql.func.locate(first_word, sql.func.lower(StudyStrain.name)).asc(),
+                sql.func.lower(StudyStrain.name).asc()
+            )
+            .limit(limit)
+            .offset(offset)
+        ).all()
+
+        results = [{'id': row[0], 'text': f"{row[1]} (NCBI:{row[0]})"} for row in results]
+
+        total_count = db_session.scalars(
+            sql.select(sql.func.count(StudyStrain.name.distinct()))
+            .where(sql.func.lower(StudyStrain.name).like(term_pattern))
+        ).one()
+        has_more = (page * per_page < total_count)
+
+        return results, has_more
+
     def __lt__(self, other):
         return self.name < other.name
 

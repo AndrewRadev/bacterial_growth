@@ -41,8 +41,8 @@ def static_home_page():
     taxa_count       = g.db_session.scalars(sql.select(sql.func.count(Taxon.id))).one()
     metabolite_count = g.db_session.scalars(sql.select(sql.func.count(Metabolite.id))).one()
 
-    study_taxa_count = g.db_session.scalars(
-        sql.select(sql.func.count(sql.distinct(StudyStrain.ncbiId)))
+    study_strain_count = g.db_session.scalars(
+        sql.select(sql.func.count(sql.distinct(StudyStrain.name)))
         .join(Study)
         .where(Study.isPublished)
         .where(StudyStrain.notUnknown)
@@ -65,7 +65,7 @@ def static_home_page():
         metabolite_count=metabolite_count,
         study_metabolite_count=study_metabolite_count,
         taxa_count=taxa_count,
-        study_taxa_count=study_taxa_count,
+        study_strain_count=study_strain_count,
         last_ncbi_update=last_ncbi_update,
         last_chebi_update=last_chebi_update,
     )
