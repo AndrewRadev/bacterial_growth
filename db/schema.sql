@@ -262,7 +262,7 @@ CREATE TABLE Metabolites (
   `name` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   id int NOT NULL AUTO_INCREMENT,
   averageMass decimal(10,5) DEFAULT NULL,
-  `definition` text COLLATE utf8mb4_bin,
+  `definition` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin,
   massIsEstimation tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (id),
   UNIQUE KEY Metabolites_chebiId (chebiId)
@@ -431,12 +431,12 @@ DROP TABLE IF EXISTS StudyMetabolites;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE StudyMetabolites (
   studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  chebi_id varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  chebiId varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   id bigint unsigned NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (id),
-  KEY fk_1 (chebi_id),
+  KEY fk_1 (chebiId),
   KEY fk_3 (studyId),
-  CONSTRAINT MetabolitePerExperiment_fk_1 FOREIGN KEY (chebi_id) REFERENCES Metabolites (chebiId) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT MetabolitePerExperiment_fk_1 FOREIGN KEY (chebiId) REFERENCES Metabolites (chebiId) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT MetabolitePerExperiment_fk_3 FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -672,5 +672,6 @@ INSERT INTO MigrationVersions VALUES
 (76,'2025_11_18_125634_add_more_fields_to_metabolites','2025-11-18 14:20:52'),
 (77,'2025_11_19_173702_add_include_unknown_flag_to_study_techniques','2025-11-20 14:00:51'),
 (79,'2025_11_26_151231_rename_ncbi_id_in_study_strains','2025-11-26 14:13:39'),
-(81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20');
+(81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20'),
+(83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13');
 

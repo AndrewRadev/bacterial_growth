@@ -55,9 +55,9 @@ class TestSearch(unittest.TestCase):
                     SELECT
                         studyId as publicId,
                         Metabolites.name as name,
-                        chebi_id
+                        chebiId
                     FROM StudyMetabolites
-                    INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebi_id
+                    INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebiId
                 ) as StudyMetabolites_Alias
                 WHERE LOWER(name) LIKE :value_1
             )

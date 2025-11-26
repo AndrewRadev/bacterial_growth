@@ -17,7 +17,7 @@ def metabolite_show_page(chebiId):
 
     study_count = g.db_session.scalars(
         sql.select(sql.func.count(StudyMetabolite.id))
-        .where(StudyMetabolite.chebi_id == metabolite.chebiId)
+        .where(StudyMetabolite.chebiId == metabolite.chebiId)
     ).one()
 
     search_url = url_for(
