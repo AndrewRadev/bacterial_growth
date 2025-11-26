@@ -59,8 +59,8 @@ def dynamical_query(all_advance_query):
             # renamed to "publicId"
             where_clause = f"""
             FROM (
-                SELECT studyId as publicId, name, NCBId
-                FROM Strains
+                SELECT studyId as publicId, name, ncbiId
+                FROM StudyStrains
             ) as Strains_Alias
             WHERE LOWER(name) LIKE :value_{len(values)}
             """
@@ -69,10 +69,10 @@ def dynamical_query(all_advance_query):
             microb_ID = query_dict['value'].strip()
             where_clause = f"""
             FROM (
-                SELECT studyId as publicId, name, NCBId
-                FROM Strains
+                SELECT studyId as publicId, name, ncbiId
+                FROM StudyStrains
             ) as Strains_Alias
-            WHERE NCBId = :value_{len(values)}
+            WHERE ncbiId = :value_{len(values)}
             """
             values.append(microb_ID)
         elif query_dict['option'] == 'Metabolites':

@@ -646,7 +646,7 @@ def _build_strain(db_session, identifier, submission, study, user_uuid):
 
         strain_params = {
             'name':    taxon.name,
-            'NCBId':   taxon.ncbiId,
+            'ncbiId':  taxon.ncbiId,
             'defined': True,
             **strain_params,
         }
@@ -661,7 +661,7 @@ def _build_strain(db_session, identifier, submission, study, user_uuid):
 
         strain_params = {
             'name':        custom_strain_data['name'],
-            'NCBId':       custom_strain_data['species'],
+            'ncbiId':      custom_strain_data['species'],
             'description': custom_strain_data['description'],
             'defined':     False,
             **strain_params,
@@ -669,7 +669,7 @@ def _build_strain(db_session, identifier, submission, study, user_uuid):
     elif identifier == 'unknown':
         strain_params = {
             'name':        "Unknown",
-            'NCBId':       0,
+            'ncbiId':      0,
             'description': "Unknown measurements",
             'defined':     False,
             **strain_params,

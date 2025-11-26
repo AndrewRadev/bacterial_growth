@@ -14,7 +14,7 @@ class TestModelingTasks(DatabaseTest):
         self.assertEqual(modeling_request.state, 'ready')
 
     def test_baranyi_roberts_calculation(self):
-        strain              = self.create_strain()
+        strain              = self.create_study_strain()
         measurement_context = self.create_measurement_context(subjectId=strain.id, subjectType='strain')
         modeling_request    = self.create_modeling_request()
 

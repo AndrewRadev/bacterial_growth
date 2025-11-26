@@ -76,7 +76,7 @@ def experiment_json(publicId):
         'communityStrains': [
             {
                 'id':     s.id,
-                'NCBId': s.NCBId,
+                'NCBId':  s.ncbiId,
                 'custom': not s.defined,
                 'name':   s.name,
             } for s in community_strains
@@ -211,7 +211,7 @@ def search_json():
             values = value.split(',')
             study_strain_ids = g.db_session.scalars(
                 sql.select(StudyStrain.id)
-                .where(StudyStrain.NCBId.in_(values)),
+                .where(StudyStrain.ncbiId.in_(values)),
             ).all()
             results.update(_contexts_by_subject('strain', study_strain_ids))
 

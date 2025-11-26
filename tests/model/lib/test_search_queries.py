@@ -33,8 +33,8 @@ class TestSearch(unittest.TestCase):
         self.assertSqlQuery(query, """
             SELECT DISTINCT publicId
             FROM (
-                SELECT studyId as publicId, name, NCBId
-                FROM Strains
+                SELECT studyId as publicId, name, ncbiId
+                FROM StudyStrains
             ) as Strains_Alias
             WHERE LOWER(name) LIKE :value_0
         """)

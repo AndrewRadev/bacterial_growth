@@ -47,7 +47,7 @@ class TestExperimentExportForm(DatabaseTest):
         m1 = self.create_metabolite(name='glucose', averageMass=7)
         self.create_study_metabolite(chebiId=m1.chebiId, studyId=e1.study.publicId)
 
-        s1 = self.create_strain(name="Roseburia", studyId=e1.study.publicId)
+        s1 = self.create_study_strain(name="Roseburia", studyId=e1.study.publicId)
 
         targets = [
             ('bioreplicate', b1, 'od',         'CFUs/μL'),
