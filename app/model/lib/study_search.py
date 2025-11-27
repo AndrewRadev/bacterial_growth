@@ -33,13 +33,13 @@ class StudySearch():
 
     def fetch_results(self):
         publish_clause = self._build_publish_clause()
+        order_clauses = (Study.publicId.desc(),)
 
         db_query = (
             sql.select(Study)
-            .distinct()
+            .group_by(Study.publicId)
             .join(StudyUser, isouter=True)
             .where(publish_clause)
-            .order_by(Study.publicId.desc())
             .limit(self.per_page)
         )
 
@@ -59,11 +59,15 @@ class StudySearch():
         else:
             self.query_words = []
 
-        if self.ncbiIds:
-            db_query = db_query.join(StudyStrain).where(StudyStrain.ncbiId.in_(self.ncbiIds))
-
         if self.chebiIds:
             db_query = db_query.join(StudyMetabolite).where(StudyMetabolite.chebiId.in_(self.chebiIds))
+            order_clauses = (sql.func.count(StudyMetabolite.id.distinct()).desc(), *order_clauses)
+
+        if self.ncbiIds:
+            db_query = db_query.join(StudyStrain).where(StudyStrain.ncbiId.in_(self.ncbiIds))
+            order_clauses = (sql.func.count(StudyStrain.ncbiId.distinct()).desc(), *order_clauses)
+
+        db_query = db_query.order_by(*order_clauses)
 
         return self.db_session.scalars(db_query).all()
 

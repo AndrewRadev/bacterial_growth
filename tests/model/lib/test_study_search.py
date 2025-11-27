@@ -81,26 +81,26 @@ class TestStudySearch(DatabaseTest):
 
         s1 = self.create_study()
         self.create_study_strain(studyId=s1.publicId, ncbiId=roseburia.ncbiId)
+        self.create_study_strain(studyId=s1.publicId, ncbiId=blautia.ncbiId)
 
         s2 = self.create_study()
-        self.create_study_strain(studyId=s2.publicId, ncbiId=blautia.ncbiId)
+        self.create_study_strain(studyId=s2.publicId, ncbiId=roseburia.ncbiId)
 
         s3 = self.create_study()
-        self.create_study_strain(studyId=s3.publicId, ncbiId=roseburia.ncbiId)
         self.create_study_strain(studyId=s3.publicId, ncbiId=blautia.ncbiId)
 
-        # No connected strains:
+        # No connected strains, will not be returned:
         s4 = self.create_study()
 
         search = StudySearch(self.db_session, user=admin, ncbiIds=[roseburia.ncbiId])
-        self._assertEqualPublicIds(search.fetch_results(), [s3, s1])
+        self._assertEqualPublicIds(search.fetch_results(), [s2, s1])
 
         search = StudySearch(self.db_session, user=admin, ncbiIds=[blautia.ncbiId])
-        self._assertEqualPublicIds(search.fetch_results(), [s3, s2])
+        self._assertEqualPublicIds(search.fetch_results(), [s3, s1])
 
-        # TODO (2025-11-26) AND query for strains
-        # search = StudySearch(self.db_session, user=admin, ncbiIds=[roseburia.ncbiId, blautia.ncbiId])
-        # self._assertEqualPublicIds(search.fetch_results(), [s3])
+        # Order by larger number of matches
+        search = StudySearch(self.db_session, user=admin, ncbiIds=[roseburia.ncbiId, blautia.ncbiId])
+        self._assertEqualPublicIds(search.fetch_results(), [s1, s3, s2])
 
     def test_metabolite_query(self):
         admin = self.create_user(isAdmin=True)
@@ -110,26 +110,26 @@ class TestStudySearch(DatabaseTest):
 
         s1 = self.create_study()
         self.create_study_metabolite(studyId=s1.publicId, chebiId=glucose.chebiId)
+        self.create_study_metabolite(studyId=s1.publicId, chebiId=trehalose.chebiId)
 
         s2 = self.create_study()
-        self.create_study_metabolite(studyId=s2.publicId, chebiId=trehalose.chebiId)
+        self.create_study_metabolite(studyId=s2.publicId, chebiId=glucose.chebiId)
 
         s3 = self.create_study()
-        self.create_study_metabolite(studyId=s3.publicId, chebiId=glucose.chebiId)
         self.create_study_metabolite(studyId=s3.publicId, chebiId=trehalose.chebiId)
 
-        # No connected metabolites:
+        # No connected metabolites, will not be returned:
         s4 = self.create_study()
 
         search = StudySearch(self.db_session, user=admin, chebiIds=[glucose.chebiId])
-        self._assertEqualPublicIds(search.fetch_results(), [s3, s1])
+        self._assertEqualPublicIds(search.fetch_results(), [s2, s1])
 
         search = StudySearch(self.db_session, user=admin, chebiIds=[trehalose.chebiId])
-        self._assertEqualPublicIds(search.fetch_results(), [s3, s2])
+        self._assertEqualPublicIds(search.fetch_results(), [s3, s1])
 
-        # TODO (2025-11-26) AND query for metabolites
-        # search = StudySearch(self.db_session, user=admin, ncbiIds=[glucose.chebiId, trehalose.chebiId])
-        # self._assertEqualPublicIds(search.fetch_results(), [s3])
+        # Order by larger number of matches:
+        search = StudySearch(self.db_session, user=admin, chebiIds=[glucose.chebiId, trehalose.chebiId])
+        self._assertEqualPublicIds(search.fetch_results(), [s1, s3, s2])
 
     def _assertEqualPublicIds(self, list1, list2):
         get_public_id = lambda s: s.publicId
