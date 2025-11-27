@@ -135,6 +135,9 @@ def read_timestamp_date(path):
     return timestamp
 
 
+def is_ajax(request):
+    return request.headers.get('X-Requested-With', '') == 'XMLHttpRequest'
+
 
 def _one_or_error(key, iterator):
     value = next(iterator)

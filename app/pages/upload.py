@@ -17,6 +17,7 @@ from app.model.lib.submission_process import (
     validate_data_file,
 )
 from app.model.lib.errors import LoginRequired
+from app.model.lib.util import is_ajax
 from app.view.forms.submission_form import SubmissionForm
 from app.view.forms.upload_step2_form import UploadStep2Form
 from app.view.forms.upload_step3_form import UploadStep3Form
@@ -59,7 +60,7 @@ def upload_step2_page():
     submission_form = _init_submission_form(step=2)
     upload_form     = _init_upload_form(UploadStep2Form, submission_form.submission)
 
-    if _request_is_ajax():
+    if is_ajax(request):
         return _step2_partial(upload_form, submission_form)
 
     if request.method == 'POST':
@@ -93,7 +94,7 @@ def upload_step3_page():
     submission_form = _init_submission_form(step=3)
     upload_form     = _init_upload_form(UploadStep3Form, submission_form.submission)
 
-    if _request_is_ajax():
+    if is_ajax(request):
         return _step3_partial(upload_form, submission_form)
 
     if request.method == 'POST':
@@ -127,7 +128,7 @@ def upload_step4_page():
     submission_form = _init_submission_form(step=4)
     upload_form     = _init_upload_form(UploadStep4Form, submission_form.submission)
 
-    if _request_is_ajax():
+    if is_ajax(request):
         return _step4_partial(upload_form, submission_form, request.args['subform_type'])
 
     if request.method == 'POST':
@@ -161,7 +162,7 @@ def upload_step5_page():
     submission_form = _init_submission_form(step=5)
     upload_form     = _init_upload_form(UploadStep5Form, submission_form.submission)
 
-    if _request_is_ajax():
+    if is_ajax(request):
         return _step5_partial(upload_form, submission_form)
 
     if request.method == 'POST':
@@ -289,7 +290,3 @@ def _init_upload_form(form_class, submission):
         return form_class(request.form)
     else:
         return form_class(data=submission.studyDesign)
-
-
-def _request_is_ajax():
-    return request.headers.get('X-Requested-With', '') == 'XMLHttpRequest'

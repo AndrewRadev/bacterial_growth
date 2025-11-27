@@ -18,6 +18,7 @@ from app.model.orm import (
     StudyUser,
 )
 from app.model.lib.study_search import StudySearch
+from app.model.lib.util import is_ajax
 
 _PER_PAGE = 10
 
@@ -34,17 +35,20 @@ def new_search_index_page():
 
     studies = search.fetch_results()
 
-    if studies:
-        error = None
+    if is_ajax(request):
+        return render_template(
+            "pages/search/_new_index_update.html",
+            search=search,
+            studies=studies,
+            offset=0,
+        )
     else:
-        error = "Couldn't find a study with these parameters."
-
-    return render_template(
-        "pages/search/new_index.html",
-        search=search,
-        studies=studies,
-        error=error,
-    )
+        return render_template(
+            "pages/search/new_index.html",
+            search=search,
+            studies=studies,
+            offset=0,
+        )
 
 
 def search_index_page():

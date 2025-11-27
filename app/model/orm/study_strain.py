@@ -70,7 +70,8 @@ class StudyStrain(OrmBase):
         results = [{'id': row[0], 'text': f"{row[1]} (NCBI:{row[0]})"} for row in results]
 
         total_count = db_session.scalars(
-            sql.select(sql.func.count(Taxon.name.distinct()))
+            sql.select(sql.func.count(Taxon.ncbiId.distinct()))
+            .join(StudyStrain)
             .where(sql.func.lower(Taxon.name).like(term_pattern))
         ).one()
         has_more = (page * per_page < total_count)

@@ -6,7 +6,7 @@ from flask import url_for, request
 from jinja2.utils import urlize
 
 
-def format_text(text, first_paragraph=False):
+def format_text(text, first_paragraph=False, p_class=''):
     if not text:
         return ''
 
@@ -18,9 +18,12 @@ def format_text(text, first_paragraph=False):
     text = re.sub(r'\bEMGDB0*(\d+)', _replace_experiment_reference, text)
 
     if first_paragraph:
-        text = f"<p>{_split_paragraphs(text)[0]}</p>"
+        text = f"""<p class="{p_class}">{_split_paragraphs(text)[0]}</p>"""
     else:
-        text = "\n\n".join([f"<p>{paragraph.strip()}</p>" for paragraph in _split_paragraphs(text)])
+        text = "\n\n".join([
+            f"""<p class="{p_class}">{paragraph.strip()}</p>"""
+            for paragraph in _split_paragraphs(text)
+        ])
 
     return Markup(text)
 

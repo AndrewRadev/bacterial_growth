@@ -17,13 +17,16 @@
     </h1>
 
     <article>
-      <form action="{{ url_for('new_search_index_page') }}" class="simple-form margin-top-10">
+      <form
+          action="{{ url_for('new_search_index_page') }}"
+          class="simple-form margin-top-10 js-search-form">
         <div class="form-row full">
           <label class="full">
             <span>By study title or description:</span>
             <input
                 type="text"
                 name="q"
+                autocomplete="off"
                 value="{{ request.args.get('q') or '' }}"
                 placeholder="Text included in the study"
                 class="form-input-full form-input-blue" />
@@ -61,15 +64,9 @@
         </div>
       </form>
 
-      {% if studies: %}
-        <ol class="results-list">
-          {{ render_results_list(studies, offset, search.query_words) }}
-        </ol>
-      {% elif error: %}
-        <p>
-          <div class="error-message">{{ error }}</div>
-        </p>
-      {% endif %}
+      <ol class="results-list js-results-list">
+        {{ render_results_list(studies, search, offset) }}
+      </ol>
     </article>
   </div>
 {% endblock %}

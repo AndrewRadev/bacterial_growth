@@ -1,14 +1,4 @@
 Page('.search-page', function($page) {
-  // Make sure the "advanced search" checkbox reflects the current state of the
-  // form:
-  let $checkbox = $page.find('#advanced-search-input');
-  let $inputs = $checkbox.parents('.form-row').nextAll('.form-row.clause');
-  if ($inputs.length == 0) {
-    $checkbox.prop('checked', false);
-  } else {
-    $checkbox.prop('checked', true);
-  }
-
   // Initialize selection of strains
   let $strainSelect = $page.find('.js-strain-select');
   $strainSelect.select2({
@@ -44,6 +34,20 @@ Page('.search-page', function($page) {
     $select.trigger('change');
   });
 
+  // Trigger search automatically
+  $page.on('keyup', 'input[name=q]', _.debounce(updateSearch, 200));
+  $page.on('change', '.js-strain-select,.js-metabolite-select', updateSearch)
+
+  // Make sure the "advanced search" checkbox reflects the current state of the
+  // form:
+  let $checkbox = $page.find('#advanced-search-input');
+  let $inputs = $checkbox.parents('.form-row').nextAll('.form-row.clause');
+  if ($inputs.length == 0) {
+    $checkbox.prop('checked', false);
+  } else {
+    $checkbox.prop('checked', true);
+  }
+
   $page.on('change', '#advanced-search-input', function(e) {
     let checkbox = $(e.currentTarget);
 
@@ -68,6 +72,20 @@ Page('.search-page', function($page) {
     let new_clause = build_new_clause();
     $button.parents('.form-row').before(new_clause);
   });
+
+  function updateSearch() {
+    let $searchForm  = $page.find('.js-search-form');
+    let $resultsList = $page.find('.js-results-list');
+
+    $resultsList.addClass('loading');
+
+    $searchForm.ajaxSubmit({
+      success: function(response) {
+        $resultsList.html(response);
+        $resultsList.removeClass('loading');
+      }
+    });
+  }
 
   function remove_advanced_search() {
     // We find the checkbox and remove all form rows after it:
