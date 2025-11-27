@@ -3,6 +3,18 @@
     display: none;
   }
 
+  .strain-select + .select2-container .select2-selection {
+    background: no-repeat top right url(/static/images/large-icons/bacteria_search.png);
+    background-size: 100px;
+    background-color: var(--light-blue);
+  }
+
+  .metabolite-select + .select2-container .select2-selection {
+    background: no-repeat top right url(/static/images/large-icons/trehalose_transparent.png);
+    background-size: 100px;
+    background-color: var(--light-blue);
+  }
+
   .results-list {
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
