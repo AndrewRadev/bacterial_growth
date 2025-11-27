@@ -17,11 +17,16 @@ def format_text(text, first_paragraph=False, p_class=''):
     text = re.sub(r'\bSMGDB0*(\d+)', _replace_study_reference, text)
     text = re.sub(r'\bEMGDB0*(\d+)', _replace_experiment_reference, text)
 
+    if len(p_class):
+        class_attr = f" class=\"{p_class}\""
+    else:
+        class_attr = ""
+
     if first_paragraph:
-        text = f"""<p class="{p_class}">{_split_paragraphs(text)[0]}</p>"""
+        text = f"<p{class_attr}>{_split_paragraphs(text)[0]}</p>"
     else:
         text = "\n\n".join([
-            f"""<p class="{p_class}">{paragraph.strip()}</p>"""
+            f"<p{class_attr}>{paragraph.strip()}</p>"
             for paragraph in _split_paragraphs(text)
         ])
 
