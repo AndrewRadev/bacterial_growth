@@ -26,7 +26,7 @@ class StudySearch():
         self.user       = user
         self.query      = (query or '').strip().lower()
         self.per_page   = per_page
-        self.ncbiIds    = ncbiIds or []
+        self.ncbiIds    = [int(n) for n in (ncbiIds or [])]
         self.chebiIds   = chebiIds or []
 
         self.query_words = []

@@ -10,6 +10,8 @@ from markupsafe import Markup
 from bs4 import BeautifulSoup
 from werkzeug.exceptions import NotFound
 
+from app.model.lib.util import is_ajax
+
 
 class HelpPages:
     def __init__(self):
@@ -108,7 +110,7 @@ def help_index_page():
     else:
         search_results = None
 
-    if _request_is_ajax():
+    if is_ajax(request):
         return render_template(
             "pages/help/_page_list.html",
             search_results=search_results,
@@ -131,7 +133,3 @@ def help_show_page(name):
         title=title,
         content=html_content,
     )
-
-
-def _request_is_ajax():
-    return request.headers.get('X-Requested-With', '') == 'XMLHttpRequest'
