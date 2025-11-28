@@ -5,7 +5,28 @@ set -e
 export APP_ENV=production
 export PYTHONPATH=.
 
-gunicorn --log-level DEBUG -w 3 --bind "0.0.0.0:8081" "main:create_app()" &
-celery -A scripts.run_celery worker --concurrency=3 --loglevel INFO &
+echo "PID: $$"
 
-wait
+gunicorn --log-level DEBUG -w 3 --bind "0.0.0.0:8081" "main:create_app()" &
+export SERVER_PID=$!
+
+celery -A scripts.run_celery worker --concurrency=3 --loglevel INFO &
+export WORKER_PID=$!
+
+reload_processes() {
+  echo "> Reloading processes"
+
+  # Reload server by using SIGHUP
+  kill -HUP "$SERVER_PID"
+
+  # Reload celery by killing and restarting:
+  kill -TERM "$WORKER_PID"
+  celery -A scripts.run_celery worker --concurrency=3 --loglevel INFO &
+  export WORKER_PID=$!
+}
+
+trap 'reload_processes' SIGHUP
+
+while true; do
+  sleep 1
+done
