@@ -1,0 +1,6 @@
+#! /bin/bash
+
+set -e
+
+export PIDFILE="$(pwd)/var/prod-server.pid"
+kill -HUP "$(cat $PIDFILE)"
