@@ -268,7 +268,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
 
     chart = Chart(
         time_units=study.timeUnits,
-        title=measurement_context.get_chart_label(g.db_session),
+        title=measurement_context.get_chart_label(),
         legend_position='right',
         log_left=log_transform,
     )
