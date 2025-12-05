@@ -60,6 +60,10 @@ class StudyTechnique(OrmBase):
     ), deferred=True)
 
     @property
+    def is_growth(self):
+        return self.type not in ('ph', 'metabolite')
+
+    @property
     def short_name(self):
         return TECHNIQUE_SHORT_NAMES[self.type]
 
