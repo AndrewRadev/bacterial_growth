@@ -20,6 +20,77 @@ This script sets `APP_ENV` appropriately and launches a `gunicorn` server for th
 
 The app is launched on port 8081, but you can modify the script to change that.
 
+If you make a change to the code, you can stop the server and restart it, but it's also possible to run the following command to reload web workers without ever stopping requests:
+
+```bash
+bin/reload-prod-server
+```
+
+This sends a `HUP` signal to gunicorn, which it is able to respond to ([gunicorn FAQ](https://docs.gunicorn.org/en/stable/faq.html#how-do-i-reload-my-application-in-gunicorn)), and it stops and restarts the celery workers. Implementation-wise, `prod-server` script saves its PID to a file under the `var/` directory of the app, and `reload-prod-server` reads that PID and sends the `HUP` signal to the main process.
+
+## Process management with systemd
+
+A useful way to manage the servers is by using [systemd](https://systemd.io/), a very standard service manager in Linux systems. You can create a systemd unit file that looks like this:
+
+```ini
+[Unit]
+Description=mgrowthdb
+
+# start us only once the network and logging subsystems are available
+After=syslog.target network.target
+
+# See these pages for lots of options:
+# https://0pointer.de/public/systemd-man/systemd.service.html
+# https://0pointer.de/public/systemd-man/systemd.exec.html
+[Service]
+Type=simple
+WorkingDirectory=/path/to/your/installation/
+
+# How to start the application and how to reload it. Assumes that you package
+ExecStart=/bin/bash -lc 'source ~/.bashrc && micromamba run -n mgrowthdb bin/prod-server'
+ExecReload=/path/to/your/installation/bin/reload-prod-server
+
+User=<your-user-id>
+Group=users
+UMask=0002
+
+# if we crash, restart
+RestartSec=1
+Restart=on-failure
+
+# Identifier for logging purposes
+SyslogIdentifier=mgrowthdb
+
+[Install]
+WantedBy=multi-user.target
+```
+
+This assumes that you use [micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) for your python environment, but you could also use a virtual environment or some other method. You could also package up the `ExecStart` command in a separate executable that sets up the environment appropriately.
+
+Once you've created this file, you need to place it in the right location where systemd files are found. This should be `/usr/lib/systemd/system/`, but it may vary, check the documentation for your specific flavor of linux. You can symlink the file:
+
+```bash
+sudo ln -s mgrowthdb.service /usr/lib/systemd/system/mgrowthdb.service
+```
+
+Once you do that, you can use the following commands:
+
+```bash
+# Start the service:
+sudo systemctl start mgrowthdb.service
+
+# Enable the service so it starts automatically when the system boots:
+sudo systemctl enable mgrowthdb.service
+
+# Reload the service (without stopping it) or stop and restart it:
+sudo systemctl reload mgrowthdb.service
+sudo systemctl restart mgrowthdb.service
+
+# Check the status of the service or tail its logs as it runs:
+sudo systemctl status mgrowthdb.service
+sudo journalctl -f -u mgrowthdb.service
+```
+
 ## Nginx configuration
 
 A simple Nginx configuration that would work with the app is something like this:
