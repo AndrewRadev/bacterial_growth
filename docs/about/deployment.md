@@ -46,8 +46,12 @@ After=syslog.target network.target
 Type=simple
 WorkingDirectory=/path/to/your/installation/
 
+<<<<<<< HEAD
 # How to start the application and how to reload it.
 # Assumes that you package your python environment using micromamba, but it's not necessary.
+=======
+# How to start the application and how to reload it. Assumes that you package
+>>>>>>> e7788952 (Systemd documentation)
 ExecStart=/bin/bash -lc 'source ~/.bashrc && micromamba run -n mgrowthdb bin/prod-server'
 ExecReload=/path/to/your/installation/bin/reload-prod-server
 
