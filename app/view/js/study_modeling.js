@@ -1,4 +1,4 @@
-Page('.study-manage-page', function($page) {
+Page('.study-modeling-page', function($page) {
   let studyId = $page.data('studyId');
   let $form   = $page.find('.js-modeling-form');
 

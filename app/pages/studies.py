@@ -318,7 +318,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         r_summary    = None
 
     return render_template(
-        'pages/studies/manage/_modeling_chart.html',
+        'pages/studies/modeling/_chart.html',
         chart=chart,
         form_data=request.form,
         model_type=modeling_type,
