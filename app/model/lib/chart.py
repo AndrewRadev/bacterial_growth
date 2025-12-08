@@ -302,7 +302,7 @@ class Chart:
             if lower <= 0.0:
                 lower = None
             else:
-                lower = np.log(lower)
-            upper = np.log(upper)
+                lower = np.log10(lower)
+            upper = np.log10(upper)
 
         return [lower, upper]
