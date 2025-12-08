@@ -46,7 +46,8 @@ After=syslog.target network.target
 Type=simple
 WorkingDirectory=/path/to/your/installation/
 
-# How to start the application and how to reload it. Assumes that you package
+# How to start the application and how to reload it.
+# Assumes that you package your python environment using micromamba, but it's not necessary.
 ExecStart=/bin/bash -lc 'source ~/.bashrc && micromamba run -n mgrowthdb bin/prod-server'
 ExecReload=/path/to/your/installation/bin/reload-prod-server
 
