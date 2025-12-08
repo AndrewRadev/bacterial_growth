@@ -17,7 +17,7 @@ from app.model.orm import (
     MeasurementContext,
     MeasurementTechnique,
     Metabolite,
-    ModelingRequest,
+    ModelingResult,
     Perturbation,
     Project,
     Study,
@@ -276,16 +276,16 @@ class DatabaseTest(unittest.TestCase):
 
         return self._create_orm_record(Submission, params)
 
-    def create_modeling_request(self, **params):
-        study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+    def create_modeling_result(self, **params):
+        measurement_context_id = self._get_or_create_dependency(params, 'measurementContextId', ('measurement_context', 'id'))
 
         params = {
-            'type':    'baranyi_roberts',
-            'studyId': study_id,
+            'type':                 'baranyi_roberts',
+            'measurementContextId': measurement_context_id,
             **params,
         }
 
-        return self._create_orm_record(ModelingRequest, params)
+        return self._create_orm_record(ModelingResult, params)
 
     def create_community(self, **params):
         study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))

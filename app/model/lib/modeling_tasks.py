@@ -94,6 +94,8 @@ def _process_modeling_request(db_session, modeling_result_id, measurement_contex
     db_session.add(modeling_result)
     db_session.commit()
 
+    return modeling_result
+
 
 def _extract_r_summary(text):
     output_lines = []
