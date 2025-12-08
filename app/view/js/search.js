@@ -77,12 +77,9 @@ Page('.search-page', function($page) {
     let $searchForm  = $page.find('.js-search-form');
     let $resultsList = $page.find('.js-results-list');
 
-    $resultsList.addClass('loading');
-
     $searchForm.ajaxSubmit({
       success: function(response) {
         $resultsList.html(response);
-        $resultsList.removeClass('loading');
       }
     });
   }
