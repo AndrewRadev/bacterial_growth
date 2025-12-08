@@ -16,9 +16,11 @@ from app.model.orm import (
     Community,
     Experiment,
     MeasurementContext,
+    MeasurementTechnique,
     ModelingRequest,
     ModelingResult,
     Study,
+    StudyTechnique,
     StudyUser,
     Submission,
 )
@@ -69,7 +71,20 @@ def study_manage_page(publicId):
 
 
 def study_modeling_page(publicId):
-    study = _fetch_study(publicId)
+    study = _fetch_study(
+        publicId,
+        sql_options=(
+            sql.orm.selectinload(Study.studyTechniques),
+            sql.orm.selectinload(Study.experiments, Experiment.bioreplicates),
+            sql.orm.selectinload(Study.experiments, Experiment.compartments),
+            sql.orm.selectinload(
+                Study.studyTechniques,
+                StudyTechnique.measurementTechniques,
+                MeasurementTechnique.measurementContexts,
+                MeasurementContext.modelingResults,
+            ),
+        )
+    )
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
