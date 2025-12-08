@@ -46,7 +46,6 @@ class ModelingRequest(OrmBase):
     type: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
     studyId: Mapped[str] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
-    study: Mapped['Study'] = relationship(back_populates='modelingRequests')
 
     jobUuid: Mapped[str] = mapped_column(sql.String(100))
     state:   Mapped[str] = mapped_column(sql.String(100), default='pending')

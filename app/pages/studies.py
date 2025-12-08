@@ -17,7 +17,6 @@ from app.model.orm import (
     Experiment,
     MeasurementContext,
     MeasurementTechnique,
-    ModelingRequest,
     ModelingResult,
     Study,
     StudyTechnique,
@@ -237,30 +236,27 @@ def study_modeling_submit_action(publicId):
     modeling_type = args.pop('modelingType')
     measurement_context_id = int(args.pop('selectedContext').removeprefix('measurementContext|'))
 
-    modeling_request = g.db_session.scalars(
-        sql.select(ModelingRequest)
+    modeling_result = g.db_session.scalars(
+        sql.select(ModelingResult)
         .where(
-            ModelingRequest.type == modeling_type,
-            ModelingRequest.studyId == study.publicId,
+            ModelingResult.type == modeling_type,
+            ModelingResult.measurementContextId == measurement_context_id,
         )
     ).one_or_none()
 
-    if modeling_request is None:
-        modeling_request = ModelingRequest(
+    if modeling_result is None:
+        modeling_result = ModelingResult(
             type=modeling_type,
-            study=study,
+            measurementContextId=measurement_context_id,
         )
 
-    results = modeling_request.create_results(g.db_session, [measurement_context_id])
-    modeling_request.state = 'pending'
-    g.db_session.add(modeling_request)
+    modeling_result.state = 'pending'
+    g.db_session.add(modeling_result)
     g.db_session.commit()
 
-    result = process_modeling_request.delay(modeling_request.id, [measurement_context_id], args)
-    modeling_request.jobUuid = result.task_id
-    g.db_session.commit()
+    process_modeling_request.delay(modeling_result.id, measurement_context_id, args)
 
-    return {'modelingResultId': results[0].id}
+    return {'modelingResultId': modeling_result.id}
 
 
 def study_modeling_check_json(publicId):
@@ -268,9 +264,8 @@ def study_modeling_check_json(publicId):
 
     result_states = {}
 
-    for modeling_request in study.modelingRequests:
-        for modeling_result in modeling_request.results:
-            result_states[modeling_result.id] = modeling_result.state
+    for modeling_result in study.modelingResults:
+        result_states[modeling_result.id] = modeling_result.state
 
     return result_states
 
@@ -310,9 +305,8 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
 
     modeling_result = g.db_session.scalars(
         sql.select(ModelingResult)
-        .join(ModelingRequest)
         .where(
-            ModelingRequest.type == modeling_type,
+            ModelingResult.type == modeling_type,
             ModelingResult.measurementContextId == measurement_context.id,
             ModelingResult.state == 'ready',
         )

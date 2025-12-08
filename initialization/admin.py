@@ -193,7 +193,7 @@ def init_admin(app):
         form_excluded_columns = [
             'measurements', 'measurementContexts', 'studyTechniques', 'measurementTechniques',
             'studyUsers', 'experiments', 'strains', 'communities', 'compartments',
-            'modelingRequests', 'modelingResults', 'bioreplicates',
+            'modelingResults', 'bioreplicates',
             'studyMetabolites', 'metabolites',
         ]
 

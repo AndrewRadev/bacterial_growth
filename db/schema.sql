@@ -316,7 +316,7 @@ DROP TABLE IF EXISTS ModelingResults;
 CREATE TABLE ModelingResults (
   id int NOT NULL AUTO_INCREMENT,
   `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  requestId int NOT NULL,
+  requestId int DEFAULT NULL,
   state varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `error` text,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -673,5 +673,6 @@ INSERT INTO MigrationVersions VALUES
 (77,'2025_11_19_173702_add_include_unknown_flag_to_study_techniques','2025-11-20 14:00:51'),
 (79,'2025_11_26_151231_rename_ncbi_id_in_study_strains','2025-11-26 14:13:39'),
 (81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20'),
-(83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13');
+(83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13'),
+(85,'2025_12_08_172450_remove_modeling_request_id_constraint','2025-12-08 16:26:02');
 

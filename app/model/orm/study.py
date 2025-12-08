@@ -67,7 +67,6 @@ class Study(OrmBase):
     )
 
     measurementContexts: Mapped[List['MeasurementContext']] = owner_relationship()
-    modelingRequests:    Mapped[List['ModelingRequest']]    = owner_relationship()
 
     bioreplicates: Mapped[List['Bioreplicate']] = relationship(
         secondary='Experiments',
@@ -86,7 +85,7 @@ class Study(OrmBase):
     )
 
     modelingResults: Mapped[List['ModelingResult']] = relationship(
-        secondary='ModelingRequests',
+        secondary='MeasurementContexts',
         viewonly=True,
     )
 

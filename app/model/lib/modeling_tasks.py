@@ -9,7 +9,6 @@ from celery.utils.log import get_task_logger
 from db import FLASK_DB
 from app.model.lib.r_script import RScript
 from app.model.orm import (
-    ModelingRequest,
     ModelingResult,
     MeasurementContext,
 )
@@ -18,109 +17,81 @@ _LOGGER = get_task_logger(__name__)
 
 
 @shared_task
-def process_modeling_request(modeling_request_id, measurement_context_ids, args):
+def process_modeling_request(modeling_result_id, measurement_context_id, args):
     db_session = FLASK_DB.session
 
-    return _process_modeling_request(db_session, modeling_request_id, measurement_context_ids, args)
+    return _process_modeling_request(db_session, modeling_result_id, measurement_context_id, args)
 
 
-def _process_modeling_request(db_session, modeling_request_id, measurement_context_ids, args={}):
-    modeling_request = db_session.get(ModelingRequest, modeling_request_id)
-    modeling_request.state = 'pending'
-    db_session.commit()
+def _process_modeling_request(db_session, modeling_result_id, measurement_context_id, args={}):
+    modeling_result = db_session.get(ModelingResult, modeling_result_id)
 
-    measurement_contexts = db_session.scalars(
-        sql.select(MeasurementContext)
-        .where(MeasurementContext.id.in_(measurement_context_ids))
-    ).all()
+    measurement_context = db_session.get(MeasurementContext, measurement_context_id)
 
-    has_error = False
-
-    point_count = int(args.get('pointCount', '5'))
-    end_time    = args.get('endTime', '')
+    modeling_type = modeling_result.type
+    point_count   = int(args.get('pointCount', '5'))
+    end_time      = args.get('endTime', '')
 
     with tempfile.TemporaryDirectory() as tmp_dir_name:
-        for measurement_context in measurement_contexts:
-            modeling_result = db_session.scalars(
-                sql.select(ModelingResult)
-                .where(
-                    ModelingResult.requestId == modeling_request.id,
-                    ModelingResult.measurementContextId == measurement_context.id,
-                )
-            ).one()
+        inputs = {}
 
-            inputs = {}
+        if modeling_type == 'easy_linear':
+            inputs = {'pointCount': point_count}
+        elif modeling_type in ('logistic', 'baranyi_roberts'):
+            inputs = {'endTime': end_time}
 
-            if modeling_request.type == 'easy_linear':
-                inputs = {'pointCount': point_count}
-            elif modeling_request.type in ('logistic', 'baranyi_roberts'):
-                inputs = {'endTime': end_time}
+        data = measurement_context.get_df(db_session)
+        if modeling_type in ('logistic', 'baranyi_roberts') and end_time != '':
+            data = data[data['time'] <= float(end_time)]
 
-            db_session.add(modeling_result)
-            modeling_request.results.append(modeling_result)
+        # We don't need standard deviation for modeling:
+        data = data.drop(columns=['std'])
 
-            data = measurement_context.get_df(db_session)
-            if modeling_request.type in ('logistic', 'baranyi_roberts') and end_time != '':
-                data = data[data['time'] <= float(end_time)]
+        # Remove rows with NA values, if any
+        data = data.dropna()
 
-            # We don't need standard deviation for modeling:
-            data = data.drop(columns=['std'])
+        try:
+            rscript = RScript(root_path=tmp_dir_name)
+            rscript.write_csv('input.csv', data)
+            if modeling_type == 'easy_linear':
+                rscript.write_json('input.json', {'pointCount': point_count})
 
-            # Remove rows with NA values, if any
-            data = data.dropna()
+            script_name = f"scripts/modeling/{modeling_type}.R"
+            output      = rscript.run(script_name)
 
-            try:
-                rscript = RScript(root_path=tmp_dir_name)
-                rscript.write_csv('input.csv', data)
-                if modeling_request.type == 'easy_linear':
-                    rscript.write_json('input.json', {'pointCount': point_count})
+            _LOGGER.info(output)
 
-                script_name = f"scripts/modeling/{modeling_request.type}.R"
-                output      = rscript.run(script_name)
+            fit          = rscript.read_flat_json('fit.json', discard_keys="_row")
+            coefficients = rscript.read_key_value_json(
+                'coefficients.json',
+                key_name="_row",
+                value_name="coefficients",
+            )
 
-                _LOGGER.info(output)
-
-                fit          = rscript.read_flat_json('fit.json', discard_keys="_row")
-                coefficients = rscript.read_key_value_json(
-                    'coefficients.json',
-                    key_name="_row",
-                    value_name="coefficients",
-                )
-
-                if coefficients is None or fit is None:
-                    modeling_result.state = 'error'
-                    modeling_result.error = 'No coefficients and/or fit were generated by the R script'
-                    has_error = True
-                else:
-                    modeling_result.update(
-                        rSummary=_extract_r_summary(output),
-                        params={
-                            'inputs':              inputs,
-                            'coefficients':        coefficients,
-                            'fit':                 fit,
-                            'r_version':           rscript.get_r_version(),
-                            'growthrates_version': rscript.get_growthrates_version(),
-                        },
-                        state='ready',
-                        error=None,
-                        calculatedAt=datetime.now(UTC),
-                    )
-                    flag_modified(modeling_result, 'params')
-
-                    modeling_request.error = None
-            except Exception as e:
+            if coefficients is None or fit is None:
                 modeling_result.state = 'error'
-                modeling_result.error = 'RScript error'
-                has_error = True
-                _LOGGER.error(e)
+                modeling_result.error = 'No coefficients and/or fit were generated by the R script'
+            else:
+                modeling_result.update(
+                    rSummary=_extract_r_summary(output),
+                    params={
+                        'inputs':              inputs,
+                        'coefficients':        coefficients,
+                        'fit':                 fit,
+                        'r_version':           rscript.get_r_version(),
+                        'growthrates_version': rscript.get_growthrates_version(),
+                    },
+                    state='ready',
+                    error=None,
+                    calculatedAt=datetime.now(UTC),
+                )
+                flag_modified(modeling_result, 'params')
+        except Exception as e:
+            modeling_result.state = 'error'
+            modeling_result.error = 'RScript error'
+            _LOGGER.error(e)
 
-    if has_error:
-        modeling_request.state = 'error'
-        modeling_request.error = 'One or more requests errored out'
-    else:
-        modeling_request.state = 'ready'
-
-    db_session.add(modeling_request)
+    db_session.add(modeling_result)
     db_session.commit()
 
 
