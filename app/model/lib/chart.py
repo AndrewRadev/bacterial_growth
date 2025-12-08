@@ -115,30 +115,39 @@ class Chart:
         left_yaxis_range  = self._calculate_y_range(converted_data_left, log=self.log_left)
         right_yaxis_range = self._calculate_y_range(converted_data_right, log=self.log_right)
 
-        for index, (x0, x1, label, text) in enumerate(self.regions):
-            y0, y1 = left_yaxis_range
+        if self.regions:
+            # No log-transformation applied for the region-drawing:
+            y0, y1 = self._calculate_y_range(converted_data_left)
 
-            fig.add_trace(
-                go.Scatter(
-                    name=label,
-                    x=[x0, x0, x1, x1, x0],
-                    y=[y0, y0, y0, y1, y1],
-                    opacity=0.15,
-                    line_width=0,
-                    fill="toself",
-                    hovertemplate=text,
-                    mode="text",
-                ),
-            )
+            for index, (x0, x1, label, text) in enumerate(self.regions):
+                fig.add_trace(
+                    go.Scatter(
+                        name=label,
+                        x=[x0, x0, x1, x1, x0],
+                        y=[y0, y0, y0, y1, y1],
+                        opacity=0.15,
+                        line_width=0,
+                        fill="toself",
+                        hovertemplate=text,
+                        mode="text",
+                    ),
+                )
 
-        fig.update_yaxes(title_text=left_units_label,  secondary_y=False)
-        fig.update_yaxes(title_text=right_units_label, secondary_y=True)
-
-        left_yaxis = dict(side="left", exponentformat="power", range=left_yaxis_range)
+        left_yaxis = dict(
+            side="left",
+            title_text=left_units_label,
+            exponentformat="power",
+            range=left_yaxis_range,
+        )
         if self.log_left:
             left_yaxis['type'] = 'log'
 
-        right_yaxis = dict(side="right", exponentformat="power", range=right_yaxis_range)
+        right_yaxis = dict(
+            side="right",
+            title_text=right_units_label,
+            exponentformat="power",
+            range=right_yaxis_range,
+        )
         if self.log_right:
             right_yaxis['type'] = 'log'
 
@@ -295,14 +304,14 @@ class Chart:
         # to make sure the content is visible:
         padding = (global_max_y - global_min_y) * 0.05
 
+        if log:
+            if global_min_y <= 0.0:
+                global_min_y = -math.inf
+            else:
+                global_min_y = np.log10(global_min_y)
+            global_max_y = np.log10(global_max_y)
+
         lower = global_min_y - padding
         upper = global_max_y + padding
-
-        if log:
-            if lower <= 0.0:
-                lower = None
-            else:
-                lower = np.log10(lower)
-            upper = np.log10(upper)
 
         return [lower, upper]
