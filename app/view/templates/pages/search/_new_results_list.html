@@ -16,12 +16,21 @@
             {{ study.nameWithId|highlight(search.query_words) }}
           </a>
 
-          {% if not study.isPublished: %}
-            <span
-              class="icon icon-invisible"
-              data-tooltip="This study is not published yet. You're seeing it because you uploaded it, you have permission to manage it, or you're an admin.">
-            </span>
-          {% endif %}
+          <div class="flex-row flex-right flex-gap-10">
+            {% if not study.isPublished: %}
+              <span
+                  class="icon icon-invisible flex-end"
+                  data-tooltip="This study is not published yet. You're seeing it because you uploaded it, you have permission to manage it, or you're an admin.">
+              </span>
+            {% endif %}
+
+            {% if study.manageable_by_user(g.current_user): %}
+              <span
+                  class="icon icon-tool flex-end"
+                  data-tooltip="You are able to manage this study, either because you uploaded it or because you've given someone the right to edit it.">
+              </span>
+            {% endif %}
+          </div>
         </h3>
 
         {% if study.description: %}
