@@ -16,6 +16,7 @@
   }
 
   .results-list {
+    transition: all var(--transition-length);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding-right: 40px;
