@@ -2,7 +2,6 @@ import sqlalchemy as sql
 
 from app.model.lib.db import execute_into_df
 from app.model.lib.chart import Chart
-from app.model.lib.log_transform import apply_log_transform
 from app.model.orm import (
     Bioreplicate,
     Experiment,
@@ -68,10 +67,7 @@ class ComparativeChartForm:
                 axis = 'left'
                 log_transform = self.log_left
 
-            df = self.get_df(measurement_context.id)
-            if log_transform:
-                df = apply_log_transform(df)
-
+            df    = self.get_df(measurement_context.id)
             label = measurement_context.get_chart_label()
 
             if technique.subjectType == 'metabolite':

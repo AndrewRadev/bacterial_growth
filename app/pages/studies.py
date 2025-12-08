@@ -28,7 +28,6 @@ from app.view.forms.comparative_chart_form import ComparativeChartForm
 from app.model.lib.chart import Chart
 from app.model.lib.modeling_tasks import process_modeling_request
 from app.model.lib.model_export import export_model_csv
-from app.model.lib.log_transform import apply_log_transform
 import app.model.lib.util as util
 
 
@@ -294,9 +293,6 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
     if units == '':
         units = measurement_context.technique.short_name
 
-    if log_transform:
-        measurement_df = apply_log_transform(measurement_df)
-
     chart.add_df(
         measurement_df,
         units=units,
@@ -314,8 +310,6 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
 
     if modeling_result:
         df = modeling_result.generate_chart_df(measurement_df)
-        if log_transform:
-            df = apply_log_transform(df)
 
         label = modeling_result.model_name
         chart.add_model_df(df, units=units, label=label)

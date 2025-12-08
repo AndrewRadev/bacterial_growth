@@ -96,11 +96,6 @@ class Chart:
         if right_units_label == '[mixed units]':
             self.mixed_units_right = True
 
-        if self.log_left:
-            left_units_label = f"ln({left_units_label})"
-        if self.log_right:
-            right_units_label = f"ln({right_units_label})"
-
         for (df, label) in converted_data_left:
             scatter_params = self._get_scatter_params(df, label, log=self.log_left)
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=False)
@@ -139,6 +134,14 @@ class Chart:
         fig.update_yaxes(title_text=left_units_label,  secondary_y=False)
         fig.update_yaxes(title_text=right_units_label, secondary_y=True)
 
+        left_yaxis = dict(side="left", exponentformat="power", range=left_yaxis_range)
+        if self.log_left:
+            left_yaxis['type'] = 'log'
+
+        right_yaxis = dict(side="right", exponentformat="power", range=right_yaxis_range)
+        if self.log_right:
+            right_yaxis['type'] = 'log'
+
         if self.title:
             title = dict(text=self.title)
         else:
@@ -152,16 +155,8 @@ class Chart:
             legend=dict(yanchor="bottom", y=1, xanchor="left", x=0, orientation='h'),
             modebar=dict(orientation='v'),
             font_family="Public Sans",
-            yaxis=dict(
-                exponentformat="power",
-                side="left",
-                range=left_yaxis_range,
-            ),
-            yaxis2=dict(
-                exponentformat="power",
-                side="right",
-                range=right_yaxis_range,
-            ),
+            yaxis=left_yaxis,
+            yaxis2=right_yaxis,
             xaxis=dict(
                 title=dict(text='Time (h)'),
                 range=xaxis_range,
@@ -210,22 +205,12 @@ class Chart:
         return converted_data, tuple(converted_units)[0]
 
     def _get_scatter_params(self, df, label, log=False):
-        if log:
-            value = df['log_value']
-        else:
-            value = df['value']
+        value = df['value']
 
         if self.show_std and 'std' in df:
             if df['std'].isnull().all():
                 # STD values were blank, don't draw error bars
                 error_y = None
-            elif log:
-                # data should have been transformed, the std will be split into
-                # upper and lower:
-                error_y = go.scatter.ErrorY(
-                    array=df['log_std_upper'],
-                    arrayminus=df['log_std_lower'],
-                )
             else:
                 # We want to clip negative error bars to 0
                 positive_err = df['std']
@@ -282,10 +267,7 @@ class Chart:
             lowers = []
             uppers = []
 
-            if log:
-                entries = zip(df['log_value'], df['log_std_upper'], df['log_std_lower'])
-            else:
-                entries = zip(df['value'], df['std'], df['std'])
+            entries = zip(df['value'], df['std'], df['std'])
 
             for value, upper_std, lower_std in entries:
                 # For some reason, pandas might give us a None here, or it might
@@ -312,4 +294,15 @@ class Chart:
         # The range of the chart is given a padding depending on the data range
         # to make sure the content is visible:
         padding = (global_max_y - global_min_y) * 0.05
-        return [global_min_y - padding, global_max_y + padding]
+
+        lower = global_min_y - padding
+        upper = global_max_y + padding
+
+        if log:
+            if lower <= 0.0:
+                lower = None
+            else:
+                lower = np.log(lower)
+            upper = np.log(upper)
+
+        return [lower, upper]
