@@ -1,3 +1,4 @@
+from pathlib import Path
 import flask_assets
 
 
@@ -55,27 +56,12 @@ def init_assets(app):
         output='build/plotly.js'
     ))
 
+    app_css_files = [f"../app/view/css/{p.name}" for p in Path('app/view/css').glob('*.css')]
+
     assets.register('app_css', flask_assets.Bundle(
         '../app/view/css/vendor/select2-4.0.13.css',
         '../app/view/css/vendor/tippy-fix.css',
-        '../app/view/css/select2-custom.css',
-        '../app/view/css/reset.css',
-        '../app/view/css/utils.css',
-        '../app/view/css/fonts.css',
-        '../app/view/css/main.css',
-        '../app/view/css/sidebar.css',
-        '../app/view/css/home.css',
-        '../app/view/css/search.css',
-        '../app/view/css/upload.css',
-        '../app/view/css/export.css',
-        '../app/view/css/login.css',
-        '../app/view/css/profile.css',
-        '../app/view/css/study.css',
-        '../app/view/css/study-visualize.css',
-        '../app/view/css/study-manage.css',
-        '../app/view/css/experiment.css',
-        '../app/view/css/comparison.css',
-        '../app/view/css/help.css',
+        *app_css_files,
         filters='cssmin',
         output='build/app.css'
     ))

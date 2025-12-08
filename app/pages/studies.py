@@ -68,6 +68,14 @@ def study_manage_page(publicId):
     return render_template("pages/studies/manage.html", study=study)
 
 
+def study_modeling_page(publicId):
+    study = _fetch_study(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
+
+    return render_template("pages/studies/modeling.html", study=study)
+
+
 def study_export_page(publicId):
     study = _fetch_study(publicId)
 

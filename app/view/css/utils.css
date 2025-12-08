@@ -376,8 +376,7 @@ form.simple-form {
   }
 
   &.orange-border {
-    border: 1px solid orange;
-  }
+    border: 1px solid coral; }
 
   &.no-border {
     border: none;
@@ -436,19 +435,20 @@ form.simple-form {
   vertical-align: bottom;
 }
 
-.icon.icon-edit           { background-image: url('/static/images/icons/edit.svg'); }
-.icon.icon-remove         { background-image: url('/static/images/icons/red-minus.svg'); }
-.icon.icon-delete         { background-image: url('/static/images/icons/square-red-minus.svg'); }
-.icon.icon-add            { background-image: url('/static/images/icons/green-plus.svg'); }
-.icon.icon-download-black { background-image: url('/static/images/icons/download-black.svg'); }
-.icon.icon-download-white { background-image: url('/static/images/icons/download-white.svg'); }
-.icon.icon-chart          { background-image: url('/static/images/icons/chart-dots-2.svg'); }
-.icon.icon-tool           { background-image: url('/static/images/icons/tool.svg'); }
-.icon.icon-info           { background-image: url('/static/images/icons/info-circle.svg'); }
-.icon.icon-duplicate      { background-image: url('/static/images/icons/transition-bottom.svg'); }
-.icon.icon-left           { background-image: url('/static/images/icons/chevrons-left.svg'); }
-.icon.icon-right          { background-image: url('/static/images/icons/chevrons-right.svg'); }
-.icon.icon-orcid          { background-image: url('/static/images/icons/orcid-authenticated.svg'); }
-.icon.icon-invisible      { background-image: url('/static/images/icons/red-eye.svg'); }
-.icon.icon-unknown-strain { background-image: url('/static/images/icons/progress-help.svg'); }
-.icon.icon-calculated     { background-image: url('/static/images/icons/calculator.svg'); }
+.icon.icon-edit              { background-image: url('/static/images/icons/edit.svg'); }
+.icon.icon-remove            { background-image: url('/static/images/icons/red-minus.svg'); }
+.icon.icon-delete            { background-image: url('/static/images/icons/square-red-minus.svg'); }
+.icon.icon-add               { background-image: url('/static/images/icons/green-plus.svg'); }
+.icon.icon-download-black    { background-image: url('/static/images/icons/download-black.svg'); }
+.icon.icon-download-white    { background-image: url('/static/images/icons/download-white.svg'); }
+.icon.icon-chart             { background-image: url('/static/images/icons/chart-dots-2.svg'); }
+.icon.icon-tool              { background-image: url('/static/images/icons/tool.svg'); }
+.icon.icon-info              { background-image: url('/static/images/icons/info-circle.svg'); }
+.icon.icon-duplicate         { background-image: url('/static/images/icons/transition-bottom.svg'); }
+.icon.icon-left              { background-image: url('/static/images/icons/chevrons-left.svg'); }
+.icon.icon-right             { background-image: url('/static/images/icons/chevrons-right.svg'); }
+.icon.icon-orcid             { background-image: url('/static/images/icons/orcid-authenticated.svg'); }
+.icon.icon-invisible         { background-image: url('/static/images/icons/red-eye.svg'); }
+.icon.icon-unknown-strain    { background-image: url('/static/images/icons/progress-help.svg'); }
+.icon.icon-calculated        { background-image: url('/static/images/icons/calculator.svg'); }
+.icon.icon-calculated-orange { background-image: url('/static/images/icons/calculator-orange.svg'); }
