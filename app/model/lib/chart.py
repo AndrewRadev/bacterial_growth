@@ -263,8 +263,9 @@ class Chart:
         Find the limit for the y axis, ignoring model dataframes, since they
         might have exponentials that shoot up.
         """
-        global_max_y = 0
-        global_min_y = math.inf
+        global_max_y          = 0
+        global_min_y          = math.inf
+        global_positive_min_y = math.inf
 
         for (i, (df, _)) in enumerate(data):
             if i in self.model_df_indices:
@@ -292,24 +293,30 @@ class Chart:
                 else:
                     lowers.append(np.clip(value - lower_std, min=0))
 
-            max_y = max(uppers)
-            min_y = min(lowers)
+            max_y          = max(uppers)
+            min_y          = min(lowers)
+            positive_min_y = min([y for y in lowers if y > 0])
 
             if max_y > global_max_y:
                 global_max_y = max_y
             if min_y < global_min_y:
                 global_min_y = min_y
+            if positive_min_y < global_positive_min_y:
+                global_positive_min_y = positive_min_y
 
         # The range of the chart is given a padding depending on the data range
         # to make sure the content is visible:
         padding = (global_max_y - global_min_y) * 0.05
 
         if log:
+            # Fifth of an order of magnitude of padding:
+            padding = 0.2
+            global_max_y = np.log10(global_max_y)
+
             if global_min_y <= 0.0:
-                global_min_y = -math.inf
+                global_min_y = np.log10(global_positive_min_y)
             else:
                 global_min_y = np.log10(global_min_y)
-            global_max_y = np.log10(global_max_y)
 
         lower = global_min_y - padding
         upper = global_max_y + padding
