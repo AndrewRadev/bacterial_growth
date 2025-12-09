@@ -128,8 +128,6 @@ Page('.study-modeling-page', function($page) {
       data: {
         'modelingType': modelingType,
         'logTransform': logTransform,
-        'width':        $chart.width(),
-        'height':       $chart.height(),
       },
       success: function(response) {
         $chart.html(response)

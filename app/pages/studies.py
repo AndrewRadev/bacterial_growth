@@ -273,10 +273,6 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
     study = _fetch_study(publicId)
     args = request.args.to_dict()
 
-    # TODO (2025-06-12) Unused?
-    # width  = args.pop('width')
-    # height = args.pop('height')
-
     modeling_type = args.pop('modelingType')
     log_transform = args.pop('logTransform', 'false') == 'true'
 
