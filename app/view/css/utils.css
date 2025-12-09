@@ -258,6 +258,7 @@ form.simple-form {
     border-radius: var(--border-radius);
     background-color: rgb(8, 131, 149);
     color: white;
+    transition: background-color var(--transition-length);
 
     &.small-button {
       padding: 0.3rem;
@@ -376,7 +377,8 @@ form.simple-form {
   }
 
   &.orange-border {
-    border: 1px solid coral; }
+    border: 1px solid coral;
+  }
 
   &.no-border {
     border: none;
