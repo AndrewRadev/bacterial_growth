@@ -119,8 +119,6 @@
     </div>
   {% endfor %}
 
-  <hr>
-
   <div class="modeling-fields">
     <div class="form-row">
       <label class="full">
@@ -134,17 +132,17 @@
     </div>
 
     <div class="form-row hidden" data-modeling-input data-modeling-input-easy_linear>
-      <div class="form-row margin-top-10">
-        <label data-tooltip="Set to limit the number of points to use to determine the slope">
-          <span>Point count:</span>
-          <input
-              type="number"
-              name="pointCount"
-              min="2"
-              class="form-input-blue form-input-full"
-              value="{{ request.form['pointCount'] or 5 }}" />
-        </label>
-      </div>
+      <label
+          class="full"
+          data-tooltip="Set to limit the number of points to use to determine the slope">
+        <span>Point count:</span>
+        <input
+            type="number"
+            name="pointCount"
+            min="2"
+            class="form-input-blue form-input-full"
+            value="{{ request.form['pointCount'] or 5 }}" />
+      </label>
     </div>
 
     <div class="form-row full hidden" data-modeling-input data-modeling-input-logistic data-modeling-input-baranyi_roberts>

@@ -20,7 +20,7 @@ _LOGGER = get_task_logger(__name__)
 def process_modeling_request(modeling_result_id, measurement_context_id, args):
     db_session = FLASK_DB.session
 
-    return _process_modeling_request(db_session, modeling_result_id, measurement_context_id, args)
+    _process_modeling_request(db_session, modeling_result_id, measurement_context_id, args)
 
 
 def _process_modeling_request(db_session, modeling_result_id, measurement_context_id, args={}):
@@ -94,6 +94,7 @@ def _process_modeling_request(db_session, modeling_result_id, measurement_contex
     db_session.add(modeling_result)
     db_session.commit()
 
+    # Returning the object for testing purposes, not used
     return modeling_result
 
 
