@@ -98,6 +98,13 @@ class ModelingResult(OrmBase):
                 'K':     None,
                 'h0':    None,
             }
+        elif model_type.startswith('custom_'):
+            inputs = {}
+            coefficients = {
+                'mumax': None,
+                'lag':   None,
+                'K':     None,
+            }
         else:
             raise ValueError(f"Don't know what the coefficients are for model type: {repr(model_type)}")
 

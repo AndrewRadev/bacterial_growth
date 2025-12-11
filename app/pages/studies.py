@@ -295,7 +295,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         label="Measurements",
     )
 
-    modeling_result = g.db_session.scalars(
+    modeling_record = g.db_session.scalars(
         sql.select(ModelingResult)
         .where(
             ModelingResult.type == modeling_type,
@@ -304,14 +304,14 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         )
     ).one_or_none()
 
-    if modeling_result:
-        df = modeling_result.generate_chart_df(measurement_df)
+    if modeling_record:
+        df = modeling_record.generate_chart_df(measurement_df)
 
-        label = modeling_result.model_name
+        label = modeling_record.model_name
         chart.add_model_df(df, units=units, label=label)
 
-        model_params = modeling_result.params
-        r_summary    = modeling_result.rSummary
+        model_params = modeling_record.params
+        r_summary    = modeling_record.rSummary
     else:
         model_params = ModelingResult.empty_params(modeling_type)
         r_summary    = None
@@ -320,7 +320,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         'pages/studies/modeling/_chart.html',
         chart=chart,
         form_data=request.form,
-        model_type=modeling_type,
+        modeling_type=modeling_type,
         model_params=model_params,
         r_summary=r_summary,
         measurement_context=measurement_context,

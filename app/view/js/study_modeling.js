@@ -108,6 +108,14 @@ Page('.study-modeling-page', function($page) {
 
     $form.find('[data-modeling-input]').addClass('hidden');
     $form.find(`[data-modeling-input-${modelingType}]`).removeClass('hidden');
+
+    if (modelingType.startsWith('custom_')) {
+      $form.find('.js-calculation-status').hide();
+      $page.find('.js-custom-upload-form').show();
+    } else {
+      $form.find('.js-calculation-status').show();
+      $page.find('.js-custom-upload-form').hide();
+    }
   }
 
   function updateChart($radio) {

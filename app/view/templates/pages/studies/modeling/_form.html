@@ -127,6 +127,7 @@
           <option value="easy_linear">"Easy linear" method</option>
           <option value="logistic">Logistic model</option>
           <option value="baranyi_roberts">Baranyi-Roberts model</option>
+          <option value="custom_new">Custom model</option>
         </select>
       </label>
     </div>
@@ -157,16 +158,18 @@
       </label>
     </div>
 
-    <h3>Calculation status</h3>
+    <div class="js-calculation-status">
+      <h3>Calculation status</h3>
 
-    <div class="help">
-      <div class="js-calculation-result">
-        Pending, submit the form to start calculation process.
+      <div class="help">
+        <div class="js-calculation-result">
+          Pending, submit the form to start calculation process.
+        </div>
       </div>
-    </div>
 
-    <div class="flex-column flex-gap-10">
-      <input type="submit" class="flex-end" value="Calculate" />
+      <div class="flex-column flex-gap-10">
+        <input type="submit" class="flex-end" value="Calculate" />
+      </div>
     </div>
   </div>
 

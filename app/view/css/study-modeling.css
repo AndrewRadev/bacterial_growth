@@ -39,10 +39,6 @@
     margin-top: 20px;
   }
 
-  .chart-placeholder {
-    height: 300px;
-  }
-
   .modeling-form {
     .columns {
       display: flex;
