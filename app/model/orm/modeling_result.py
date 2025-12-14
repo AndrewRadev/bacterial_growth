@@ -144,12 +144,12 @@ class ModelingResult(OrmBase):
         else:
             timepoints = np.linspace(start_time, end_time, 200)
             values     = self._predict(timepoints)
-            errors     = []
+            errors     = None
 
         return pd.DataFrame.from_dict({
             'time':   timepoints,
             'value':  values,
-            'errors': stds,
+            'errors': errors,
         })
 
     def _predict(self, timepoints):
