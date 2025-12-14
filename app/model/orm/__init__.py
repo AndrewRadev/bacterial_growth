@@ -9,7 +9,6 @@ from .measurement import Measurement
 from .measurement_context import MeasurementContext
 from .measurement_technique import MeasurementTechnique
 from .metabolite import Metabolite
-from .modeling_request import ModelingRequest
 from .modeling_result import ModelingResult
 from .perturbation import Perturbation
 from .project import Project

@@ -46,9 +46,6 @@ class ModelingResult(OrmBase):
     id:   Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
-    requestId: Mapped[int] = mapped_column(sql.ForeignKey('ModelingRequests.id'), nullable=False)
-    request: Mapped['ModelingRequest'] = relationship(back_populates='results')
-
     measurementContextId: Mapped[int] = mapped_column(
         sql.ForeignKey('MeasurementContexts.id'),
         nullable=False,

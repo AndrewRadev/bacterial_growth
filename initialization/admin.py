@@ -31,7 +31,6 @@ from app.model.orm import (
     MeasurementContext,
     MeasurementTechnique,
     Metabolite,
-    ModelingRequest,
     ModelingResult,
     Perturbation,
     Project,
@@ -258,7 +257,6 @@ def init_admin(app):
     admin.add_view(AppView(MeasurementTechnique,      db_session, category="Measurements"))
     admin.add_view(AppView(MeasurementContext,        db_session, category="Measurements"))
     admin.add_view(AppView(Measurement,               db_session, category="Measurements"))
-    admin.add_view(AppView(ModelingRequest,           db_session, category="Measurements"))
     admin.add_view(ModelingResultView(ModelingResult, db_session, category="Measurements"))
 
     class MetaboliteView(AppView):
