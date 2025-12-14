@@ -69,7 +69,7 @@ class ModelingResult(OrmBase):
     # For custom models:
     xValues: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
     yValues: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
-    yStds:   Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    yErrors: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
     @validates('type')
     def _validate_type(self, key, value):
@@ -140,16 +140,16 @@ class ModelingResult(OrmBase):
         if self.type.startswith('custom_'):
             timepoints = self.xValues
             values     = self.yValues
-            stds       = self.yStds
+            errors     = self.yErrors
         else:
             timepoints = np.linspace(start_time, end_time, 200)
             values     = self._predict(timepoints)
-            stds       = []
+            errors     = []
 
         return pd.DataFrame.from_dict({
-            'time':  timepoints,
-            'value': values,
-            'std':   stds,
+            'time':   timepoints,
+            'value':  values,
+            'errors': stds,
         })
 
     def _predict(self, timepoints):

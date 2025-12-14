@@ -303,7 +303,7 @@ def study_modeling_custom_create_action(publicId):
     modeling_result.update(
         xValues=predictions_df['time'].tolist(),
         yValues=predictions_df['value'].tolist(),
-        yStds=predictions_df['std'].replace({np.nan: None}).tolist(),
+        yErrors=predictions_df['error'].replace({np.nan: None}).tolist(),
     )
 
     g.db_session.add(modeling_result)

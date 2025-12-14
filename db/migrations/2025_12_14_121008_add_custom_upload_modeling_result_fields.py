@@ -6,7 +6,7 @@ def up(conn):
         ALTER TABLE ModelingResults
         ADD xValues JSON DEFAULT (json_array()),
         ADD yValues JSON DEFAULT (json_array()),
-        ADD yStds JSON DEFAULT (json_array()),
+        ADD yErrors JSON DEFAULT (json_array()),
         ADD customModelId INT DEFAULT NULL,
 
         ADD CONSTRAINT ModelingResults_customModelId
@@ -25,7 +25,7 @@ def down(conn):
         ALTER TABLE ModelingResults
         DROP xValues,
         DROP yValues,
-        DROP yStds,
+        DROP yErrors,
         DROP CONSTRAINT ModelingResults_customModelId,
         DROP customModelId;
     """
