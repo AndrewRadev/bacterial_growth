@@ -10,6 +10,7 @@ from sqlalchemy.orm import (
     relationship,
     validates,
 )
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
@@ -65,6 +66,7 @@ class ModelingResult(OrmBase):
     createdAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     updatedAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     calculatedAt: Mapped[datetime] = mapped_column(UtcDateTime)
+    publishedAt:  Mapped[datetime] = mapped_column(UtcDateTime)
 
     # For custom models:
     xValues: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
@@ -73,7 +75,7 @@ class ModelingResult(OrmBase):
 
     @validates('type')
     def _validate_type(self, key, value):
-        if re.fullmatch('custom_\d+', value):
+        if re.fullmatch(r'custom_\d+', value):
             return value
         else:
             return self._validate_inclusion(key, value, _VALID_TYPES)
@@ -125,6 +127,10 @@ class ModelingResult(OrmBase):
                 'rss': None,
             }
         }
+
+    @hybrid_property
+    def isPublished(self):
+        return self.publishedAt != None
 
     @property
     def model_name(self):

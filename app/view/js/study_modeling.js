@@ -129,10 +129,12 @@ Page('.study-modeling-page', function($page) {
 
   function updateChart($radio) {
     let $form = $radio.parents('form');
+    $form.find('input').prop('disabled', true);
 
     let $chart       = $form.find('.js-chart');
     let modelingType = $form.find('select[name=modelingType]').val();
     let logTransform = $form.find('input[name=logTransform]').prop('checked');
+    let isPublished  = $form.find('input[name=isPublished]').prop('checked');
 
     $page.find('.js-technique-row').removeClass('highlight');
     $radio.parents('.js-technique-row').addClass('highlight');
@@ -145,9 +147,11 @@ Page('.study-modeling-page', function($page) {
       data: {
         'modelingType': modelingType,
         'logTransform': logTransform,
+        'isPublished':  isPublished,
       },
       success: function(response) {
         $chart.html(response)
+        $form.find('input').prop('disabled', false);
         initTooltips();
       },
     });

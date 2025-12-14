@@ -26,6 +26,23 @@
     }
   }
 
+  .publish-box {
+    border-color: darksalmon;
+    &.is-published {
+      border-color: seagreen;
+    }
+
+    .message {
+      height: 28px;
+      line-height: 28px;
+    }
+
+    .icon {
+      vertical-align: middle;
+    }
+
+  }
+
   .r-summary pre {
     padding: 10px;
     background-color: #eee;
@@ -37,9 +54,7 @@
 
   .modeling-form {
     margin-top: 20px;
-  }
 
-  .modeling-form {
     .columns {
       display: flex;
       flex-direction: row;
@@ -54,6 +69,12 @@
         overflow-x: hidden;
         align-self: flex-start;
         min-height: 300px;
+      }
+
+      .chart {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
     }
 

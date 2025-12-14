@@ -450,7 +450,8 @@ form.simple-form {
 .icon.icon-left              { background-image: url('/static/images/icons/chevrons-left.svg'); }
 .icon.icon-right             { background-image: url('/static/images/icons/chevrons-right.svg'); }
 .icon.icon-orcid             { background-image: url('/static/images/icons/orcid-authenticated.svg'); }
-.icon.icon-invisible         { background-image: url('/static/images/icons/red-eye.svg'); }
+.icon.icon-visible           { background-image: url('/static/images/icons/green-eye-check.svg'); }
+.icon.icon-invisible         { background-image: url('/static/images/icons/red-eye-cross.svg'); }
 .icon.icon-unknown-strain    { background-image: url('/static/images/icons/progress-help.svg'); }
 .icon.icon-calculated        { background-image: url('/static/images/icons/calculator.svg'); }
 .icon.icon-calculated-orange { background-image: url('/static/images/icons/calculator-orange.svg'); }

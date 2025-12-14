@@ -1,5 +1,6 @@
 import io
 import uuid
+from datetime import datetime, UTC
 
 from flask import (
     g,
@@ -329,6 +330,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
 
     modeling_type = args.pop('modelingType')
     log_transform = args.pop('logTransform', 'false') == 'true'
+    is_published  = args.pop('isPublished', 'false') == 'true'
 
     measurement_context = g.db_session.get(MeasurementContext, measurementContextId)
     measurement_df      = measurement_context.get_df(g.db_session)
@@ -359,6 +361,12 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
     ).one_or_none()
 
     if modeling_record:
+        # Update publish state if it's changed:
+        if is_published and not modeling_record.isPublished:
+            modeling_record.publishedAt = datetime.now(UTC)
+        elif not is_published and modeling_record.isPublished:
+            modeling_record.publishedAt = None
+
         df = modeling_record.generate_chart_df(measurement_df)
 
         label = modeling_record.model_name
@@ -379,6 +387,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         r_summary=r_summary,
         measurement_context=measurement_context,
         log_transform=log_transform,
+        is_published=is_published,
     )
 
 
