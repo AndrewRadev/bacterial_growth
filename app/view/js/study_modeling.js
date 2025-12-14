@@ -6,6 +6,7 @@ Page('.study-modeling-page', function($page) {
   let $activeRadio = $('.js-technique-row:visible input[type=radio]:checked');
   if ($activeRadio.length > 0) {
     updateChart($activeRadio.first());
+    updateSelectedContext($activeRadio.first());
   }
 
   let $pendingIndicators = $page.find('[data-modeling-state=pending]');
@@ -29,6 +30,7 @@ Page('.study-modeling-page', function($page) {
     let $activeRadio = $page.find('.js-technique-row:visible input[type=radio]:checked');
     if ($activeRadio.length > 0) {
       updateChart($activeRadio.first());
+      updateSelectedContext($activeRadio.first());
     }
   });
 
@@ -111,10 +113,10 @@ Page('.study-modeling-page', function($page) {
 
     if (modelingType.startsWith('custom_')) {
       $form.find('.js-calculation-status').hide();
-      $page.find('.js-custom-upload-form').show();
+      $page.find('.js-custom-upload-form').removeClass('hidden');
     } else {
       $form.find('.js-calculation-status').show();
-      $page.find('.js-custom-upload-form').hide();
+      $page.find('.js-custom-upload-form').addClass('hidden');
     }
   }
 
@@ -142,6 +144,13 @@ Page('.study-modeling-page', function($page) {
         initTooltips();
       },
     });
+  }
+
+  function updateSelectedContext($radio) {
+    let radioValue = $radio.val();
+    let contextId = parseInt(radioValue.replaceAll('measurementContext|', ''), 10);
+
+    $page.find('input[name=selectedMeasurementContextId]').val(contextId);
   }
 
   function checkForUpdates() {

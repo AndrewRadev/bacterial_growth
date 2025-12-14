@@ -48,14 +48,21 @@
         </div>
       </form>
 
-      <div class="box margin-top-10">
-        <form method="POST" class="simple-form">
+      <div class="box margin-top-10 hidden js-custom-upload-form">
+        <form
+            enctype="multipart/form-data"
+            action="{{ url_for('study_modeling_custom_create_action', publicId=study.publicId) }}"
+            method="POST"
+            class="simple-form">
           <h3>Upload custom model data</h3>
+
+          <input type="hidden" name="selectedMeasurementContextId" />
 
           <div class="form-row">
             <label class="full">
-              <span>Model name</span>
+              <span class="required">Model name</span>
               <input
+                  required
                   name="name"
                   type="text"
                   class="form-input-blue form-input-full"
@@ -91,7 +98,8 @@
             <label class="full">
               <span>Model predictions</span>
               <input
-                  name="data"
+                  required
+                  name="predictions"
                   type="file"
                   class="form-input-full" />
               <p class="help">

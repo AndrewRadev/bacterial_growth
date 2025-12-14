@@ -10,10 +10,13 @@ from flask import (
 )
 from werkzeug.exceptions import Forbidden
 import sqlalchemy as sql
+import pandas as pd
+import numpy as np
 
 from app.model.orm import (
     Bioreplicate,
     Community,
+    CustomModel,
     Experiment,
     MeasurementContext,
     MeasurementTechnique,
@@ -256,6 +259,36 @@ def study_modeling_submit_action(publicId):
     process_modeling_request.delay(modeling_result.id, measurement_context_id, args)
 
     return {'modelingResultId': modeling_result.id}
+
+
+def study_modeling_custom_create_action(publicId):
+    study = _fetch_study(publicId)
+
+    predictions_df = pd.read_csv(request.files['predictions'])
+
+    # TODO (2025-12-14) Find-or-create
+    custom_model = CustomModel(
+        name=request.form['name'],
+        url=request.form.get('url'),
+        description=request.form.get('description'),
+        studyId=study.publicId,
+    )
+    g.db_session.add(custom_model)
+    g.db_session.commit()
+
+    modeling_result = ModelingResult(
+        measurementContextId=request.form['selectedMeasurementContextId'],
+        customModelId=custom_model.id,
+        type=f"custom_{custom_model.id}",
+        state='ready',
+        xValues=predictions_df['time'].tolist(),
+        yValues=predictions_df['value'].tolist(),
+        yStds=predictions_df['std'].replace({np.nan: None}).tolist(),
+    )
+    g.db_session.add(modeling_result)
+    g.db_session.commit()
+
+    return "OK"
 
 
 def study_modeling_check_json(publicId):

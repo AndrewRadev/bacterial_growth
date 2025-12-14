@@ -87,6 +87,11 @@ def init_routes(app):
         methods=["POST"],
     )
     app.add_url_rule(
+        "/study/<string:publicId>/modeling/custom/create",
+        view_func=study_pages.study_modeling_custom_create_action,
+        methods=["POST"],
+    )
+    app.add_url_rule(
         "/study/<string:publicId>/modeling/check.json",
         view_func=study_pages.study_modeling_check_json,
     )

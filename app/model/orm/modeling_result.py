@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 import numpy as np
@@ -52,6 +53,9 @@ class ModelingResult(OrmBase):
     )
     measurementContext: Mapped['MeasurementContext'] = relationship(back_populates='modelingResults')
 
+    customModelId: Mapped[int] = mapped_column(sql.ForeignKey('CustomModels.id'))
+    customModel: Mapped['CustomModel'] = relationship()
+
     params: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
     state:    Mapped[str] = mapped_column(sql.String(100), default='pending')
@@ -62,9 +66,17 @@ class ModelingResult(OrmBase):
     updatedAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     calculatedAt: Mapped[datetime] = mapped_column(UtcDateTime)
 
+    # For custom models:
+    xValues: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    yValues: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    yStds:   Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+
     @validates('type')
     def _validate_type(self, key, value):
-        return self._validate_inclusion(key, value, _VALID_TYPES)
+        if re.fullmatch('custom_\d+', value):
+            return value
+        else:
+            return self._validate_inclusion(key, value, _VALID_TYPES)
 
     @validates('state')
     def _validate_state(self, key, value):
