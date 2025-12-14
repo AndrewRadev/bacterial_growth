@@ -134,10 +134,12 @@
             {% endfor %}
 
             <option value="custom_new" data-custom-model-id="new">
-            Custom: New model
+              Custom: New model
             </option>
           {% else: %}
-            <option value="custom_new">Custom model</option>
+            <option value="custom_new" data-custom-model-id="new">
+              Custom model
+            </option>
           {% endif %}
         </select>
       </label>
