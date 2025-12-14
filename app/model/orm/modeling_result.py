@@ -128,18 +128,28 @@ class ModelingResult(OrmBase):
 
     @property
     def model_name(self):
-        return MODEL_NAMES[self.type]
+        if self.type.startswith('custom_'):
+            return self.customModel.name
+        else:
+            return MODEL_NAMES[self.type]
 
     def generate_chart_df(self, measurements_df):
         start_time = measurements_df['time'].min()
         end_time   = measurements_df['time'].max()
 
-        timepoints = np.linspace(start_time, end_time, 200)
-        values = self._predict(timepoints)
+        if self.type.startswith('custom_'):
+            timepoints = self.xValues
+            values     = self.yValues
+            stds       = self.yStds
+        else:
+            timepoints = np.linspace(start_time, end_time, 200)
+            values     = self._predict(timepoints)
+            stds       = []
 
         return pd.DataFrame.from_dict({
-            'time': timepoints,
+            'time':  timepoints,
             'value': values,
+            'std':   stds,
         })
 
     def _predict(self, timepoints):

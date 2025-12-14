@@ -264,31 +264,52 @@ def study_modeling_submit_action(publicId):
 def study_modeling_custom_create_action(publicId):
     study = _fetch_study(publicId)
 
-    predictions_df = pd.read_csv(request.files['predictions'])
+    custom_model_id        = request.form['customModelId']
+    measurement_context_id = request.form['selectedMeasurementContextId']
 
-    # TODO (2025-12-14) Find-or-create
-    custom_model = CustomModel(
+    if custom_model_id == 'new':
+        custom_model = CustomModel(studyId=study.publicId)
+    else:
+        custom_model = g.db_session.get(CustomModel, custom_model_id)
+        if custom_model.studyId != publicId:
+            raise Forbidden
+
+    custom_model.update(
         name=request.form['name'],
         url=request.form.get('url'),
         description=request.form.get('description'),
-        studyId=study.publicId,
     )
     g.db_session.add(custom_model)
     g.db_session.commit()
 
-    modeling_result = ModelingResult(
-        measurementContextId=request.form['selectedMeasurementContextId'],
-        customModelId=custom_model.id,
-        type=f"custom_{custom_model.id}",
-        state='ready',
+    predictions_df = pd.read_csv(request.files['predictions'])
+
+    modeling_result = g.db_session.scalars(
+        sql.select(ModelingResult)
+        .where(
+            ModelingResult.measurementContextId == measurement_context_id,
+            ModelingResult.customModelId == custom_model.id,
+        )
+    ).one_or_none()
+
+    if modeling_result is None:
+        modeling_result = ModelingResult(
+            measurementContextId=request.form['selectedMeasurementContextId'],
+            customModelId=custom_model.id,
+            type=f"custom_{custom_model.id}",
+            state='ready',
+        )
+
+    modeling_result.update(
         xValues=predictions_df['time'].tolist(),
         yValues=predictions_df['value'].tolist(),
         yStds=predictions_df['std'].replace({np.nan: None}).tolist(),
     )
+
     g.db_session.add(modeling_result)
     g.db_session.commit()
 
-    return "OK"
+    return redirect(request.referrer)
 
 
 def study_modeling_check_json(publicId):

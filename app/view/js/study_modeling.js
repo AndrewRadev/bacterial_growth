@@ -104,7 +104,10 @@ Page('.study-modeling-page', function($page) {
       find(`.js-technique-row[data-technique-id="${selectedTechniqueId}"]`).
       removeClass('hidden');
 
-    let modelingType = $form.find('select[name=modelingType]').val();
+    let $modelingType = $form.find('select[name=modelingType]');
+    let modelingType = $modelingType.val();
+    let customModelId = $modelingType.find('option:selected').data('customModelId');
+
     $form.find('[data-modeling-type]').addClass('hidden');
     $form.find(`[data-modeling-type="${modelingType}"]`).removeClass('hidden');
 
@@ -113,10 +116,14 @@ Page('.study-modeling-page', function($page) {
 
     if (modelingType.startsWith('custom_')) {
       $form.find('.js-calculation-status').hide();
-      $page.find('.js-custom-upload-form').removeClass('hidden');
+      $page.find('.js-custom-model-form').removeClass('hidden');
+
+      $page.find(`.js-custom-model-form form`).addClass('hidden');
+      $page.find(`.js-custom-model-form form[data-custom-model-id=${customModelId}]`).removeClass('hidden');
     } else {
       $form.find('.js-calculation-status').show();
-      $page.find('.js-custom-upload-form').addClass('hidden');
+      $page.find('.js-custom-model-form').addClass('hidden');
+      $page.find(`.js-custom-model-form form`).addClass('hidden');
     }
   }
 

@@ -1,5 +1,6 @@
 {% from 'utils/_post_button.html' import post_button %}
-{% from 'pages/studies/modeling/_form.html' import render_modeling_form %}
+{% from 'pages/studies/modeling/_experiment_form.html' import render_experiment_form %}
+{% from 'pages/studies/modeling/_custom_model_form.html' import render_custom_model_form %}
 
 {% extends '_layout.html' %}
 
@@ -35,7 +36,7 @@
           class="simple-form modeling-form js-modeling-form">
         <div class="columns">
           <div class="controls-column">
-            {{ render_modeling_form(study) }}
+            {{ render_experiment_form(study) }}
           </div>
 
           <div class="chart-column box">
@@ -48,72 +49,12 @@
         </div>
       </form>
 
-      <div class="box margin-top-10 hidden js-custom-upload-form">
-        <form
-            enctype="multipart/form-data"
-            action="{{ url_for('study_modeling_custom_create_action', publicId=study.publicId) }}"
-            method="POST"
-            class="simple-form">
-          <h3>Upload custom model data</h3>
+      <div class="box margin-top-10 hidden js-custom-model-form">
+        {% for custom_model in study.customModels: %}
+          {{ render_custom_model_form(study, custom_model) }}
+        {% endfor %}
 
-          <input type="hidden" name="selectedMeasurementContextId" />
-
-          <div class="form-row">
-            <label class="full">
-              <span class="required">Model name</span>
-              <input
-                  required
-                  name="name"
-                  type="text"
-                  class="form-input-blue form-input-full"
-                  placeholder="Pick a short label for the model" />
-            </label>
-
-            <label
-                class="full"
-                data-tooltip="Where can people find more information about the modeling process?">
-              <span>Information URL</span>
-              <input
-                  name="modelUrl"
-                  type="url"
-                  class="form-input-blue form-input-full"
-                  placeholder="https://example.com" />
-            </label>
-          </div>
-
-          <div class="form-row">
-            <label class="full">
-              <span>Description</span>
-              <textarea
-                  rows=2
-                  name="description"
-                  class="form-input-blue form-input-full"
-                  placeholder="Provide a short description of your modeling methodology"></textarea>
-            </label>
-          </div>
-
-          <hr>
-
-          <div class="form-row">
-            <label class="full">
-              <span>Model predictions</span>
-              <input
-                  required
-                  name="predictions"
-                  type="file"
-                  class="form-input-full" />
-              <p class="help">
-                Provide the predictions of your model that correspond to the
-                selected measurements of <strong>TODO</strong>. The data should
-                be a CSV with "time", "value", and (optionally) "std" columns.
-              </p>
-            </label>
-          </div>
-
-          <div class="form-row">
-            <input type="submit" class="flex-right" value="Submit" />
-          </div>
-        </form>
+        {{ render_custom_model_form(study, custom_model=None) }}
       </div>
     </article>
   </div>

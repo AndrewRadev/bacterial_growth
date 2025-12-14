@@ -67,6 +67,7 @@ class Study(OrmBase):
     )
 
     measurementContexts: Mapped[List['MeasurementContext']] = owner_relationship()
+    customModels:        Mapped[List['CustomModel']]        = owner_relationship()
 
     bioreplicates: Mapped[List['Bioreplicate']] = relationship(
         secondary='Experiments',

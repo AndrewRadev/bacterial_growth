@@ -1,0 +1,75 @@
+{% macro render_custom_model_form(study, custom_model=None) %}
+
+  <form
+      data-custom-model-id="{{ custom_model.id or "new" }}"
+      enctype="multipart/form-data"
+      action="{{ url_for('study_modeling_custom_create_action', publicId=study.publicId) }}"
+      method="POST"
+      class="simple-form hidden">
+    <h3>Upload custom model data</h3>
+
+    <input type="hidden" name="customModelId" value="{{ custom_model.id or "new" }}" />
+    <input type="hidden" name="selectedMeasurementContextId" />
+
+    <div class="form-row">
+      <label class="full">
+        <span class="required">Model name</span>
+        <input
+            required
+            name="name"
+            type="text"
+            value="{{ custom_model.name or '' }}"
+            class="form-input-blue form-input-full"
+            placeholder="Pick a short label for the model" />
+      </label>
+
+      <label
+          class="full"
+          data-tooltip="Where can people find more information about the modeling process?">
+        <span>Information URL</span>
+        <input
+            name="url"
+            type="url"
+            value="{{ custom_model.url or '' }}"
+            class="form-input-blue form-input-full"
+            placeholder="https://example.com" />
+      </label>
+    </div>
+
+    <div class="form-row">
+      <label class="full">
+        <span>Description</span>
+        <textarea
+            rows=2
+            name="description"
+            class="form-input-blue form-input-full"
+            placeholder="Provide a short description of your modeling methodology">
+          {{- custom_model.description or '' -}}
+        </textarea>
+      </label>
+    </div>
+
+    <hr>
+
+    <div class="form-row">
+      <label class="full">
+        <span>Model predictions</span>
+        <input
+            required
+            name="predictions"
+            type="file"
+            class="form-input-full" />
+        <p class="help">
+          Provide the predictions of your model that correspond to the
+          selected measurements of <strong>TODO</strong>. The data should
+          be a CSV with "time", "value", and (optionally) "std" columns.
+        </p>
+      </label>
+    </div>
+
+    <div class="form-row">
+      <input type="submit" class="flex-right" value="Submit" />
+    </div>
+  </form>
+
+{% endmacro %}

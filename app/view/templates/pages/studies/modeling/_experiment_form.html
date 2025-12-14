@@ -1,4 +1,4 @@
-{% macro render_modeling_form(study) %}
+{% macro render_experiment_form(study) %}
 
   <div class="form-row">
     <label>
@@ -125,7 +125,20 @@
           <option value="easy_linear">"Easy linear" method</option>
           <option value="logistic">Logistic model</option>
           <option value="baranyi_roberts">Baranyi-Roberts model</option>
-          <option value="custom_new">Custom model</option>
+
+          {% if study.customModels: %}
+            {% for m in study.customModels:  %}
+              <option value="custom_{{ m.id }}" data-custom-model-id="{{ m.id }}">
+                Custom: {{ m.name }}
+              </option>
+            {% endfor %}
+
+            <option value="custom_new" data-custom-model-id="new">
+            Custom: New model
+            </option>
+          {% else: %}
+            <option value="custom_new">Custom model</option>
+          {% endif %}
         </select>
       </label>
     </div>

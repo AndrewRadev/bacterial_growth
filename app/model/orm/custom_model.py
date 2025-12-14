@@ -22,7 +22,7 @@ class CustomModel(OrmBase):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     studyId: Mapped[int] = mapped_column(sql.ForeignKey('Studies.publicId'), nullable=False)
-    study: Mapped['Study'] = relationship()
+    study: Mapped['Study'] = relationship(back_populates='customModels')
 
     name:        Mapped[str] = mapped_column(sql.String(255), nullable=False)
     url:         Mapped[str] = mapped_column(sql.String(255))

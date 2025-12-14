@@ -702,6 +702,6 @@ INSERT INTO MigrationVersions VALUES
 (81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20'),
 (83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13'),
 (85,'2025_12_08_172450_remove_modeling_request_id_constraint','2025-12-08 16:26:02'),
-(88,'2025_12_14_121007_create_custom_models','2025-12-14 11:23:28'),
-(91,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-14 11:42:43');
+(92,'2025_12_14_121007_create_custom_models','2025-12-14 14:36:15'),
+(93,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-14 14:36:15');
 
