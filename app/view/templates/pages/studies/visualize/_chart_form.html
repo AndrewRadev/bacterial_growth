@@ -56,16 +56,16 @@
         {% set modeling_info = study.get_modeling_info() %}
 
         {% if modeling_info: %}
-            <optgroup label="Models">
-              {% for (type, name, _description) in modeling_info: %}
-                <option
-                    data-technique-type="model"
-                    value="{{ type }}"
-                    data-subject-type="strain">
-                  {{- name -}}
-                </option>
-              {% endfor %}
-            </optgroup>
+          <optgroup label="Models">
+            {% for (type, name, _description) in modeling_info: %}
+              <option
+                  data-technique-type="model"
+                  value="{{ type }}"
+                  data-subject-type="strain">
+                {{- name }} predictions
+              </option>
+            {% endfor %}
+          </optgroup>
         {% endif %}
       </select>
     </label>
@@ -151,6 +151,10 @@
                       {{ "data-axis-right" if modeling_result.id in form.right_axis_model_ids }}
                       class="js-measurement-toggle" />
                   <label for="{{ key }}">
+                    {{ measurement_context.technique.short_name }}
+
+                    for
+
                     {% if subjectType == 'bioreplicate' and experiment.compartments|length > 1: %}
                       {{ subjectName }}<sub>{{ measurement_context.compartment.name }}</sub>
                     {% else: %}
