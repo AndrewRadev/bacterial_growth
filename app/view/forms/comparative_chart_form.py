@@ -116,9 +116,7 @@ class ComparativeChartForm:
 
             measurement_df = self.get_df(measurement_context.id)
             df             = modeling_result.generate_chart_df(measurement_df)
-
-            # TODO generate better label
-            label = f"{modeling_result.model_name} predictions for {measurement_context.get_chart_label()}"
+            label          = modeling_result.get_chart_label()
 
             if technique.units == '':
                 units = technique.short_name
@@ -184,14 +182,24 @@ class ComparativeChartForm:
                 self.left_axis_model_ids.add(modeling_result_id)
 
             elif arg.startswith('axis|'):
-                context_id = int(arg.removeprefix('axis|'))
+                record_type, record_id = arg.removeprefix('axis|').split('|')
 
                 if value == 'left':
                     # Left axis by default
                     pass
                 elif value == 'right':
-                    self.left_axis_ids.discard(context_id)
-                    self.right_axis_ids.add(context_id)
+                    if record_type == 'measurementContext':
+                        context_id = int(record_id)
+
+                        self.left_axis_ids.discard(context_id)
+                        self.right_axis_ids.add(context_id)
+                    elif record_type == 'modelingResult':
+                        result_id = int(record_id)
+
+                        self.left_axis_model_ids.discard(result_id)
+                        self.right_axis_model_ids.add(result_id)
+                    else:
+                        raise ValueError(f"Unexpected record type: {record_type}")
                 else:
                     raise ValueError(f"Unexpected axis: {value}")
 

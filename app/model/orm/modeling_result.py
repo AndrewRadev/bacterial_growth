@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from decimal import Decimal
 
 import numpy as np
 import pandas as pd
@@ -153,24 +154,34 @@ class ModelingResult(OrmBase):
         else:
             return MODEL_DESCRIPTIONS[self.type]
 
+    def get_chart_label(self):
+        from markupsafe import Markup, escape
+
+        # TODO generate better label
+        return Markup(f"{escape(self.model_name)} predictions for {self.measurementContext.get_chart_label()}")
+
     def generate_chart_df(self, measurements_df):
         start_time = measurements_df['time'].min()
         end_time   = measurements_df['time'].max()
 
         if self.type.startswith('custom_'):
-            timepoints = self.xValues
-            values     = self.yValues
-            errors     = self.yErrors
+            timepoints = _map_float(self.xValues)
+            values     = _map_float(self.yValues)
+            errors     = _map_float(self.yErrors)
         else:
             timepoints = np.linspace(start_time, end_time, 200)
             values     = self._predict(timepoints)
             errors     = None
 
-        return pd.DataFrame.from_dict({
-            'time':   timepoints,
-            'value':  values,
-            'errors': errors,
+        df = pd.DataFrame.from_dict({
+            'time':  timepoints,
+            'value': values,
+            'std':   errors,
         })
+
+        # TODO (2025-12-15) Convert units
+
+        return df
 
     def _predict(self, timepoints):
         if self.type == 'easy_linear':
@@ -220,3 +231,14 @@ class ModelingResult(OrmBase):
         log_y = np.log(y0) + mumax * A - np.log(1 + (np.exp(mumax * A) - 1)/np.exp(np.log(K) - np.log(y0)))
 
         return np.exp(log_y)
+
+def _map_float(decimal_list):
+    result = []
+
+    for value in decimal_list:
+        if isinstance(value, Decimal):
+            result.append(float(value))
+        else:
+            result.append(value)
+
+    return result
