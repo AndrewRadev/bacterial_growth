@@ -7,6 +7,7 @@ from app.model.orm import (
     Experiment,
     Measurement,
     MeasurementContext,
+    ModelingResult,
     Perturbation,
 )
 
@@ -18,6 +19,8 @@ class ComparativeChartForm:
         time_units,
         left_axis_ids=[],
         right_axis_ids=[],
+        left_axis_model_ids=[],
+        right_axis_model_ids=[],
         show_std=True,
         show_perturbations=True,
     ):
@@ -29,8 +32,14 @@ class ComparativeChartForm:
         self.left_axis_ids  = set(left_axis_ids)
         self.right_axis_ids = set(right_axis_ids)
 
+        self.left_axis_model_ids  = set(left_axis_model_ids)
+        self.right_axis_model_ids = set(right_axis_model_ids)
+
         self.measurement_context_ids = list(self.left_axis_ids) + list(self.right_axis_ids)
         self.measurement_contexts = []
+
+        self.modeling_result_ids = list(self.left_axis_model_ids) + list(self.right_axis_model_ids)
+        self.modeling_results = []
 
         self.cell_count_units = 'Cells/mL'
         self.cfu_count_units  = 'CFUs/mL'
@@ -55,6 +64,11 @@ class ComparativeChartForm:
         self.measurement_contexts = self.db_session.scalars(
             sql.select(MeasurementContext)
             .where(MeasurementContext.id.in_(self.measurement_context_ids))
+        ).all()
+
+        self.modeling_results = self.db_session.scalars(
+            sql.select(ModelingResult)
+            .where(ModelingResult.id.in_(self.modeling_result_ids))
         ).all()
 
         for measurement_context in self.measurement_contexts:
@@ -87,6 +101,35 @@ class ComparativeChartForm:
                 label=label,
                 axis=axis,
                 metabolite_mass=metabolite_mass,
+            )
+
+        for modeling_result in self.modeling_results:
+            measurement_context = modeling_result.measurementContext
+            technique = measurement_context.technique
+
+            if modeling_result.id in self.right_axis_model_ids:
+                axis = 'right'
+                log_transform = self.log_right
+            else:
+                axis = 'left'
+                log_transform = self.log_left
+
+            measurement_df = self.get_df(measurement_context.id)
+            df             = modeling_result.generate_chart_df(measurement_df)
+
+            # TODO generate better label
+            label = f"{modeling_result.model_name} predictions for {measurement_context.get_chart_label()}"
+
+            if technique.units == '':
+                units = technique.short_name
+            else:
+                units = technique.units
+
+            chart.add_model_df(
+                df,
+                units=units,
+                label=label,
+                axis=axis,
             )
 
         if self.show_perturbations:
@@ -123,6 +166,9 @@ class ComparativeChartForm:
         self.left_axis_ids  = set()
         self.right_axis_ids = set()
 
+        self.left_axis_model_ids  = set()
+        self.right_axis_model_ids = set()
+
         self.log_left  = False
         self.log_right = False
 
@@ -131,6 +177,11 @@ class ComparativeChartForm:
                 context_id = int(arg.removeprefix('measurementContext|'))
                 self.measurement_context_ids.append(context_id)
                 self.left_axis_ids.add(context_id)
+
+            elif arg.startswith('modelingResult|'):
+                modeling_result_id = int(arg.removeprefix('modelingResult|'))
+                self.modeling_result_ids.append(modeling_result_id)
+                self.left_axis_model_ids.add(modeling_result_id)
 
             elif arg.startswith('axis|'):
                 context_id = int(arg.removeprefix('axis|'))

@@ -34,18 +34,38 @@
           {% if study_technique.measurementTechniques|length > 1: %}
             <optgroup label="{{- study_technique.long_name_with_subject_type -}}">
               {% for measurement_technique in study_technique.measurementTechniques: %}
-                <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-                {{- measurement_technique.short_name -}}
+                <option
+                    value="{{ measurement_technique.id }}"
+                    data-technique-type="measurement"
+                    data-subject-type="{{ measurement_technique.subjectType }}">
+                  {{- measurement_technique.short_name -}}
                 </option>
               {% endfor %}
             </optgroup>
           {% else: %}
             {% set measurement_technique = study_technique.measurementTechniques[0] %}
-            <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-            {{- measurement_technique.long_name_with_subject_type -}}
+            <option
+                value="{{ measurement_technique.id }}"
+                data-subject-type="{{ measurement_technique.subjectType }}">
+              {{- measurement_technique.long_name_with_subject_type -}}
             </option>
           {% endif %}
         {% endfor %}
+
+        {% set modeling_info = study.get_modeling_info() %}
+
+        {% if modeling_info: %}
+            <optgroup label="Models">
+              {% for (type, name, _description) in modeling_info: %}
+                <option
+                    data-technique-type="model"
+                    value="{{ type }}"
+                    data-subject-type="strain">
+                  {{- name -}}
+                </option>
+              {% endfor %}
+            </optgroup>
+        {% endif %}
       </select>
     </label>
   </div>
@@ -114,6 +134,30 @@
                   {% endif %}
                 </label>
               </div>
+
+              {% for modeling_result in measurement_context.modelingResults if modeling_result.isPublished: %}
+                {% set key = "modelingResult|{}".format(modeling_result.id) %}
+
+                <div
+                    class="form-row hidden js-model-row"
+                    data-modeling-result-type="{{ modeling_result.type }}">
+                  <input
+                      type="checkbox"
+                      name="{{ key }}"
+                      id="{{ key }}"
+                      {{ "checked" if modeling_result.id in form.modeling_result_ids }}
+                      {{ "data-axis-left" if modeling_result.id in form.left_axis_model_ids }}
+                      {{ "data-axis-right" if modeling_result.id in form.right_axis_model_ids }}
+                      class="js-measurement-toggle" />
+                  <label for="{{ key }}">
+                    {% if subjectType == 'bioreplicate' and experiment.compartments|length > 1: %}
+                      {{ subjectName }}<sub>{{ measurement_context.compartment.name }}</sub>
+                    {% else: %}
+                      {{ subjectName }}
+                    {% endif %}
+                  </label>
+                </div>
+              {% endfor %}
             {% endfor %}
           {% endfor %}
         {% endfor %}
