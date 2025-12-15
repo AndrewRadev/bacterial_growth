@@ -154,7 +154,7 @@ def study_download_data_zip(publicId):
 def study_download_models_csv(publicId):
     study = _fetch_study(publicId)
 
-    csv_data = export_model_csv(g.db_session, study)
+    csv_data = export_model_csv(g.db_session, study, g.current_user)
 
     return send_file(
         io.BytesIO(csv_data),

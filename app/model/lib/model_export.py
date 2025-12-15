@@ -2,7 +2,7 @@ import io
 import csv
 
 
-def export_model_csv(db_session, study):
+def export_model_csv(db_session, study, user=None):
     buf = io.StringIO()
     writer = csv.DictWriter(
         buf,
@@ -30,6 +30,9 @@ def export_model_csv(db_session, study):
         if modeling_result.state != 'ready':
             continue
 
+        if not modeling_result.isPublished and not study.manageable_by_user(user):
+            continue
+
         measurement_context = modeling_result.measurementContext
         subject = measurement_context.get_subject(db_session)
 
@@ -42,18 +45,18 @@ def export_model_csv(db_session, study):
             'subject_name': measurement_context.subjectName,
             'model_type':   modeling_result.model_name,
             # Inputs:
-            'input_pointCount': params['inputs'].get('pointCount', None),
-            'input_endTime':    params['inputs'].get('endTime', None),
+            'input_pointCount': params.get('inputs', {}).get('pointCount', None),
+            'input_endTime':    params.get('inputs', {}).get('endTime', None),
             # Coefficients:
-            'y0':    params['coefficients'].get('y0',    None),
-            'mumax': params['coefficients'].get('mumax', None),
-            'lag':   params['coefficients'].get('lag',   None),
-            'y0_lm': params['coefficients'].get('y0_lm', None),
-            'K':     params['coefficients'].get('K',     None),
-            'h0':    params['coefficients'].get('h0',    None),
+            'y0':    params.get('coefficients', {}).get('y0',    None),
+            'mumax': params.get('coefficients', {}).get('mumax', None),
+            'lag':   params.get('coefficients', {}).get('lag',   None),
+            'y0_lm': params.get('coefficients', {}).get('y0_lm', None),
+            'K':     params.get('coefficients', {}).get('K',     None),
+            'h0':    params.get('coefficients', {}).get('h0',    None),
             # Fit:
-            'r2':  params['fit'].get('r2',  None),
-            'rss': params['fit'].get('rss', None),
+            'r2':  params.get('fit', {}).get('r2',  None),
+            'rss': params.get('fit', {}).get('rss', None),
         })
 
     return buf.getvalue().encode('utf-8')
