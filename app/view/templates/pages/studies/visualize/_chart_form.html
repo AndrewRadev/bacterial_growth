@@ -46,6 +46,7 @@
             {% set measurement_technique = study_technique.measurementTechniques[0] %}
             <option
                 value="{{ measurement_technique.id }}"
+                data-technique-type="measurement"
                 data-subject-type="{{ measurement_technique.subjectType }}">
               {{- measurement_technique.long_name_with_subject_type -}}
             </option>
