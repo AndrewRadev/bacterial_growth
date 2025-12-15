@@ -154,6 +154,9 @@ Page('.study-modeling-page', function($page) {
         $form.find('input').prop('disabled', false);
         initTooltips();
       },
+      error: function() {
+        $form.find('input').prop('disabled', false);
+      }
     });
   }
 
