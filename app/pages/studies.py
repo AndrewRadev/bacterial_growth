@@ -234,6 +234,9 @@ def study_chart_fragment(publicId):
 
 def study_modeling_submit_action(publicId):
     study = _fetch_study(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
+
     args = request.form.to_dict()
 
     modeling_type = args.pop('modelingType')
@@ -264,6 +267,8 @@ def study_modeling_submit_action(publicId):
 
 def study_modeling_custom_create_action(publicId):
     study = _fetch_study(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
 
     custom_model_id        = request.form['customModelId']
     measurement_context_id = request.form['selectedMeasurementContextId']
@@ -315,6 +320,8 @@ def study_modeling_custom_create_action(publicId):
 
 def study_modeling_check_json(publicId):
     study = _fetch_study(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
 
     result_states = {}
 
@@ -326,15 +333,13 @@ def study_modeling_check_json(publicId):
 
 def study_modeling_chart_fragment(publicId, measurementContextId):
     study = _fetch_study(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
+
     args = request.args.to_dict()
 
     modeling_type = args.pop('modelingType')
     log_transform = args.pop('logTransform', 'false') == 'true'
-
-    if 'isPublished' in args:
-        is_published = args.pop('isPublished', 'false') == 'true'
-    else:
-        is_published = None
 
     measurement_context = g.db_session.get(MeasurementContext, measurementContextId)
     measurement_df      = measurement_context.get_df(g.db_session)
@@ -365,17 +370,6 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
     ).one_or_none()
 
     if modeling_record:
-        # Update publish state if it's changed:
-        if is_published is not None:
-            if is_published and not modeling_record.isPublished:
-                modeling_record.publishedAt = datetime.now(UTC)
-                g.db_session.add(modeling_record)
-                g.db_session.commit()
-            elif not is_published and modeling_record.isPublished:
-                modeling_record.publishedAt = None
-                g.db_session.add(modeling_record)
-                g.db_session.commit()
-
         df = modeling_record.generate_chart_df(measurement_df)
 
         label = modeling_record.model_name
@@ -389,6 +383,7 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
 
     return render_template(
         'pages/studies/modeling/_chart.html',
+        study_id=publicId,
         chart=chart,
         modeling_record=modeling_record,
         form_data=request.form,
@@ -398,6 +393,24 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
         measurement_context=measurement_context,
         log_transform=log_transform,
     )
+
+def study_modeling_toggle_published_action(publicId, modelingResultId):
+    study = _fetch_study(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
+
+    modeling_record = g.db_session.get(ModelingResult, modelingResultId)
+
+    if modeling_record.isPublished:
+        modeling_record.publishedAt = None
+        g.db_session.add(modeling_record)
+        g.db_session.commit()
+    else:
+        modeling_record.publishedAt = datetime.now(UTC)
+        g.db_session.add(modeling_record)
+        g.db_session.commit()
+
+    return {}
 
 
 def _fetch_study(publicId, check_user_visibility=True, sql_options=None):

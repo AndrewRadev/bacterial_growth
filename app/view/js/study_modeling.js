@@ -77,6 +77,29 @@ Page('.study-modeling-page', function($page) {
     })
   });
 
+  $page.on('click', '.js-toggle-published', function(e) {
+    e.preventDefault();
+
+    let $button = $(e.currentTarget);
+    let url     = $button.data('url');
+
+    $form.find('input').prop('disabled', true);
+
+    $.ajax({
+      url: url,
+      dataType: 'json',
+      method: 'POST',
+      success: function(response) {
+        $form.find('input').prop('disabled', false);
+        let $activeRadio = $('.js-technique-row:visible input[type=radio]:checked');
+        updateChart($activeRadio.first());
+      },
+      error: function() {
+        $form.find('input').prop('disabled', false);
+      }
+    })
+  });
+
   function updateMeasurementSubjects($form) {
     let $techniqueSelect = $form.find('.js-technique-type');
     let techniqueId = $techniqueSelect.val();

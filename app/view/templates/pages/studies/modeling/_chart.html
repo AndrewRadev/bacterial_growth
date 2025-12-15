@@ -41,24 +41,39 @@
 
 {% if modeling_record: %}
   <div class="form-row box publish-box {{ "is-published" if modeling_record.isPublished }}">
-    <label>
-      <input
-          type="checkbox"
-          class="js-publish-checkbox"
-          name="isPublished"
-          {{ "checked" if modeling_record.isPublished }} />
-      <span>Published</span>
-    </label>
+    {% set toggle_publish_url = url_for(
+      'study_modeling_toggle_published_action',
+      publicId=study_id,
+      modelingResultId=modeling_record.id
+    ) %}
 
-    <span class="flex-right help small message">
-      {% if modeling_record.isPublished: %}
+    {% if modeling_record.isPublished: %}
+      <span class="help small message">
         <span class="icon icon-inline icon-visible"></span>
-        This model is visible to everyone
-      {% else: %}
+        This model is visible to everyone though the
+        <a href="{{ url_for('study_visualize_page', publicId=study_id) }}">Visualize</a>
+        page
+      </span>
+
+      <button
+          data-url="{{ toggle_publish_url }}"
+          type="button"
+          class="white-button small small-button orange-border flex-right js-toggle-published">
+        Unpublish
+      </button>
+    {% else: %}
+      <button
+          data-url="{{ toggle_publish_url }}"
+          type="button"
+          class="green-button small small-button js-toggle-published">
+        Publish
+      </button>
+
+      <span class="flex-right help small message">
         <span class="icon icon-inline icon-invisible"></span>
-        This model is only visible to you until you publish it
-      {% endif %}
-    </span>
+        This model is only accessible on this page until you publish it
+      </span>
+    {% endif %}
   </div>
 {% endif %}
 
