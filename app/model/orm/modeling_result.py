@@ -22,6 +22,13 @@ MODEL_NAMES = {
 }
 "The human-readable names of the supported models/methods"
 
+MODEL_DESCRIPTIONS = {
+    'easy_linear':     'A phenomenological method that estimates growth rate based on a regression line between observed points.',
+    'logistic':        'A model that describes exponential growth limited by a carrying capacity.',
+    'baranyi_roberts': 'A mechanistic model that aims to quantify the lag phase.',
+}
+"One-sentence descriptions of the supported models/methods"
+
 _VALID_TYPES = [
     'easy_linear',
     'logistic',
@@ -138,6 +145,13 @@ class ModelingResult(OrmBase):
             return self.customModel.name
         else:
             return MODEL_NAMES[self.type]
+
+    @property
+    def model_description(self):
+        if self.type.startswith('custom_'):
+            return self.customModel.description
+        else:
+            return MODEL_DESCRIPTIONS[self.type]
 
     def generate_chart_df(self, measurements_df):
         start_time = measurements_df['time'].min()

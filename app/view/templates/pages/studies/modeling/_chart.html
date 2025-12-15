@@ -39,26 +39,28 @@
   </div>
 </div>
 
-<div class="form-row box publish-box {{ "is-published" if is_published }}">
-  <label>
-    <input
-        type="checkbox"
-        class="js-publish-checkbox"
-        name="isPublished"
-        {{ "checked" if is_published }} />
-    <span>Published</span>
-  </label>
+{% if modeling_record: %}
+  <div class="form-row box publish-box {{ "is-published" if modeling_record.isPublished }}">
+    <label>
+      <input
+          type="checkbox"
+          class="js-publish-checkbox"
+          name="isPublished"
+          {{ "checked" if modeling_record.isPublished }} />
+      <span>Published</span>
+    </label>
 
-  <span class="flex-right help small message">
-    {% if is_published: %}
-      <span class="icon icon-inline icon-visible"></span>
-      This model is visible to everyone
-    {% else: %}
-      <span class="icon icon-inline icon-invisible"></span>
-      This model is only visible to you until you publish it
-    {% endif %}
-  </span>
-</div>
+    <span class="flex-right help small message">
+      {% if modeling_record.isPublished: %}
+        <span class="icon icon-inline icon-visible"></span>
+        This model is visible to everyone
+      {% else: %}
+        <span class="icon icon-inline icon-invisible"></span>
+        This model is only visible to you until you publish it
+      {% endif %}
+    </span>
+  </div>
+{% endif %}
 
 {% if not modeling_type.startswith('custom_'): %}
   <div class="box">

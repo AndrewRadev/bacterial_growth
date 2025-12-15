@@ -330,7 +330,11 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
 
     modeling_type = args.pop('modelingType')
     log_transform = args.pop('logTransform', 'false') == 'true'
-    is_published  = args.pop('isPublished', 'false') == 'true'
+
+    if 'isPublished' in args:
+        is_published = args.pop('isPublished', 'false') == 'true'
+    else:
+        is_published = None
 
     measurement_context = g.db_session.get(MeasurementContext, measurementContextId)
     measurement_df      = measurement_context.get_df(g.db_session)
@@ -362,10 +366,15 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
 
     if modeling_record:
         # Update publish state if it's changed:
-        if is_published and not modeling_record.isPublished:
-            modeling_record.publishedAt = datetime.now(UTC)
-        elif not is_published and modeling_record.isPublished:
-            modeling_record.publishedAt = None
+        if is_published is not None:
+            if is_published and not modeling_record.isPublished:
+                modeling_record.publishedAt = datetime.now(UTC)
+                g.db_session.add(modeling_record)
+                g.db_session.commit()
+            elif not is_published and modeling_record.isPublished:
+                modeling_record.publishedAt = None
+                g.db_session.add(modeling_record)
+                g.db_session.commit()
 
         df = modeling_record.generate_chart_df(measurement_df)
 
@@ -381,13 +390,13 @@ def study_modeling_chart_fragment(publicId, measurementContextId):
     return render_template(
         'pages/studies/modeling/_chart.html',
         chart=chart,
+        modeling_record=modeling_record,
         form_data=request.form,
         modeling_type=modeling_type,
         model_params=model_params,
         r_summary=r_summary,
         measurement_context=measurement_context,
         log_transform=log_transform,
-        is_published=is_published,
     )
 
 
