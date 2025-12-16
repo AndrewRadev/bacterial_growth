@@ -159,8 +159,6 @@ class ComparativeChartForm:
         return f"l={left_axis_part}&r={right_axis_part}"
 
     def _extract_args(self, args):
-        self.measurement_context_ids = []
-
         self.left_axis_ids  = set()
         self.right_axis_ids = set()
 

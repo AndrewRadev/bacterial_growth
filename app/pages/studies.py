@@ -211,11 +211,16 @@ def study_visualize_page(publicId):
     left_axis_ids  = _parse_comma_separated_request_ids('l')
     right_axis_ids = _parse_comma_separated_request_ids('r')
 
+    left_axis_model_ids  = _parse_comma_separated_request_ids('lm')
+    right_axis_model_ids = _parse_comma_separated_request_ids('rm')
+
     chart_form = ComparativeChartForm(
         g.db_session,
         time_units=study.timeUnits,
         left_axis_ids=left_axis_ids,
         right_axis_ids=right_axis_ids,
+        left_axis_model_ids=left_axis_model_ids,
+        right_axis_model_ids=right_axis_model_ids,
     )
 
     return render_template(
