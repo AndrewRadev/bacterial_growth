@@ -42,6 +42,20 @@ _VALID_STATES = [
 ]
 
 
+class ModelInfo:
+    def __init__(self, *, type, name, url, description):
+        self.type        = type
+        self.name        = name
+        self.url         = url
+        self.description = description
+
+    def __eq__(self, other):
+        return self.type == other.type
+
+    def __hash__(self):
+        return self.type.__hash__()
+
+
 class ModelingResult(OrmBase):
     """
     The results of fitting a model onto a set of measurements.
@@ -141,11 +155,25 @@ class ModelingResult(OrmBase):
         return self.publishedAt != None
 
     @property
+    def info(self):
+        return ModelInfo(
+            type=self.type,
+            name=self.model_name,
+            url=self.model_url,
+            description=self.model_description,
+        )
+
+    @property
     def model_name(self):
         if self.type.startswith('custom_'):
             return self.customModel.name
         else:
             return MODEL_NAMES[self.type]
+
+    @property
+    def model_url(self):
+        if self.type.startswith('custom_'):
+            return self.customModel.url
 
     @property
     def model_description(self):

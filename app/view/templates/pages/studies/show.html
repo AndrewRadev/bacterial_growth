@@ -74,18 +74,23 @@
         </ol>
       </p>
 
-      {% set modeling_info = study.get_modeling_info() %}
+      {% set model_info_list = study.get_model_info_list() %}
 
-      {% if modeling_info: %}
+      {% if model_info_list: %}
         <h2>Modeling techniques</h2>
 
         <p>
           <ol>
-            {% for (_type, name, description) in modeling_info: %}
+            {% for model_info in model_info_list: %}
               <li>
-                <strong>{{ name }}</strong>
-                {% if description != '': %}
-                  <div class="small">{{ description }}</div>
+                <strong>{{ model_info.name }}</strong>
+
+                {% if model_info.url: %}
+                  ({{ model_info.url|external_link }})
+                {% endif %}
+
+                {% if model_info.description != '': %}
+                  <div class="small">{{ model_info.description }}</div>
                 {% endif %}
               </li>
             {% endfor %}

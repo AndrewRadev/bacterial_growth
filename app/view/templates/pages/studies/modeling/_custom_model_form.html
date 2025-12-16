@@ -11,42 +11,44 @@
     <input type="hidden" name="customModelId" value="{{ custom_model.id or "new" }}" />
     <input type="hidden" name="selectedMeasurementContextId" />
 
-    <div class="form-row">
-      <label class="full">
-        <span class="required">Model name</span>
-        <input
-            required
-            name="name"
-            type="text"
-            value="{{ custom_model.name or '' }}"
-            class="form-input-blue form-input-full"
-            placeholder="Pick a short label for the model" />
-      </label>
+    <div class="form-row columns">
+      <div class="column flex-1">
+        <label class="full">
+          <span class="required">Model name</span>
+          <input
+              required
+              name="name"
+              type="text"
+              value="{{ custom_model.name or '' }}"
+              class="form-input-blue form-input-full"
+              placeholder="Pick a short label for the model" />
+        </label>
 
-      <label
-          class="full"
-          data-tooltip="Where can people find more information about the modeling process?">
-        <span>Information URL</span>
-        <input
-            name="url"
-            type="url"
-            value="{{ custom_model.url or '' }}"
-            class="form-input-blue form-input-full"
-            placeholder="https://example.com" />
-      </label>
-    </div>
+        <label
+            class="full"
+            data-tooltip="Where can people find more information about the modeling process?">
+          <span>Information URL</span>
+          <input
+              name="url"
+              type="url"
+              value="{{ custom_model.url or '' }}"
+              class="form-input-blue form-input-full"
+              placeholder="https://example.com" />
+        </label>
+      </div>
 
-    <div class="form-row">
-      <label class="full">
-        <span>Description</span>
-        <textarea
-            rows=2
-            name="description"
-            class="form-input-blue form-input-full"
-            placeholder="Provide a short description of your modeling methodology">
-          {{- custom_model.description or '' -}}
-        </textarea>
-      </label>
+      <div class="column flex-2">
+        <label class="full">
+          <span>Description</span>
+          <textarea
+              rows=3
+              name="description"
+              class="form-input-blue form-input-full"
+              placeholder="Provide a short description of your modeling methodology">
+            {{- custom_model.description or '' -}}
+          </textarea>
+        </label>
+      </div>
     </div>
 
     <hr>
@@ -54,23 +56,27 @@
     <div>
       Model predictions for:
       <span class="js-measurement-label"></span>
-
-      <p class="help small">
-        Provide the predictions of your model that correspond to the selected
-        measurements. The data should be a CSV with "<strong>time</strong>",
-        "<strong>value</strong>", and (optionally) "<strong>error</strong>"
-        columns.
-      </p>
     </div>
 
     <div class="form-row box">
-      <label class="full">
+      <label class="flex-1">
+        <span>Data CSV</data>
         <input
             required
             name="predictions"
             type="file"
             class="form-input-full" />
       </label>
+      <div class="help small flex-2">
+        Provide the predictions of your model that are fitted to the selected
+        measurements. The data should be a CSV with columns:
+
+        <ul>
+          <li>"<strong>time</strong>" in hours</li>
+          <li>"<strong>value</strong>" in <span class="js-units-label"></span></li>
+          <li>"<strong>error</strong>" (optional)</li>
+        </ul>
+      </div>
     </div>
 
     <div class="form-row">

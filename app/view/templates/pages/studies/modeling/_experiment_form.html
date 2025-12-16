@@ -92,6 +92,7 @@
                     type="radio"
                     name="selectedContext"
                     data-measurement-label="{{ measurement_context.get_chart_label() }}"
+                    data-units-label="{{ measurement_context.technique.studyTechnique.units }}"
                     {{ "checked" if selectedMeasurementContextId == measurement_context.id else "" }}
                     value="{{ key }}"
                     id="{{ key }}"

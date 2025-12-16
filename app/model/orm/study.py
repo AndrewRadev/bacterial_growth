@@ -132,20 +132,16 @@ class Study(OrmBase):
         else:
             return user.uuid in self.managerUuids
 
-    def get_modeling_info(self):
-        info = set()
+    def get_model_info_list(self):
+        info_set = set()
 
         for modeling_result in self.modelingResults:
             if not modeling_result.isPublished:
                 continue
 
-            info.add((
-                modeling_result.type,
-                modeling_result.model_name,
-                modeling_result.model_description,
-            ))
+            info_set.add(modeling_result.info)
 
-        return info
+        return sorted(info_set, key=lambda i: i.name)
 
     def find_last_submission(self, db_session):
         from app.model.orm import Submission

@@ -53,16 +53,16 @@
           {% endif %}
         {% endfor %}
 
-        {% set modeling_info = study.get_modeling_info() %}
+        {% set model_info_list = study.get_model_info_list() %}
 
-        {% if modeling_info: %}
+        {% if model_info_list: %}
           <optgroup label="Models">
-            {% for (type, name, _description) in modeling_info: %}
+            {% for model_info in model_info_list: %}
               <option
                   data-technique-type="model"
-                  value="{{ type }}"
+                  value="{{ model_info.type }}"
                   data-subject-type="strain">
-                {{- name }} predictions
+                {{- model_info.name }} predictions
               </option>
             {% endfor %}
           </optgroup>
