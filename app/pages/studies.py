@@ -41,9 +41,15 @@ def study_show_page(publicId):
         publicId,
         check_user_visibility=False,
         sql_options=(
+            # Level 1:
             sql.orm.selectinload(Study.experiments, Experiment.compartments),
-            sql.orm.selectinload(Study.experiments, Experiment.community, Community.strains),
+            sql.orm.selectinload(Study.experiments, Experiment.community),
             sql.orm.selectinload(Study.experiments, Experiment.perturbations),
+            sql.orm.selectinload(Study.experiments, Experiment.bioreplicates),
+            # Level 2:
+            sql.orm.selectinload(Study.experiments, Experiment.community, Community.strains),
+            sql.orm.selectinload(Study.experiments, Experiment.bioreplicates, Bioreplicate.measurementContexts),
+            # Level 3:
             sql.orm.selectinload(
                 Study.experiments,
                 Experiment.bioreplicates,
@@ -77,9 +83,17 @@ def study_modeling_page(publicId):
     study = _fetch_study(
         publicId,
         sql_options=(
-            sql.orm.selectinload(Study.studyTechniques),
+            # Level 1:
             sql.orm.selectinload(Study.experiments, Experiment.bioreplicates),
             sql.orm.selectinload(Study.experiments, Experiment.compartments),
+            sql.orm.selectinload(Study.studyTechniques, StudyTechnique.measurementTechniques),
+            # Level 2:
+            sql.orm.selectinload(
+                Study.studyTechniques,
+                StudyTechnique.measurementTechniques,
+                MeasurementTechnique.measurementContexts,
+            ),
+            # Level 3:
             sql.orm.selectinload(
                 Study.studyTechniques,
                 StudyTechnique.measurementTechniques,
