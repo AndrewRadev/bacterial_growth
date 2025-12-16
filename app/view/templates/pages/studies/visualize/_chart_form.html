@@ -136,7 +136,7 @@
                 </label>
               </div>
 
-              {% for modeling_result in measurement_context.modelingResults if modeling_result.isPublished: %}
+              {% for modeling_result in measurement_context.publishedModelingResults: %}
                 {% set key = "modelingResult|{}".format(modeling_result.id) %}
 
                 <div

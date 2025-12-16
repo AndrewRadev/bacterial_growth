@@ -248,11 +248,11 @@
                             </a>
                           </div>
 
-                          {% if measurement_context.modelingResults: %}
+                          {% if measurement_context.publishedModelingResults: %}
                             <h4 class="small">Models:</h4>
 
                             <ul class="small">
-                              {% for modeling_result in measurement_context.modelingResults if modeling_result.isPublished: %}
+                              {% for modeling_result in measurement_context.publishedModelingResults: %}
                                 {% set visualize_url = url_for(
                                   'study_visualize_page',
                                   publicId=study.publicId,

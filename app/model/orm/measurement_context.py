@@ -67,6 +67,10 @@ class MeasurementContext(OrmBase):
         ('bioreplicate', 'strain', 'metabolite'),
     ), deferred=True)
 
+    @property
+    def publishedModelingResults(self):
+        return [mr for mr in self.modelingResults if mr.isPublished]
+
     def get_df(self, db_session):
         from app.model.orm import Measurement
 
