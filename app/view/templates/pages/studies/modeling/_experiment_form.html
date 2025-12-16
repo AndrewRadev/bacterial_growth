@@ -1,5 +1,9 @@
 {% macro render_experiment_form(study) %}
 
+  {% set selectedTechniqueId          = request.args.get('selectedTechniqueId',          '0')|int %}
+  {% set selectedMeasurementContextId = request.args.get('selectedMeasurementContextId', '0')|int %}
+  {% set selectedCustomModelId        = request.args.get('selectedCustomModelId',        '0')|int %}
+
   <div class="form-row">
     <label>
       <span>Experiment:</span>
@@ -29,15 +33,21 @@
           {% if study_technique.measurementTechniques|length > 1: %}
             <optgroup label="{{- study_technique.long_name_with_subject_type -}}">
               {% for measurement_technique in study_technique.measurementTechniques: %}
-                <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-                {{- measurement_technique.short_name -}}
+                <option
+                    {{ "selected" if measurement_technique.id == selectedTechniqueId }}
+                    value="{{ measurement_technique.id }}"
+                    data-subject-type="{{ measurement_technique.subjectType }}">
+                  {{- measurement_technique.short_name -}}
                 </option>
               {% endfor %}
             </optgroup>
           {% else: %}
             {% set measurement_technique = study_technique.measurementTechniques[0] %}
-            <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-            {{- measurement_technique.long_name_with_subject_type -}}
+            <option
+                {{ "selected" if measurement_technique.id == selectedTechniqueId }}
+                value="{{ measurement_technique.id }}"
+                data-subject-type="{{ measurement_technique.subjectType }}">
+              {{- measurement_technique.long_name_with_subject_type -}}
             </option>
           {% endif %}
         {% endfor %}
@@ -81,6 +91,7 @@
                 <input
                     type="radio"
                     name="selectedContext"
+                    {{ "checked" if selectedMeasurementContextId == measurement_context.id else "" }}
                     value="{{ key }}"
                     id="{{ key }}"
                     class="js-measurement-toggle" />
@@ -128,7 +139,10 @@
 
           {% if study.customModels: %}
             {% for m in study.customModels:  %}
-              <option value="custom_{{ m.id }}" data-custom-model-id="{{ m.id }}">
+              <option
+                  {{ "selected" if m.id == selectedCustomModelId }}
+                  value="custom_{{ m.id }}"
+                  data-custom-model-id="{{ m.id }}">
                 Custom: {{ m.name }}
               </option>
             {% endfor %}

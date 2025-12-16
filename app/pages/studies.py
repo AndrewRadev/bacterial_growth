@@ -8,6 +8,7 @@ from flask import (
     send_file,
     request,
     redirect,
+    url_for,
 )
 from werkzeug.exceptions import Forbidden
 import sqlalchemy as sql
@@ -315,7 +316,15 @@ def study_modeling_custom_create_action(publicId):
     g.db_session.add(modeling_result)
     g.db_session.commit()
 
-    return redirect(request.referrer)
+    redirect_url = url_for(
+        'study_modeling_page',
+        publicId=study.publicId,
+        selectedMeasurementContextId=modeling_result.measurementContext.id,
+        selectedTechniqueId=modeling_result.measurementContext.technique.id,
+        selectedCustomModelId=custom_model.id,
+    )
+
+    return redirect(redirect_url)
 
 
 def study_modeling_check_json(publicId):
