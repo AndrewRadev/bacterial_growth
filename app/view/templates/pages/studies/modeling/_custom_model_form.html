@@ -51,19 +51,25 @@
 
     <hr>
 
-    <div class="form-row">
+    <div>
+      Model predictions for:
+      <span class="js-measurement-label"></span>
+
+      <p class="help small">
+        Provide the predictions of your model that correspond to the selected
+        measurements. The data should be a CSV with "<strong>time</strong>",
+        "<strong>value</strong>", and (optionally) "<strong>error</strong>"
+        columns.
+      </p>
+    </div>
+
+    <div class="form-row box">
       <label class="full">
-        <span>Model predictions</span>
         <input
             required
             name="predictions"
             type="file"
             class="form-input-full" />
-        <p class="help">
-          Provide the predictions of your model that correspond to the
-          selected measurements of <strong>TODO</strong>. The data should
-          be a CSV with "time", "value", and (optionally) "error" columns.
-        </p>
       </label>
     </div>
 

@@ -185,9 +185,11 @@ Page('.study-modeling-page', function($page) {
 
   function updateSelectedContext($radio) {
     let radioValue = $radio.val();
+    let measurementLabel = $radio.data('measurementLabel');
     let contextId = parseInt(radioValue.replaceAll('measurementContext|', ''), 10);
 
     $page.find('input[name=selectedMeasurementContextId]').val(contextId);
+    $page.find('.js-measurement-label').html(measurementLabel);
   }
 
   function checkForUpdates() {
