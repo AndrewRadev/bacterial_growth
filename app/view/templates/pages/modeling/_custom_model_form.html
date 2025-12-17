@@ -7,7 +7,13 @@
         📝 Edit
       </button>
 
-      <h3>Model: {{ custom_model.name }}</h3>
+      <h3>
+        Model: {{ custom_model.name }}
+
+        {% if custom_model.shortName: %}
+          ({{ custom_model.shortName }})
+        {% endif %}
+      </h3>
 
       {% if custom_model.url: %}
         <p>{{ custom_model.url|external_link }}</p>
@@ -22,7 +28,7 @@
   {% endif %}
 
   <form
-      data-custom-model-id="{{ custom_model.id or "new" }}"
+      data-custom-model-id="{{ custom_model.id or 'new' }}"
       action="{{ url_for('modeling_custom_model_update_action', publicId=study.publicId) }}"
       method="POST"
       class="simple-form hidden">
@@ -36,7 +42,10 @@
       </button>
     </div>
 
-    <input type="hidden" name="customModelId" value="{{ custom_model.id or "new" }}" />
+    {% if custom_model: %}
+      <input type="hidden" name="customModelId" value="{{ custom_model.id }}" />
+    {% endif %}
+
     <input type="hidden" name="selectedMeasurementContextId" />
 
     <div class="form-row columns">
@@ -49,8 +58,20 @@
               type="text"
               value="{{ custom_model.name or '' }}"
               class="form-input-blue form-input-full"
-              placeholder="Pick a short label for the model" />
+              placeholder="Full name of the model" />
         </label>
+
+        <label class="full">
+          <span>Short name</span>
+          <input
+              maxlength=5
+              name="shortName"
+              type="text"
+              value="{{ custom_model.shortName or '' }}"
+              class="form-input-blue form-input-full"
+              placeholder="A short label for charts (max 5 characters)" />
+        </label>
+
 
         <label
             class="full"
@@ -79,10 +100,28 @@
       </div>
     </div>
 
-    <input
-        type="submit"
-        value="{{ 'Update' if custom_model else 'Create' }}"
-        class="flex-end" />
+    <div class="flex-row full">
+      <input
+          type="submit"
+          value="{{ 'Update' if custom_model else 'Create' }}"
+          class="flex-start" />
+
+      {% if custom_model: %}
+        {% set delete_url = url_for(
+          'modeling_custom_model_delete_action',
+          publicId=study.publicId,
+          customModelId=custom_model.id
+        ) %}
+
+        <button
+            type="button"
+            data-url="{{ delete_url }}"
+            data-confirm="This will delete this model and all of its uploaded measurements. Are you sure?"
+            class="flex-right white-button orange-border js-delete-model">
+          🗑 Delete
+        </button>
+      {% endif %}
+    </div>
   </form>
 
 {% endmacro %}

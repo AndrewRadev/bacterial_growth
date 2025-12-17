@@ -180,7 +180,7 @@ class ModelingResult(OrmBase):
     @property
     def short_model_name(self):
         if self.type.startswith('custom_'):
-            return self.customModel.name
+            return self.customModel.shortName
         else:
             return SHORT_MODEL_NAMES[self.type]
 
@@ -199,7 +199,9 @@ class ModelingResult(OrmBase):
     def get_chart_label(self):
         from markupsafe import Markup, escape
 
-        return self.measurementContext.get_chart_label(model_name=self.short_model_name)
+        model_name = self.short_model_name or self.model_name
+
+        return self.measurementContext.get_chart_label(model_name=model_name)
 
     def generate_chart_df(self, measurements_df):
         start_time = measurements_df['time'].min()

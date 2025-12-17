@@ -25,6 +25,7 @@ class CustomModel(OrmBase):
     study: Mapped['Study'] = relationship(back_populates='customModels')
 
     name:        Mapped[str] = mapped_column(sql.String(255), nullable=False)
+    shortName:   Mapped[str] = mapped_column(sql.String(5))
     url:         Mapped[str] = mapped_column(sql.String(255))
     description: Mapped[str] = mapped_column(sql.String)
 

@@ -1,14 +1,19 @@
 {% macro render_custom_upload_form(study, custom_model) %}
 
+  {% set form_url = url_for(
+    'modeling_custom_model_upload_action',
+    publicId=study.publicId,
+    customModelId=custom_model.id
+  )  %}
+
   <form
       data-custom-model-id="{{ custom_model.id }}"
       enctype="multipart/form-data"
-      action="{{ url_for('modeling_custom_model_upload_action', publicId=study.publicId) }}"
+      action="{{ form_url }}"
       method="POST"
       class="simple-form hidden">
     <h3>Upload {{ custom_model.name }} predictions</h3>
 
-    <input type="hidden" name="customModelId" value="{{ custom_model.id }}" />
     <input type="hidden" name="selectedMeasurementContextId" />
 
     <div>

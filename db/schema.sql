@@ -123,6 +123,7 @@ CREATE TABLE CustomModels (
   `description` text,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  shortName varchar(5) DEFAULT NULL,
   PRIMARY KEY (id),
   KEY CustomModels_studyId (studyId),
   CONSTRAINT CustomModels_studyId FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
@@ -703,7 +704,8 @@ INSERT INTO MigrationVersions VALUES
 (81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20'),
 (83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13'),
 (85,'2025_12_08_172450_remove_modeling_request_id_constraint','2025-12-08 16:26:02'),
-(94,'2025_12_14_121007_create_custom_models','2025-12-14 15:28:46'),
-(95,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-14 15:28:47'),
-(97,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-14 16:39:34');
+(101,'2025_12_14_121007_create_custom_models','2025-12-15 15:15:04'),
+(102,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-15 15:15:04'),
+(103,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-15 15:15:04'),
+(105,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 14:35:08');
 

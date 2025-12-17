@@ -137,7 +137,7 @@
                   <label for="{{ key }}">
                     {{ modeling_result.model_name }}
 
-                    {% if modeling_result.short_model_name != modeling_result.model_name: %}
+                    {% if modeling_result.short_model_name: %}
                       ({{ modeling_result.short_model_name }})
                     {% endif %}
                   </label>

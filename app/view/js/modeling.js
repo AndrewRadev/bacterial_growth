@@ -100,6 +100,20 @@ Page('.study-modeling-page', function($page) {
     $preview.removeClass('hidden');
   });
 
+  $page.on('click', '.js-delete-model', function(e) {
+    let $button = $(this);
+
+    if (confirm($button.data('confirm'))) {
+      $.ajax({
+        url: $button.data('url'),
+        method: 'POST',
+        success: function() {
+          window.location.reload();
+        }
+      });
+    }
+  });
+
   function updateMeasurementSubjects($form) {
     let $techniqueSelect = $form.find('.js-technique-type');
     let techniqueId = $techniqueSelect.val();

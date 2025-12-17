@@ -203,8 +203,8 @@ def modeling_custom_model_update_action(publicId):
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
-    custom_model_id        = request.form['customModelId']
-    measurement_context_id = request.form['selectedMeasurementContextId']
+    custom_model_id        = request.form.get('customModelId')
+    measurement_context_id = request.form.get('selectedMeasurementContextId')
 
     technique_id = None
     if measurement_context_id:
@@ -216,17 +216,18 @@ def modeling_custom_model_update_action(publicId):
         if measurement_context:
             technique_id = measurement_context.techniqueId
 
-    if custom_model_id == 'new':
-        custom_model = CustomModel(studyId=study.publicId)
-    else:
+    if custom_model_id:
         custom_model = g.db_session.get(CustomModel, custom_model_id)
         if custom_model.studyId != publicId:
             raise Forbidden
+    else:
+        custom_model = CustomModel(studyId=study.publicId)
 
     custom_model.update(
         name=request.form['name'],
-        url=request.form.get('url'),
-        description=request.form.get('description'),
+        shortName=request.form['shortName'],
+        url=request.form['url'],
+        description=request.form['description'],
     )
     g.db_session.add(custom_model)
     g.db_session.commit()
@@ -242,15 +243,30 @@ def modeling_custom_model_update_action(publicId):
     return redirect(redirect_url)
 
 
-def modeling_custom_model_upload_action(publicId):
+def modeling_custom_model_delete_action(publicId, customModelId):
     study = _fetch_study_for_manager(publicId)
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
-    custom_model_id        = request.form['customModelId']
+    custom_model = g.db_session.get(CustomModel, customModelId)
+    if custom_model.studyId != publicId:
+        raise Forbidden
+
+    g.db_session.delete(custom_model)
+    g.db_session.commit()
+
+    # The ajax action will reload the page
+    return {}
+
+
+def modeling_custom_model_upload_action(publicId, customModelId):
+    study = _fetch_study_for_manager(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
+
     measurement_context_id = request.form['selectedMeasurementContextId']
 
-    custom_model = g.db_session.get_one(CustomModel, custom_model_id)
+    custom_model = g.db_session.get_one(CustomModel, customModelId)
     if custom_model.studyId != publicId:
         raise Forbidden
 
