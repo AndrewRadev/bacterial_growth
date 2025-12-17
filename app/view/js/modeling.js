@@ -92,6 +92,14 @@ Page('.study-modeling-page', function($page) {
     $form.removeClass('hidden');
   });
 
+  $page.on('click', '.js-cancel-edit-model', function(e) {
+    let $form = $(this).parents('form[data-custom-model-id]');
+    let $preview = $form.prev('.js-preview');
+
+    $form.addClass('hidden');
+    $preview.removeClass('hidden');
+  });
+
   function updateMeasurementSubjects($form) {
     let $techniqueSelect = $form.find('.js-technique-type');
     let techniqueId = $techniqueSelect.val();

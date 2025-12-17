@@ -1,7 +1,9 @@
 {% macro render_custom_model_form(study, custom_model=None) %}
   {% if custom_model: %}
     <div class="preview js-preview">
-      <button class="white-button small-button small float-right js-edit-model">
+      <button
+          type="button"
+          class="white-button small-button small float-right js-edit-model">
         📝 Edit
       </button>
 
@@ -24,7 +26,15 @@
       action="{{ url_for('modeling_custom_model_update_action', publicId=study.publicId) }}"
       method="POST"
       class="simple-form hidden">
-    <h3>Describe custom model</h3>
+    <div class="form-row">
+      <h3>Describe custom model</h3>
+
+      <button
+          type="button"
+          class="white-button small-button small flex-right js-cancel-edit-model">
+        📝 Cancel edit
+      </button>
+    </div>
 
     <input type="hidden" name="customModelId" value="{{ custom_model.id or "new" }}" />
     <input type="hidden" name="selectedMeasurementContextId" />

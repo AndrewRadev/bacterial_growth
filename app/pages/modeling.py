@@ -241,6 +241,7 @@ def modeling_custom_model_update_action(publicId):
 
     return redirect(redirect_url)
 
+
 def modeling_custom_model_upload_action(publicId):
     study = _fetch_study_for_manager(publicId)
     if not study.manageable_by_user(g.current_user):
