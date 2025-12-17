@@ -3,7 +3,7 @@
   <form
       data-custom-model-id="{{ custom_model.id or "new" }}"
       enctype="multipart/form-data"
-      action="{{ url_for('study_modeling_custom_create_action', publicId=study.publicId) }}"
+      action="{{ url_for('modeling_custom_create_action', publicId=study.publicId) }}"
       method="POST"
       class="simple-form hidden">
     <h3>Upload custom model data</h3>

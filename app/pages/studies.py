@@ -1,6 +1,4 @@
-import io
 import uuid
-from datetime import datetime, UTC
 
 from flask import (
     g,
@@ -8,36 +6,26 @@ from flask import (
     send_file,
     request,
     redirect,
-    url_for,
 )
 from werkzeug.exceptions import Forbidden
 import sqlalchemy as sql
-import pandas as pd
-import numpy as np
 
 from app.model.orm import (
     Bioreplicate,
     Community,
-    CustomModel,
     Experiment,
     MeasurementContext,
-    MeasurementTechnique,
-    ModelingResult,
     Study,
-    StudyTechnique,
     StudyUser,
     Submission,
 )
 from app.view.forms.experiment_export_form import ExperimentExportForm
 from app.view.forms.comparative_chart_form import ComparativeChartForm
-from app.model.lib.chart import Chart
-from app.model.lib.modeling_tasks import process_modeling_request
-from app.model.lib.model_export import export_model_csv
 import app.model.lib.util as util
 
 
 def study_show_page(publicId):
-    study = _fetch_study(
+    study = _fetch_study_for_visitor(
         publicId,
         check_user_visibility=False,
         sql_options=(
@@ -78,44 +66,15 @@ def study_show_page(publicId):
 
 
 def study_manage_page(publicId):
-    study = _fetch_study(publicId)
+    study = _fetch_study_for_visitor(publicId)
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
     return render_template("pages/studies/manage.html", study=study)
 
 
-def study_modeling_page(publicId):
-    study = _fetch_study(
-        publicId,
-        sql_options=(
-            # Level 1:
-            sql.orm.selectinload(Study.experiments, Experiment.bioreplicates),
-            sql.orm.selectinload(Study.experiments, Experiment.compartments),
-            sql.orm.selectinload(Study.studyTechniques, StudyTechnique.measurementTechniques),
-            # Level 2:
-            sql.orm.selectinload(
-                Study.studyTechniques,
-                StudyTechnique.measurementTechniques,
-                MeasurementTechnique.measurementContexts,
-            ),
-            # Level 3:
-            sql.orm.selectinload(
-                Study.studyTechniques,
-                StudyTechnique.measurementTechniques,
-                MeasurementTechnique.measurementContexts,
-                MeasurementContext.modelingResults,
-            ),
-        )
-    )
-    if not study.manageable_by_user(g.current_user):
-        raise Forbidden()
-
-    return render_template("pages/studies/modeling.html", study=study)
-
-
 def study_export_page(publicId):
-    study = _fetch_study(publicId)
+    study = _fetch_study_for_visitor(publicId)
 
     return render_template(
         "pages/studies/export.html",
@@ -126,7 +85,7 @@ def study_export_page(publicId):
 
 def study_export_preview_fragment(publicId):
     # We only need the id here, but we call it to apply visibility checks:
-    _fetch_study(publicId)
+    _fetch_study_for_visitor(publicId)
 
     csv_previews = []
     export_form = ExperimentExportForm(g.db_session, request.args)
@@ -143,7 +102,7 @@ def study_export_preview_fragment(publicId):
 
 
 def study_download_data_zip(publicId):
-    study = _fetch_study(publicId)
+    study = _fetch_study_for_visitor(publicId)
     csv_data = []
 
     export_form = ExperimentExportForm(g.db_session, request.args)
@@ -172,20 +131,8 @@ def study_download_data_zip(publicId):
     )
 
 
-def study_download_models_csv(publicId):
-    study = _fetch_study(publicId)
-
-    csv_data = export_model_csv(g.db_session, study, g.current_user)
-
-    return send_file(
-        io.BytesIO(csv_data),
-        as_attachment=True,
-        download_name=f"{publicId}_models.csv",
-    )
-
-
 def study_reset_action(publicId):
-    study = _fetch_study(publicId, check_user_visibility=False)
+    study = _fetch_study_for_visitor(publicId, check_user_visibility=False)
     if study.ownerUuid != g.current_user.uuid:
         raise Forbidden()
 
@@ -212,7 +159,7 @@ def study_reset_action(publicId):
 
 
 def study_visualize_page(publicId):
-    study = _fetch_study(publicId)
+    study = _fetch_study_for_visitor(publicId)
 
     left_axis_ids  = _parse_comma_separated_request_ids('l')
     right_axis_ids = _parse_comma_separated_request_ids('r')
@@ -237,7 +184,7 @@ def study_visualize_page(publicId):
 
 
 def study_chart_fragment(publicId):
-    study = _fetch_study(publicId)
+    study = _fetch_study_for_visitor(publicId)
     args = request.form.to_dict()
 
     width = request.args.get('width', None)
@@ -258,196 +205,7 @@ def study_chart_fragment(publicId):
     )
 
 
-def study_modeling_submit_action(publicId):
-    study = _fetch_study(publicId)
-    if not study.manageable_by_user(g.current_user):
-        raise Forbidden()
-
-    args = request.form.to_dict()
-
-    modeling_type = args.pop('modelingType')
-    measurement_context_id = int(args.pop('selectedContext').removeprefix('measurementContext|'))
-
-    modeling_result = g.db_session.scalars(
-        sql.select(ModelingResult)
-        .where(
-            ModelingResult.type == modeling_type,
-            ModelingResult.measurementContextId == measurement_context_id,
-        )
-    ).one_or_none()
-
-    if modeling_result is None:
-        modeling_result = ModelingResult(
-            type=modeling_type,
-            measurementContextId=measurement_context_id,
-        )
-
-    modeling_result.state = 'pending'
-    g.db_session.add(modeling_result)
-    g.db_session.commit()
-
-    process_modeling_request.delay(modeling_result.id, measurement_context_id, args)
-
-    return {'modelingResultId': modeling_result.id}
-
-
-def study_modeling_custom_create_action(publicId):
-    study = _fetch_study(publicId)
-    if not study.manageable_by_user(g.current_user):
-        raise Forbidden()
-
-    custom_model_id        = request.form['customModelId']
-    measurement_context_id = request.form['selectedMeasurementContextId']
-
-    if custom_model_id == 'new':
-        custom_model = CustomModel(studyId=study.publicId)
-    else:
-        custom_model = g.db_session.get(CustomModel, custom_model_id)
-        if custom_model.studyId != publicId:
-            raise Forbidden
-
-    custom_model.update(
-        name=request.form['name'],
-        url=request.form.get('url'),
-        description=request.form.get('description'),
-    )
-    g.db_session.add(custom_model)
-    g.db_session.commit()
-
-    predictions_df = pd.read_csv(request.files['predictions'])
-
-    modeling_result = g.db_session.scalars(
-        sql.select(ModelingResult)
-        .where(
-            ModelingResult.measurementContextId == measurement_context_id,
-            ModelingResult.customModelId == custom_model.id,
-        )
-    ).one_or_none()
-
-    if modeling_result is None:
-        modeling_result = ModelingResult(
-            measurementContextId=request.form['selectedMeasurementContextId'],
-            customModelId=custom_model.id,
-            type=f"custom_{custom_model.id}",
-            state='ready',
-        )
-
-    modeling_result.update(
-        xValues=predictions_df['time'].tolist(),
-        yValues=predictions_df['value'].tolist(),
-        yErrors=predictions_df['error'].replace({np.nan: None}).tolist(),
-    )
-
-    g.db_session.add(modeling_result)
-    g.db_session.commit()
-
-    redirect_url = url_for(
-        'study_modeling_page',
-        publicId=study.publicId,
-        selectedMeasurementContextId=modeling_result.measurementContext.id,
-        selectedTechniqueId=modeling_result.measurementContext.technique.id,
-        selectedCustomModelId=custom_model.id,
-    )
-
-    return redirect(redirect_url)
-
-
-def study_modeling_check_json(publicId):
-    study = _fetch_study(publicId)
-    if not study.manageable_by_user(g.current_user):
-        raise Forbidden()
-
-    result_states = {}
-
-    for modeling_result in study.modelingResults:
-        result_states[modeling_result.id] = modeling_result.state
-
-    return result_states
-
-
-def study_modeling_chart_fragment(publicId, measurementContextId):
-    study = _fetch_study(publicId)
-    if not study.manageable_by_user(g.current_user):
-        raise Forbidden()
-
-    args = request.args.to_dict()
-
-    modeling_type = args.pop('modelingType')
-    log_transform = args.pop('logTransform', 'false') == 'true'
-
-    measurement_context = g.db_session.get(MeasurementContext, measurementContextId)
-    measurement_df      = measurement_context.get_df(g.db_session)
-
-    chart = Chart(
-        time_units=study.timeUnits,
-        title=measurement_context.get_chart_label(),
-        legend_position='right',
-        log_left=log_transform,
-    )
-    units = measurement_context.technique.units
-    if units == '':
-        units = measurement_context.technique.short_name
-
-    chart.add_df(
-        measurement_df,
-        units=units,
-        label="Measurements",
-    )
-
-    modeling_record = g.db_session.scalars(
-        sql.select(ModelingResult)
-        .where(
-            ModelingResult.type == modeling_type,
-            ModelingResult.measurementContextId == measurement_context.id,
-            ModelingResult.state == 'ready',
-        )
-    ).one_or_none()
-
-    if modeling_record:
-        df = modeling_record.generate_chart_df(measurement_df)
-
-        label = modeling_record.model_name
-        chart.add_model_df(df, units=units, label=label)
-
-        model_params = modeling_record.params
-        r_summary    = modeling_record.rSummary
-    else:
-        model_params = ModelingResult.empty_params(modeling_type)
-        r_summary    = None
-
-    return render_template(
-        'pages/studies/modeling/_chart.html',
-        study_id=publicId,
-        chart=chart,
-        modeling_record=modeling_record,
-        form_data=request.form,
-        modeling_type=modeling_type,
-        model_params=model_params,
-        r_summary=r_summary,
-        measurement_context=measurement_context,
-        log_transform=log_transform,
-    )
-
-def study_modeling_toggle_published_action(publicId, modelingResultId):
-    study = _fetch_study(publicId)
-    if not study.manageable_by_user(g.current_user):
-        raise Forbidden()
-
-    modeling_record = g.db_session.get(ModelingResult, modelingResultId)
-
-    if modeling_record.isPublished:
-        modeling_record.publishedAt = None
-        g.db_session.add(modeling_record)
-        g.db_session.commit()
-    else:
-        modeling_record.publishedAt = datetime.now(UTC)
-        g.db_session.add(modeling_record)
-        g.db_session.commit()
-
-    return {}
-
-
-def _fetch_study(publicId, check_user_visibility=True, sql_options=None):
+def _fetch_study_for_visitor(publicId, check_user_visibility=True, sql_options=None):
     sql_options = sql_options or ()
 
     study = g.db_session.scalars(

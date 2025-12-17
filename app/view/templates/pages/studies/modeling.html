@@ -25,14 +25,14 @@
         <div class="flex-row">
           {{ post_button(
             "Download model parameters",
-            url_for('study_download_models_csv', publicId=study.publicId),
+            url_for('modeling_params_csv', publicId=study.publicId),
             class="flex-right flex-end"
           ) }}
         </div>
       </div>
 
       <form
-          action="{{ url_for('study_modeling_submit_action', publicId=study.publicId) }}"
+          action="{{ url_for('modeling_submit_action', publicId=study.publicId) }}"
           class="simple-form modeling-form js-modeling-form">
         <div class="columns">
           <div class="controls-column">

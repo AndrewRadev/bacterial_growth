@@ -43,7 +43,7 @@ def init_assets(app):
         '../app/view/js/export.js',
         '../app/view/js/study.js',
         '../app/view/js/study_visualize.js',
-        '../app/view/js/study_modeling.js',
+        '../app/view/js/modeling.js',
         '../app/view/js/experiment.js',
         '../app/view/js/comparison.js',
         '../app/view/js/help.js',

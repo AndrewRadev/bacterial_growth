@@ -42,7 +42,7 @@
 {% if modeling_record: %}
   <div class="form-row box publish-box {{ "is-published" if modeling_record.isPublished }}">
     {% set toggle_publish_url = url_for(
-      'study_modeling_toggle_published_action',
+      'modeling_toggle_published_action',
       publicId=study_id,
       modelingResultId=modeling_record.id
     ) %}

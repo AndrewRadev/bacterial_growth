@@ -97,7 +97,7 @@
                     value="{{ key }}"
                     id="{{ key }}"
                     class="js-measurement-toggle" />
-                <label for="{{ key }}">
+                <label class="full" for="{{ key }}">
                   {% if subjectType == 'bioreplicate' and experiment.compartments|length > 1 %}
                     {{ measurement_context.subjectName }}<sub>{{ measurement_context.compartment.name }}</sub>
                   {% else: %}
@@ -105,7 +105,7 @@
                   {% endif %}
                 </label>
 
-                <div class="js-modeling-result-state flex-right">
+                <div class="js-modeling-result-state">
                   {% for modeling_result in measurement_context.modelingResults: %}
                     <div
                         data-modeling-result-id="{{ modeling_result.id }}"

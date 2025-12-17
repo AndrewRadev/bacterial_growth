@@ -165,7 +165,7 @@ Page('.study-modeling-page', function($page) {
     let measurementContextId = $radio.val().replaceAll('measurementContext|', '');
 
     $.ajax({
-      url: `/study/${studyId}/modeling/${measurementContextId}/chart`,
+      url: `/modeling/${studyId}/chart/${measurementContextId}/`,
       dataType: 'html',
       data: {
         'modelingType': modelingType,
@@ -196,7 +196,7 @@ Page('.study-modeling-page', function($page) {
 
   function checkForUpdates() {
     $.ajax({
-      url: `/study/${studyId}/modeling/check.json`,
+      url: `/modeling/${studyId}/check.json`,
       dataType: 'json',
       success: function(response) {
         let $calculationResult = $page.find('.js-calculation-result');
