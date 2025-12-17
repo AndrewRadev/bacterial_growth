@@ -216,13 +216,15 @@ class ModelingResult(OrmBase):
             values     = self._predict(timepoints)
             errors     = None
 
-        df = pd.DataFrame.from_dict({
+        data = {
             'time':  timepoints,
             'value': values,
-            'std':   errors,
-        })
+        }
 
-        # TODO (2025-12-15) Convert units
+        if errors:
+            data['std'] = errors
+
+        df = pd.DataFrame.from_dict(data)
 
         return df
 

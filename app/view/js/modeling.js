@@ -158,12 +158,14 @@ Page('.study-modeling-page', function($page) {
       if (modelingType == 'custom_new') {
         $page.find('.js-custom-model-form').removeClass('hidden');
         $page.find(`.js-custom-model-form form`).addClass('hidden');
+        $page.find(`.js-custom-model-form .js-preview`).addClass('hidden');
         $page.find(`.js-custom-model-form form[data-custom-model-id=new]`).removeClass('hidden');
 
         $page.find('.js-custom-upload-form').addClass('hidden');
       } else {
         $page.find('.js-custom-model-form').removeClass('hidden');
         $page.find(`.js-custom-model-form form`).addClass('hidden');
+        $page.find(`.js-custom-model-form .js-preview[data-custom-model-id=${customModelId}]`).removeClass('hidden');
 
         if ($activeRadio.length > 0) {
           $page.find('.js-custom-upload-form').removeClass('hidden');
@@ -174,10 +176,11 @@ Page('.study-modeling-page', function($page) {
       $form.find('.js-calculation-status').show();
 
       $page.find('.js-custom-model-form').addClass('hidden');
-      $page.find(`.js-custom-model-form form`).addClass('hidden');
+      $page.find('.js-custom-model-form form').addClass('hidden');
+      $page.find('.js-custom-model-form .js-preview').addClass('hidden');
 
       $page.find('.js-custom-upload-form').addClass('hidden');
-      $page.find(`.js-custom-upload-form form`).addClass('hidden');
+      $page.find('.js-custom-upload-form form').addClass('hidden');
     }
   }
 

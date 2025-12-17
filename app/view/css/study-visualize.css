@@ -3,6 +3,12 @@
     margin-top: 0;
   }
 
+  .experiment-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-bottom: 10px;
+  }
+
   .chart-form {
     margin-top: 20px;
 

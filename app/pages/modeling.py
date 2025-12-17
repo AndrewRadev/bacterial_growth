@@ -291,8 +291,10 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     modeling_result.update(
         xValues=predictions_df['time'].tolist(),
         yValues=predictions_df['value'].tolist(),
-        yErrors=predictions_df['error'].replace({np.nan: None}).tolist(),
     )
+
+    if 'error' in predictions_df:
+        modeling_result.yErrors = predictions_df['error'].replace({np.nan: None}).tolist(),
 
     g.db_session.add(modeling_result)
     g.db_session.commit()
@@ -300,6 +302,7 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     redirect_url = url_for(
         'modeling_page',
         publicId=study.publicId,
+        selectedExperimentId=modeling_result.measurementContext.bioreplicate.experimentId,
         selectedMeasurementContextId=modeling_result.measurementContext.id,
         selectedTechniqueId=modeling_result.measurementContext.technique.id,
         selectedCustomModelId=custom_model.id,

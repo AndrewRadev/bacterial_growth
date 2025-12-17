@@ -1,5 +1,6 @@
 {% macro render_experiment_form(study) %}
 
+  {% set selectedExperimentId         = request.args.get('selectedExperimentId',         '') %}
   {% set selectedTechniqueId          = request.args.get('selectedTechniqueId',          '0')|int %}
   {% set selectedMeasurementContextId = request.args.get('selectedMeasurementContextId', '0')|int %}
   {% set selectedCustomModelId        = request.args.get('selectedCustomModelId',        '0')|int %}
@@ -9,7 +10,9 @@
       <span>Experiment:</span>
       <select name="experimentId" class="form-input-blue full">
         {% for experiment in study.experiments: %}
-          <option value="{{ experiment.publicId }}">
+          <option
+              {{ "selected" if experiment.publicId == selectedExperimentId }}
+              value="{{ experiment.publicId }}">
           {{- experiment.name }}: {{ experiment.description -}}
           </option>
         {% endfor %}

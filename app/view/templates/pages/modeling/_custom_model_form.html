@@ -1,6 +1,6 @@
 {% macro render_custom_model_form(study, custom_model=None) %}
   {% if custom_model: %}
-    <div class="preview js-preview">
+    <div class="preview js-preview" data-custom-model-id="{{ custom_model.id }}">
       <button
           type="button"
           class="white-button small-button small float-right js-edit-model">
