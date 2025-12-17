@@ -62,6 +62,12 @@ def study_show_page(publicId):
                 Bioreplicate.measurementContexts,
                 MeasurementContext.technique,
             ),
+            sql.orm.selectinload(
+                Study.experiments,
+                Experiment.bioreplicates,
+                Bioreplicate.measurementContexts,
+                MeasurementContext.modelingResults,
+            ),
         )
     )
 
