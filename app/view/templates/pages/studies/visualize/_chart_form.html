@@ -36,7 +36,6 @@
               {% for measurement_technique in study_technique.measurementTechniques: %}
                 <option
                     value="{{ measurement_technique.id }}"
-                    data-technique-type="measurement"
                     data-subject-type="{{ measurement_technique.subjectType }}">
                   {{- measurement_technique.short_name -}}
                 </option>
@@ -46,27 +45,11 @@
             {% set measurement_technique = study_technique.measurementTechniques[0] %}
             <option
                 value="{{ measurement_technique.id }}"
-                data-technique-type="measurement"
                 data-subject-type="{{ measurement_technique.subjectType }}">
               {{- measurement_technique.long_name_with_subject_type -}}
             </option>
           {% endif %}
         {% endfor %}
-
-        {% set model_info_list = study.get_model_info_list() %}
-
-        {% if model_info_list: %}
-          <optgroup label="Models">
-            {% for model_info in model_info_list: %}
-              <option
-                  data-technique-type="model"
-                  value="{{ model_info.type }}"
-                  data-subject-type="strain">
-                {{- model_info.name }} predictions
-              </option>
-            {% endfor %}
-          </optgroup>
-        {% endif %}
       </select>
     </label>
   </div>
@@ -140,8 +123,9 @@
                 {% set key = "modelingResult|{}".format(modeling_result.id) %}
 
                 <div
-                    class="form-row hidden js-model-row"
-                    data-modeling-result-type="{{ modeling_result.type }}">
+                    class="form-row small model-row hidden js-technique-row"
+                    data-technique-id="{{ measurement_context.techniqueId }}">
+                  <span class="icon icon-arrow-down-right"></span>
                   <input
                       type="checkbox"
                       name="{{ key }}"
@@ -151,14 +135,10 @@
                       {{ "data-axis-right" if modeling_result.id in form.right_axis_model_ids }}
                       class="js-measurement-toggle" />
                   <label for="{{ key }}">
-                    {{ measurement_context.technique.short_name }}
+                    {{ modeling_result.model_name }}
 
-                    for
-
-                    {% if subjectType == 'bioreplicate' and experiment.compartments|length > 1: %}
-                      {{ subjectName }}<sub>{{ measurement_context.compartment.name }}</sub>
-                    {% else: %}
-                      {{ subjectName }}
+                    {% if modeling_result.short_model_name != modeling_result.model_name: %}
+                      ({{ modeling_result.short_model_name }})
                     {% endif %}
                   </label>
                 </div>

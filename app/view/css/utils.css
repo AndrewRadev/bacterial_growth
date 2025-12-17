@@ -459,4 +459,5 @@ form.simple-form {
 .icon.icon-unknown-strain    { background-image: url('/static/images/icons/progress-help.svg'); }
 .icon.icon-calculated        { background-image: url('/static/images/icons/calculator.svg'); }
 .icon.icon-calculated-orange { background-image: url('/static/images/icons/calculator-orange.svg'); }
+.icon.icon-arrow-down-right  { background-image: url('/static/images/icons/arrow-down-right.svg'); }
 .icon.icon-upload-orange     { background-image: url('/static/images/icons/upload-orange.svg'); }

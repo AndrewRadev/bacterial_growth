@@ -23,6 +23,13 @@ MODEL_NAMES = {
 }
 "The human-readable names of the supported models/methods"
 
+SHORT_MODEL_NAMES = {
+    'easy_linear':     'EL',
+    'logistic':        'Log.',
+    'baranyi_roberts': 'B.-R.',
+}
+"Shortened model names to show in charts"
+
 MODEL_DESCRIPTIONS = {
     'easy_linear':     'A phenomenological method that estimates growth rate based on a regression line between observed points.',
     'logistic':        'A model that describes exponential growth limited by a carrying capacity.',
@@ -171,6 +178,13 @@ class ModelingResult(OrmBase):
             return MODEL_NAMES[self.type]
 
     @property
+    def short_model_name(self):
+        if self.type.startswith('custom_'):
+            return self.customModel.name
+        else:
+            return SHORT_MODEL_NAMES[self.type]
+
+    @property
     def model_url(self):
         if self.type.startswith('custom_'):
             return self.customModel.url
@@ -185,8 +199,7 @@ class ModelingResult(OrmBase):
     def get_chart_label(self):
         from markupsafe import Markup, escape
 
-        # TODO generate better label
-        return Markup(f"{escape(self.model_name)} predictions for {self.measurementContext.get_chart_label()}")
+        return self.measurementContext.get_chart_label(model_name=self.short_model_name)
 
     def generate_chart_df(self, measurements_df):
         start_time = measurements_df['time'].min()

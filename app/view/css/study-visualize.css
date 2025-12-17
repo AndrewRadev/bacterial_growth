@@ -68,6 +68,21 @@
     }
   }
 
+  .model-row {
+    padding-left: 6px;
+    margin-top: -4px;
+
+    input[type="checkbox"] {
+      margin-left: -4px;
+      margin-right: -2px;
+    }
+
+    .icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
   .data-controls {
     border-bottom: 2px solid var(--border-color);
     padding: 4px 0;

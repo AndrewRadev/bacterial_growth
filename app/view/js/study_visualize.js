@@ -94,7 +94,6 @@ Page('.study-visualize-page', function($page) {
 
     $form.find('.js-experiment-container').addClass('hidden');
     $form.find('.js-technique-row').addClass('hidden');
-    $form.find('.js-model-row').addClass('hidden');
 
     let $experiment = $form.find(`.js-experiment-container[data-experiment-id="${selectedExperimentId}"]`);
     $experiment.removeClass('hidden');
@@ -103,20 +102,11 @@ Page('.study-visualize-page', function($page) {
       find('select[name="techniqueId"] option:selected');
 
     let selectedTechniqueId          = selectedOption.val();
-    let selectedTechniqueType        = selectedOption.data('techniqueType');
     let selectedTechniqueSubjectType = selectedOption.data('subjectType');
 
-    if (selectedTechniqueType == 'measurement') {
-      $experiment.
-        find(`.js-technique-row[data-technique-id="${selectedTechniqueId}"]`).
-        removeClass('hidden');
-    } else if (selectedTechniqueType == 'model') {
-      $experiment.
-        find(`.js-model-row[data-modeling-result-type="${selectedTechniqueId}"]`).
-        removeClass('hidden');
-    } else {
-      console.error(`Unexpected technqiue type: ${selectedTechniqueType}`);
-    }
+    $experiment.
+      find(`.js-technique-row[data-technique-id="${selectedTechniqueId}"]`).
+      removeClass('hidden');
 
     // Update chart:
 
