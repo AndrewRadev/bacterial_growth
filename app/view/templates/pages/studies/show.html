@@ -191,8 +191,15 @@
                       </span>
                     </span>
 
+                    {% set visualize_url = url_for(
+                      'study_visualize_page',
+                      publicId=study.publicId,
+                      selectedExperimentId=experiment.publicId,
+                      l=measurement_context_ids|join(',')
+                    ) %}
+
                     <a
-                        href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context_ids|join(',')) }}"
+                        href="{{ visualize_url }}"
                         class="white-button no-border small-button"
                         data-tooltip="Visualize">
                       📈
@@ -256,6 +263,8 @@
                                 {% set visualize_url = url_for(
                                   'study_visualize_page',
                                   publicId=study.publicId,
+                                  selectedExperimentId=experiment.publicId,
+                                  selectedTechniqueId=technique.id,
                                   l=measurement_context.id,
                                   lm=modeling_result.id
                                 ) %}

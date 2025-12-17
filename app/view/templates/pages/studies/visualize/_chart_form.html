@@ -1,10 +1,16 @@
 {% macro render_chart_form(form, study) %}
+
+  {% set selectedExperimentId = request.args.get('selectedExperimentId', '') %}
+  {% set selectedTechniqueId  = request.args.get('selectedTechniqueId',  '0')|int %}
+
   <div class="form-row">
     <label>
       <span>Experiment:</span>
       <select name="experimentId" class="form-input-blue full">
         {% for experiment in study.experiments: %}
-          <option value="{{ experiment.publicId }}">
+          <option
+              {{ "selected" if experiment.publicId == selectedExperimentId }}
+              value="{{ experiment.publicId }}">
             {{- experiment.name }}: {{ experiment.description|truncate(80) -}}
           </option>
         {% endfor %}
@@ -29,6 +35,7 @@
             <optgroup label="{{- study_technique.long_name_with_subject_type -}}">
               {% for measurement_technique in study_technique.measurementTechniques: %}
                 <option
+                    {{ "selected" if measurement_technique.id == selectedTechniqueId }}
                     value="{{ measurement_technique.id }}"
                     data-subject-type="{{ measurement_technique.subjectType }}">
                   {{- measurement_technique.short_name -}}
@@ -38,6 +45,7 @@
           {% else: %}
             {% set measurement_technique = study_technique.measurementTechniques[0] %}
             <option
+                {{ "selected" if measurement_technique.id == selectedTechniqueId }}
                 value="{{ measurement_technique.id }}"
                 data-subject-type="{{ measurement_technique.subjectType }}">
               {{- measurement_technique.long_name_with_subject_type -}}
