@@ -94,8 +94,13 @@ def init_routes(app):
         methods=["POST"],
     )
     app.add_url_rule(
-        "/modeling/<string:publicId>/create-custom-model",
-        view_func=modeling_pages.modeling_custom_create_action,
+        "/modeling/<string:publicId>/custom-model-update",
+        view_func=modeling_pages.modeling_custom_model_update_action,
+        methods=["POST"],
+    )
+    app.add_url_rule(
+        "/modeling/<string:publicId>/custom-model-upload",
+        view_func=modeling_pages.modeling_custom_model_upload_action,
         methods=["POST"],
     )
     app.add_url_rule(

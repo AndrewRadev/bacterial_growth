@@ -4,6 +4,8 @@ Page('.study-modeling-page', function($page) {
 
   updateFormVisibility($form);
   let $activeRadio = $('.js-technique-row:visible input[type=radio]:checked');
+
+  updateCustomModelVisibility($form, $activeRadio);
   if ($activeRadio.length > 0) {
     updateChart($activeRadio.first());
     updateSelectedContext($activeRadio.first());
@@ -25,33 +27,15 @@ Page('.study-modeling-page', function($page) {
 
   $page.on('change', 'form.js-modeling-form', function(e) {
     let $form = $(e.currentTarget);
-    updateFormVisibility($form);
 
+    updateFormVisibility($form);
     let $activeRadio = $page.find('.js-technique-row:visible input[type=radio]:checked');
+
+    updateCustomModelVisibility($form, $activeRadio);
     if ($activeRadio.length > 0) {
       updateChart($activeRadio.first());
       updateSelectedContext($activeRadio.first());
     }
-  });
-
-  $page.on('click', '.js-select-all', function(e) {
-    e.preventDefault();
-
-    let $link = $(e.currentTarget);
-    let $form = $link.parents('form');
-    $form.find('input[type=checkbox].js-measurement-toggle:visible').prop('checked', true);
-
-    updateFormVisibility($form)
-  });
-
-  $page.on('click', '.js-clear-chart', function(e) {
-    e.preventDefault();
-
-    let $link = $(e.currentTarget);
-    let $form = $link.parents('form');
-    $form.find('input[type=checkbox]').prop('checked', false);
-
-    updateFormVisibility($form)
   });
 
   $page.on('submit', '.js-modeling-form', function(e) {
@@ -100,6 +84,14 @@ Page('.study-modeling-page', function($page) {
     })
   });
 
+  $page.on('click', '.js-edit-model', function(e) {
+    let $parentContainer = $(this).parents('.js-preview');
+    let $form = $parentContainer.next('form[data-custom-model-id]');
+
+    $parentContainer.addClass('hidden');
+    $form.removeClass('hidden');
+  });
+
   function updateMeasurementSubjects($form) {
     let $techniqueSelect = $form.find('.js-technique-type');
     let techniqueId = $techniqueSelect.val();
@@ -108,7 +100,6 @@ Page('.study-modeling-page', function($page) {
     $form.find(`[data-technique-id=${techniqueId}]`).removeClass('hidden')
   }
 
-  // TODO: duplicates study_visualize.js, except for the form submission
   function updateFormVisibility($form) {
     let selectedExperimentId = $form.find('select[name="experimentId"]:visible').val();
 
@@ -126,7 +117,9 @@ Page('.study-modeling-page', function($page) {
     $experiment.
       find(`.js-technique-row[data-technique-id="${selectedTechniqueId}"]`).
       removeClass('hidden');
+  }
 
+  function updateCustomModelVisibility($form, $activeRadio) {
     let $modelingType = $form.find('select[name=modelingType]');
     let modelingType = $modelingType.val();
     let customModelId = $modelingType.find('option:selected').data('customModelId');
@@ -139,14 +132,30 @@ Page('.study-modeling-page', function($page) {
 
     if (modelingType.startsWith('custom_')) {
       $form.find('.js-calculation-status').hide();
-      $page.find('.js-custom-model-form').removeClass('hidden');
 
-      $page.find(`.js-custom-model-form form`).addClass('hidden');
-      $page.find(`.js-custom-model-form form[data-custom-model-id=${customModelId}]`).removeClass('hidden');
+      if (modelingType == 'custom_new') {
+        $page.find('.js-custom-model-form').removeClass('hidden');
+        $page.find(`.js-custom-model-form form`).addClass('hidden');
+        $page.find(`.js-custom-model-form form[data-custom-model-id=new]`).removeClass('hidden');
+
+        $page.find('.js-custom-upload-form').addClass('hidden');
+      } else {
+        $page.find('.js-custom-model-form').removeClass('hidden');
+        $page.find(`.js-custom-model-form form`).addClass('hidden');
+
+        if ($activeRadio.length > 0) {
+          $page.find('.js-custom-upload-form').removeClass('hidden');
+          $page.find(`.js-custom-upload-form form[data-custom-model-id=${customModelId}]`).removeClass('hidden');
+        }
+      }
     } else {
       $form.find('.js-calculation-status').show();
+
       $page.find('.js-custom-model-form').addClass('hidden');
       $page.find(`.js-custom-model-form form`).addClass('hidden');
+
+      $page.find('.js-custom-upload-form').addClass('hidden');
+      $page.find(`.js-custom-upload-form form`).addClass('hidden');
     }
   }
 

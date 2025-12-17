@@ -1,6 +1,7 @@
 {% from 'utils/_post_button.html' import post_button %}
-{% from 'pages/studies/modeling/_experiment_form.html' import render_experiment_form %}
-{% from 'pages/studies/modeling/_custom_model_form.html' import render_custom_model_form %}
+{% from 'pages/modeling/_experiment_form.html' import render_experiment_form %}
+{% from 'pages/modeling/_custom_model_form.html' import render_custom_model_form %}
+{% from 'pages/modeling/_custom_upload_form.html' import render_custom_upload_form %}
 
 {% extends '_layout.html' %}
 
@@ -55,6 +56,12 @@
         {% endfor %}
 
         {{ render_custom_model_form(study, custom_model=None) }}
+      </div>
+
+      <div class="box margin-top-10 hidden js-custom-upload-form">
+        {% for custom_model in study.customModels: %}
+          {{ render_custom_upload_form(study, custom_model) }}
+        {% endfor %}
       </div>
     </article>
   </div>

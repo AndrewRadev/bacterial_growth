@@ -54,7 +54,7 @@ def modeling_page(publicId):
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
-    return render_template("pages/studies/modeling.html", study=study)
+    return render_template("pages/modeling/show.html", study=study)
 
 
 def modeling_params_csv(publicId):
@@ -153,7 +153,7 @@ def modeling_chart_fragment(publicId, measurementContextId):
         r_summary    = None
 
     return render_template(
-        'pages/studies/modeling/_chart.html',
+        'pages/modeling/_chart.html',
         study_id=publicId,
         chart=chart,
         modeling_record=modeling_record,
@@ -198,13 +198,23 @@ def modeling_check_json(publicId):
     return result_states
 
 
-def modeling_custom_create_action(publicId):
+def modeling_custom_model_update_action(publicId):
     study = _fetch_study_for_manager(publicId)
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
     custom_model_id        = request.form['customModelId']
     measurement_context_id = request.form['selectedMeasurementContextId']
+
+    technique_id = None
+    if measurement_context_id:
+        measurement_context = g.db_session.get(
+            MeasurementContext,
+            measurement_context_id,
+        )
+
+        if measurement_context:
+            technique_id = measurement_context.techniqueId
 
     if custom_model_id == 'new':
         custom_model = CustomModel(studyId=study.publicId)
@@ -220,6 +230,28 @@ def modeling_custom_create_action(publicId):
     )
     g.db_session.add(custom_model)
     g.db_session.commit()
+
+    redirect_url = url_for(
+        'modeling_page',
+        publicId=study.publicId,
+        selectedMeasurementContextId=measurement_context_id,
+        selectedTechniqueId=technique_id,
+        selectedCustomModelId=custom_model.id,
+    )
+
+    return redirect(redirect_url)
+
+def modeling_custom_model_upload_action(publicId):
+    study = _fetch_study_for_manager(publicId)
+    if not study.manageable_by_user(g.current_user):
+        raise Forbidden()
+
+    custom_model_id        = request.form['customModelId']
+    measurement_context_id = request.form['selectedMeasurementContextId']
+
+    custom_model = g.db_session.get_one(CustomModel, custom_model_id)
+    if custom_model.studyId != publicId:
+        raise Forbidden
 
     predictions_df = pd.read_csv(request.files['predictions'])
 

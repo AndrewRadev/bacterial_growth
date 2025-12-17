@@ -1,12 +1,30 @@
 {% macro render_custom_model_form(study, custom_model=None) %}
+  {% if custom_model: %}
+    <div class="preview js-preview">
+      <button class="white-button small-button small float-right js-edit-model">
+        📝 Edit
+      </button>
+
+      <h3>Model: {{ custom_model.name }}</h3>
+
+      {% if custom_model.url: %}
+        <p>{{ custom_model.url|external_link }}</p>
+      {% endif %}
+
+      {% if custom_model.description: %}
+        <p class="small">
+          {{ custom_model.description }}
+        </p>
+      {% endif %}
+    </div>
+  {% endif %}
 
   <form
       data-custom-model-id="{{ custom_model.id or "new" }}"
-      enctype="multipart/form-data"
-      action="{{ url_for('modeling_custom_create_action', publicId=study.publicId) }}"
+      action="{{ url_for('modeling_custom_model_update_action', publicId=study.publicId) }}"
       method="POST"
       class="simple-form hidden">
-    <h3>Upload custom model data</h3>
+    <h3>Describe custom model</h3>
 
     <input type="hidden" name="customModelId" value="{{ custom_model.id or "new" }}" />
     <input type="hidden" name="selectedMeasurementContextId" />
@@ -51,37 +69,10 @@
       </div>
     </div>
 
-    <hr>
-
-    <div>
-      Model predictions for:
-      <span class="js-measurement-label"></span>
-    </div>
-
-    <div class="form-row box">
-      <label class="flex-1">
-        <span>Data CSV</data>
-        <input
-            required
-            name="predictions"
-            type="file"
-            class="form-input-full" />
-      </label>
-      <div class="help small flex-2">
-        Provide the predictions of your model that are fitted to the selected
-        measurements. The data should be a CSV with columns:
-
-        <ul>
-          <li>"<strong>time</strong>" in hours</li>
-          <li>"<strong>value</strong>" in <span class="js-units-label"></span></li>
-          <li>"<strong>error</strong>" (optional)</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <input type="submit" class="flex-right" value="Submit" />
-    </div>
+    <input
+        type="submit"
+        value="{{ 'Update' if custom_model else 'Create' }}"
+        class="flex-end" />
   </form>
 
 {% endmacro %}

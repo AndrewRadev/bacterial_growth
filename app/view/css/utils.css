@@ -60,6 +60,10 @@
   gap: 6px;
 }
 
+.float-right {
+  float: right;
+}
+
 .margin-top-10 {
   margin-top: 10px;
 }
@@ -69,6 +73,10 @@
   p {
     margin-top: 0;
   }
+}
+
+button {
+  cursor: pointer;
 }
 
 code.inline {
@@ -278,10 +286,6 @@ form.simple-form {
       margin: 0 !important;
       padding: 0 !important;
     }
-  }
-
-  button {
-    cursor: pointer;
   }
 
   textarea {
