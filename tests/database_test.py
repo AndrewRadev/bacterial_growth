@@ -11,6 +11,7 @@ from app.model.orm import (
     Community,
     CommunityStrain,
     Compartment,
+    CustomModel,
     Experiment,
     ExperimentCompartment,
     Measurement,
@@ -279,9 +280,15 @@ class DatabaseTest(unittest.TestCase):
     def create_modeling_result(self, **params):
         measurement_context_id = self._get_or_create_dependency(params, 'measurementContextId', ('measurement_context', 'id'))
 
+        if 'type' in params and params['type'].startswith('custom_'):
+            custom_model_id = self._get_or_create_dependency(params, 'customModelId', ('custom_model', 'id'))
+        else:
+            custom_model_id = None
+
         params = {
             'type':                 'baranyi_roberts',
             'measurementContextId': measurement_context_id,
+            'customModelId':        custom_model_id,
             **params,
         }
 
@@ -332,6 +339,17 @@ class DatabaseTest(unittest.TestCase):
         }
 
         return self._create_orm_record(User, params)
+
+    def create_custom_model(self, **params):
+        study_id = self._get_or_create_dependency(params, 'studyId', ('study', 'publicId'))
+
+        params = {
+            'name': 'Custom Model',
+            'studyId': study_id,
+            **params,
+        }
+
+        return self._create_orm_record(CustomModel, params)
 
     def _create_orm_record(self, model_class, params):
         instance = model_class(**params)

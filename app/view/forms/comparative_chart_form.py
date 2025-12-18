@@ -16,7 +16,7 @@ class ComparativeChartForm:
     def __init__(
         self,
         db_session,
-        time_units,
+        time_units='h',
         left_axis_ids=[],
         right_axis_ids=[],
         left_axis_model_ids=[],
@@ -45,8 +45,12 @@ class ComparativeChartForm:
         self.cfu_count_units  = 'CFUs/mL'
         self.metabolite_units = 'mM'
 
-    def build_chart(self, args, width, legend_position='top', clamp_x_data=False):
-        self._extract_args(args)
+        self.log_left  = False
+        self.log_right = False
+
+    def build_chart(self, args=None, width=None, legend_position='top', clamp_x_data=False):
+        if args:
+            self._extract_args(args)
 
         chart = Chart(
             time_units=self.time_units,
@@ -163,10 +167,27 @@ class ComparativeChartForm:
 
     @property
     def permalink_query(self):
-        left_axis_part  = ','.join([str(i) for i in self.left_axis_ids])
-        right_axis_part = ','.join([str(i) for i in self.right_axis_ids])
+        if len(self.measurement_contexts):
+            experiment_id = self.measurement_contexts[0].bioreplicate.experimentId
+            technique_id  = self.measurement_contexts[0].techniqueId
+        elif len(self.modeling_results):
+            experiment_id = self.modeling_results[0].measurementContext.bioreplicate.experimentId
+            technique_id  = self.modeling_results[0].measurementContext.techniqueId
+        else:
+            experiment_id = ''
+            technique_id = ''
 
-        return f"l={left_axis_part}&r={right_axis_part}"
+        parts = {
+            'l':  ','.join([str(i) for i in sorted(self.left_axis_ids)]),
+            'r':  ','.join([str(i) for i in sorted(self.right_axis_ids)]),
+            'lm': ','.join([str(i) for i in sorted(self.left_axis_model_ids)]),
+            'rm': ','.join([str(i) for i in sorted(self.right_axis_model_ids)]),
+
+            'selectedExperimentId': str(experiment_id),
+            'selectedTechniqueId':  str(technique_id),
+        }
+
+        return '&'.join([f"{k}={v}" for k, v in parts.items() if v != ''])
 
     def _extract_args(self, args):
         self.left_axis_ids  = set()
