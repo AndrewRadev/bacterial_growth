@@ -64,12 +64,22 @@ class ComparativeChartForm:
         self.measurement_contexts = self.db_session.scalars(
             sql.select(MeasurementContext)
             .where(MeasurementContext.id.in_(self.measurement_context_ids))
+            .options(
+                sql.orm.selectinload(MeasurementContext.technique),
+                sql.orm.selectinload(MeasurementContext.bioreplicate),
+            )
         ).all()
 
         self.modeling_results = self.db_session.scalars(
             sql.select(ModelingResult)
             .where(ModelingResult.id.in_(self.modeling_result_ids))
+            .options(
+                sql.orm.selectinload(ModelingResult.measurementContext),
+                sql.orm.selectinload(ModelingResult.measurementContext, MeasurementContext.technique),
+            )
         ).all()
+
+        measurements_df = self.get_measurements_df(self.measurement_context_ids)
 
         for measurement_context in self.measurement_contexts:
             technique = measurement_context.technique
@@ -81,7 +91,7 @@ class ComparativeChartForm:
                 axis = 'left'
                 log_transform = self.log_left
 
-            df    = self.get_df(measurement_context.id)
+            measurement_df = measurements_df[measurements_df['contextId'] == measurement_context.id]
             label = measurement_context.get_chart_label()
 
             if technique.subjectType == 'metabolite':
@@ -96,7 +106,7 @@ class ComparativeChartForm:
                 units = technique.units
 
             chart.add_df(
-                df,
+                measurement_df,
                 units=units,
                 label=label,
                 axis=axis,
@@ -114,8 +124,8 @@ class ComparativeChartForm:
                 axis = 'left'
                 log_transform = self.log_left
 
-            measurement_df = self.get_df(measurement_context.id)
-            df             = modeling_result.generate_chart_df(measurement_df)
+            measurement_df = measurements_df[measurements_df['contextId'] == measurement_context.id]
+            model_df       = modeling_result.generate_chart_df(measurement_df)
             label          = modeling_result.get_chart_label()
 
             if technique.units == '':
@@ -124,7 +134,7 @@ class ComparativeChartForm:
                 units = technique.units
 
             chart.add_model_df(
-                df,
+                model_df,
                 units=units,
                 label=label,
                 axis=axis,
@@ -213,19 +223,20 @@ class ComparativeChartForm:
             elif arg == 'metaboliteUnits':
                 self.metabolite_units = value
 
-    def get_df(self, measurement_context_id):
+    def get_measurements_df(self, measurement_context_ids):
         query = (
             sql.select(
+                Measurement.contextId,
                 Measurement.timeInHours.label("time"),
                 Measurement.value,
                 Measurement.std,
             )
             .select_from(Measurement)
             .where(
-                Measurement.contextId == measurement_context_id,
+                Measurement.contextId.in_(measurement_context_ids),
                 Measurement.value.is_not(None),
             )
-            .order_by(Measurement.timeInSeconds)
+            .order_by(Measurement.contextId, Measurement.timeInSeconds)
         )
 
         return execute_into_df(self.db_session, query)

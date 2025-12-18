@@ -159,7 +159,26 @@ def study_reset_action(publicId):
 
 
 def study_visualize_page(publicId):
-    study = _fetch_study_for_visitor(publicId)
+    study = _fetch_study_for_visitor(
+        publicId,
+        sql_options=(
+            # Level 1:
+            sql.orm.selectinload(Study.experiments, Experiment.bioreplicates),
+            # Level 2:
+            sql.orm.selectinload(
+                Study.experiments,
+                Experiment.bioreplicates,
+                Bioreplicate.measurementContexts,
+            ),
+            # Level 3:
+            sql.orm.selectinload(
+                Study.experiments,
+                Experiment.bioreplicates,
+                Bioreplicate.measurementContexts,
+                MeasurementContext.modelingResults,
+            ),
+        )
+    )
 
     left_axis_ids  = _parse_comma_separated_request_ids('l')
     right_axis_ids = _parse_comma_separated_request_ids('r')
