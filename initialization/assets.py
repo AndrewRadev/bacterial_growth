@@ -52,7 +52,7 @@ def init_assets(app):
     ))
 
     assets.register('plotly_js', flask_assets.Bundle(
-        '../app/view/js/vendor/plotly-2.34.0.min.js',
+        '../app/view/js/vendor/plotly-basic-3.3.1.js',
         output='build/plotly.js'
     ))
 

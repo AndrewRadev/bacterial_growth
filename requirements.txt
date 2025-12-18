@@ -17,7 +17,7 @@ Flask-Assets
 Flask-WTF
 Flask-SQLAlchemy
 cssmin
-plotly
+plotly==6.5.0
 celery[redis]
 gunicorn
 requests
