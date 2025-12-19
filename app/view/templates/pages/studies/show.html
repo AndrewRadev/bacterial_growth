@@ -260,16 +260,27 @@
 
                             <ul class="small">
                               {% for modeling_result in measurement_context.publishedModelingResults: %}
-                                {% set visualize_url = url_for(
-                                  'study_visualize_page',
-                                  publicId=study.publicId,
-                                  selectedExperimentId=experiment.publicId,
-                                  selectedTechniqueId=technique.id,
-                                  l=measurement_context.id,
-                                  lm=modeling_result.id
-                                ) %}
-
                                 <li>
+                                  <span class="js-compare-container" data-model-ids="{{ modeling_result.id }}">
+                                    <span class="js-compare" data-tooltip="Compare">
+                                      <a href="#" class="white-button no-border small-button">↔</a>
+                                    </span>
+
+                                    <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
+                                      👆
+                                      <a href="#" class="white-button no-border small-button">➖</a>
+                                    </span>
+                                  </span>
+
+                                  {% set visualize_url = url_for(
+                                    'study_visualize_page',
+                                    publicId=study.publicId,
+                                    selectedExperimentId=experiment.publicId,
+                                    selectedTechniqueId=technique.id,
+                                    l=measurement_context.id,
+                                    lm=modeling_result.id
+                                  ) %}
+
                                   <a
                                       href="{{ visualize_url }}"
                                       class="white-button no-border small-button"

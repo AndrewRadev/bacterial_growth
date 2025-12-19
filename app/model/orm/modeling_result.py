@@ -83,6 +83,11 @@ class ModelingResult(OrmBase):
     )
     measurementContext: Mapped['MeasurementContext'] = relationship(back_populates='modelingResults')
 
+    study: Mapped['Study'] = relationship(
+        secondary='MeasurementContexts',
+        viewonly=True
+    )
+
     customModelId: Mapped[int] = mapped_column(sql.ForeignKey('CustomModels.id'))
     customModel: Mapped['CustomModel'] = relationship()
 
@@ -219,10 +224,8 @@ class ModelingResult(OrmBase):
         data = {
             'time':  timepoints,
             'value': values,
+            'std': errors or [float('nan') for _ in range(len(timepoints))],
         }
-
-        if errors:
-            data['std'] = errors
 
         df = pd.DataFrame.from_dict(data)
 
