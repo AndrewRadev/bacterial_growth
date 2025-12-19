@@ -58,7 +58,7 @@ def modeling_page(publicId):
 
 
 def modeling_params_csv(publicId):
-    study = _fetch_study_for_manager(publicId)
+    study = _fetch_study_for_visitor(publicId)
 
     csv_data = export_model_csv(g.db_session, study, g.current_user)
 
@@ -309,6 +309,24 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     )
 
     return redirect(redirect_url)
+
+
+# TODO (2025-12-19) Extract common "fetch" methods, maybe a shared module for
+# reusable "studies" logic
+def _fetch_study_for_visitor(publicId, sql_options=None):
+    sql_options = sql_options or ()
+
+    study = g.db_session.scalars(
+        sql.select(Study)
+        .where(Study.publicId == publicId)
+        .options(*sql_options)
+        .limit(1)
+    ).one()
+
+    if not study.visible_to_user(g.current_user):
+        raise Forbidden()
+
+    return study
 
 
 def _fetch_study_for_manager(publicId, sql_options=None):
