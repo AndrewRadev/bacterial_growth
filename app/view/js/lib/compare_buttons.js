@@ -40,8 +40,15 @@ function initCompareButtons($page) {
     let $wrapper   = $button.parents('.js-compare');
     let $container = $button.parents('.js-compare-container');
 
-    let contextIds = ($container.data('contextIds') || '').toString().split(',');
-    let modelIds   = ($container.data('modelIds') || '').toString().split(',');
+    let contextIds = [];
+    let modelIds   = [];
+
+    if ($container.data('contextIds')) {
+      contextIds = $container.data('contextIds').toString().split(',');
+    }
+    if ($container.data('modelIds')) {
+      modelIds = $container.data('modelIds').toString().split(',');
+    }
 
     updateCompareData('add', contextIds, modelIds, function(compareData) {
       // Hide "compare" button, show "uncompare" button
@@ -87,11 +94,10 @@ function updateCompareData(action, contexts, models, successCallback) {
     processData: true,
     success: function(response) {
       let compareData = JSON.parse(response);
-
-      let recordCount = compareData.contextCount + (compareData.modelCount || 0);
+      let recordCount = compareData.contextCount + compareData.modelCount;
 
       if (recordCount > 0) {
-        countText = `(${compareData.contextCount})`;
+        countText = `(${compareData.contextCount + compareData.modelCount})`;
       } else {
         countText = '';
       }

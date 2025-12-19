@@ -72,14 +72,14 @@
       {% set bioreplicate = measurement_context.bioreplicate %}
       {% set experiment   = bioreplicate.experiment %}
 
-      <div class="flex-row context-row js-row" data-result-id="{{ modeling_result.id }}">
+      <div class="flex-row model-row js-row" data-model-id="{{ modeling_result.id }}">
         <div class="left flex-row" data-tooltip="Move data trace to the left axis">
           <span class="icon icon-left"></span>
           <input
               type="checkbox"
               class="js-axis js-axis-left"
               name="axis|modelingResult|{{ modeling_result.id }}"
-              {{ "checked" if measurement_context.id in chart_form.left_axis_ids }}
+              {{ "checked" if modeling_result.id in chart_form.left_axis_model_ids }}
               value="left" />
         </div>
 

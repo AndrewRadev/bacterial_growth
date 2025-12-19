@@ -27,8 +27,8 @@ def comparison_show_page():
         data_source = "link"
     else:
         compare_data = _init_compare_data()
-        context_ids = compare_data.get('contexts', [])
-        model_ids = compare_data.get('models', [])
+        context_ids = compare_data['contexts']
+        model_ids = compare_data['models']
         data_source = "session"
 
     measurement_contexts = g.db_session.scalars(
@@ -79,8 +79,8 @@ def comparison_show_page():
 def comparison_update_json(action):
     compare_data = _init_compare_data()
 
-    context_set = set(compare_data.get('contexts', []))
-    model_set   = set(compare_data.get('models', []))
+    context_set = set(compare_data['contexts'])
+    model_set   = set(compare_data['models'])
 
     for context in request.json.get('contexts', []):
         if action == 'add':
@@ -141,6 +141,8 @@ def _init_compare_data():
 
     if 'contexts' not in data:
         data['contexts'] = []
+    if 'models' not in data:
+        data['models'] = []
 
     return data
 

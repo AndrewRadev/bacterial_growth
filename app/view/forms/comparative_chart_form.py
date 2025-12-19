@@ -129,8 +129,12 @@ class ComparativeChartForm:
                 log_transform = self.log_left
 
             measurement_df = measurements_df[measurements_df['contextId'] == measurement_context.id]
-            model_df       = modeling_result.generate_chart_df(measurement_df)
-            label          = modeling_result.get_chart_label()
+            if measurement_df.empty:
+                # Could happen if we're just rendering the model without the parent measurement:
+                measurement_df = measurement_context.get_df(self.db_session)
+
+            model_df = modeling_result.generate_chart_df(measurement_df)
+            label    = modeling_result.get_chart_label()
 
             if technique.units == '':
                 units = technique.short_name

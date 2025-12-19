@@ -140,8 +140,8 @@ Page('.study-visualize-page', function($page) {
         let compareData = JSON.parse(response);
 
         let countText;
-        if (compareData.contextCount > 0) {
-          countText = `(${compareData.contextCount})`;
+        if (compareData.contextCount > 0 || compareData.modelCount > 0) {
+          countText = `(${compareData.contextCount + compareData.modelCount})`;
         } else {
           countText = '';
         }

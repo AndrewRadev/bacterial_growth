@@ -302,15 +302,20 @@ class Chart:
                 else:
                     lowers.append(np.clip(value - lower_std, min=0))
 
-            max_y          = max(uppers)
-            min_y          = min(lowers)
-            positive_min_y = min([y for y in lowers if y > 0])
+            max_y = max(uppers)
+            min_y = min(lowers)
+
+            positive_ys = [y for y in lowers if y > 0]
+            if positive_ys:
+                positive_min_y = min(positive_ys)
+            else:
+                positive_min_y = None
 
             if max_y > global_max_y:
                 global_max_y = max_y
             if min_y < global_min_y:
                 global_min_y = min_y
-            if positive_min_y < global_positive_min_y:
+            if positive_min_y is not None and positive_min_y < global_positive_min_y:
                 global_positive_min_y = positive_min_y
 
         # The range of the chart is given a padding depending on the data range
