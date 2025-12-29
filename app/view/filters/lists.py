@@ -11,3 +11,18 @@ def join_tag(collection, tag_name):
     text += f"</{tag_name}>"
 
     return Markup(text)
+
+
+def stable_groupby(collection, attribute):
+    """
+    Similar to the built-in "groupby" filter, but expects a sorted list and
+    maintains its ordering.
+    """
+    groups = {}
+    for item in collection:
+        key = getattr(item, attribute)
+        if key not in groups:
+            groups[key] = []
+        groups[key].append(item)
+
+    return groups.items()

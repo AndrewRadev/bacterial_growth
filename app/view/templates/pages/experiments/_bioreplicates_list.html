@@ -44,86 +44,96 @@
 
         <br>
 
-        <strong>Measurements</strong>:
+        {% for subject_type, measurement_contexts in bioreplicate.measurementContexts|stable_groupby('subjectType'): %}
+          <strong class="small">
+            {% if subject_type == 'bioreplicate': %}
+              Community-level measurements
+            {% elif subject_type == 'strain': %}
+              Strain-level measurements
+            {% elif subject_type == 'metabolite': %}
+              Metabolite measurements
+            {% endif %}
+          </strong>
 
-        <ul class="measurement-techniques">
-          {% for measurement_context in bioreplicate.measurementContexts: %}
-            <li class="measurement-context-container">
-              {% set measurements = measurement_context.measurements %}
-              {% set technique    = measurement_context.technique %}
+          <ul class="measurement-techniques">
+            {% for measurement_context in measurement_contexts: %}
+              <li class="measurement-context-container">
+                {% set measurements = measurement_context.measurements %}
+                {% set technique    = measurement_context.technique %}
 
-              <div class="js-table-row">
-                <span class="js-compare-container" data-context-ids="{{ measurement_context.id }}">
-                  <span class="js-compare" data-tooltip="Compare">
-                    <a href="#" class="white-button no-border small-button">↔</a>
+                <div class="js-table-row">
+                  <span class="js-compare-container" data-context-ids="{{ measurement_context.id }}">
+                    <span class="js-compare" data-tooltip="Compare">
+                      <a href="#" class="white-button no-border small-button">↔</a>
+                    </span>
+
+                    <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
+                      👆
+                      <a href="#" class="white-button no-border small-button">➖</a>
+                    </span>
                   </span>
 
-                  <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
-                    👆
-                    <a href="#" class="white-button no-border small-button">➖</a>
-                  </span>
-                </span>
+                  <a
+                      href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context.id) }}"
+                      class="white-button no-border small-button"
+                      data-tooltip="Visualize">
+                    📈
+                  </a>
 
-                <a
-                    href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context.id) }}"
-                    class="white-button no-border small-button"
-                    data-tooltip="Visualize">
-                  📈
-                </a>
+                  {{ measurement_context.get_chart_label() }}
 
-                {{ measurement_context.get_chart_label() }}
+                  <a
+                      href="{{ url_for('measurement_context_csv', id=measurement_context.id) }}"
+                      class="white-button no-border small-button"
+                      style="vertical-align: top"
+                      download="measurement_context_{{ measurement_context.id }}.csv"
+                      data-tooltip="Download data">
+                    <span class="flex-row icon icon-download-black"></span>
+                  </a>
+                </div>
 
-                <a
-                    href="{{ url_for('measurement_context_csv', id=measurement_context.id) }}"
-                    class="white-button no-border small-button"
-                    style="vertical-align: top"
-                    download="measurement_context_{{ measurement_context.id }}.csv"
-                    data-tooltip="Download data">
-                  <span class="flex-row icon icon-download-black"></span>
-                </a>
-              </div>
+                {% if measurement_context.publishedModelingResults: %}
+                  <h4 class="small">Models:</h4>
 
-              {% if measurement_context.publishedModelingResults: %}
-                <h4 class="small">Models:</h4>
+                  <ul class="small">
+                    {% for modeling_result in measurement_context.publishedModelingResults: %}
+                      <li>
+                        <span class="js-compare-container" data-model-ids="{{ modeling_result.id }}">
+                          <span class="js-compare" data-tooltip="Compare">
+                            <a href="#" class="white-button no-border small-button">↔</a>
+                          </span>
 
-                <ul class="small">
-                  {% for modeling_result in measurement_context.publishedModelingResults: %}
-                    <li>
-                      <span class="js-compare-container" data-model-ids="{{ modeling_result.id }}">
-                        <span class="js-compare" data-tooltip="Compare">
-                          <a href="#" class="white-button no-border small-button">↔</a>
+                          <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
+                            👆
+                            <a href="#" class="white-button no-border small-button">➖</a>
+                          </span>
                         </span>
 
-                        <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
-                          👆
-                          <a href="#" class="white-button no-border small-button">➖</a>
-                        </span>
-                      </span>
+                        {% set visualize_url = url_for(
+                          'study_visualize_page',
+                          publicId=study.publicId,
+                          selectedExperimentId=experiment.publicId,
+                          selectedTechniqueId=technique.id,
+                          l=measurement_context.id,
+                          lm=modeling_result.id
+                        ) %}
 
-                      {% set visualize_url = url_for(
-                        'study_visualize_page',
-                        publicId=study.publicId,
-                        selectedExperimentId=experiment.publicId,
-                        selectedTechniqueId=technique.id,
-                        l=measurement_context.id,
-                        lm=modeling_result.id
-                      ) %}
+                        <a
+                            href="{{ visualize_url }}"
+                            class="white-button no-border small-button"
+                            data-tooltip="Visualize">
+                          📈
+                        </a>
 
-                      <a
-                          href="{{ visualize_url }}"
-                          class="white-button no-border small-button"
-                          data-tooltip="Visualize">
-                        📈
-                      </a>
-
-                      {{ modeling_result.model_name }}
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-            </li>
-          {% endfor %}
-        </ul>
+                        {{ modeling_result.model_name }}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% endfor %}
       </li>
     {% endfor %}
   </ol>
