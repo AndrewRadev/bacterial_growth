@@ -27,6 +27,21 @@
     display: inline-block;
   }
 
+  .bioreplicates {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+
+    .measurement-context-container {
+      margin-top: 6px;
+    }
+
+    .bioreplicates-list li {
+      margin-top: 6px;
+    }
+  }
+
   .bioreplicates-toc {
     position: sticky;
     top: 20px;
