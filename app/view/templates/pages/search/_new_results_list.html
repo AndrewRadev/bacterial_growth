@@ -37,57 +37,57 @@
           {{ study.description|highlight(search.query_words)|format_text(first_paragraph=True, p_class="small") }}
         {% endif %}
 
-        <p>
-          <strong>Project ID</strong>:
-          <a href="{{ url_for('project_show_page', publicId=study.project.publicId) }}">
-            {{ study.project.publicId }}
-          </a>
-        </p>
+        <p class="small">
+          {% if study.url and study.url != '': %}
+            <strong>Publication</strong>:
+            {{ study.url|external_link() }}
+            <br>
+          {% endif %}
 
-        {% if study.studyURL and study.studyURL != '': %}
-          <p>
-            <strong>Publication URL</strong>:
-            {{ study.studyURL|external_link() }}
-          </p>
-        {% endif %}
+          {% if study.studyTechniques: %}
+            <strong>Measurement techniques</strong>:
+            {{ study.studyTechniques|map(attribute="short_name")|unique|join(", ") }}
+            <br>
+          {% endif %}
+        </p>
 
         <table class="simple-table margin-top-10 small">
           <tr>
-            <th>Techniques</th>
-            <th>Strains</th>
-            <th>Metabolites</th>
+            {% if study.strains: %}
+              <th>Strains</th>
+            {% endif %}
+
+            {% if study.metabolites: %}
+              <th>Metabolites</th>
+            {% endif %}
           </tr>
 
           <tr>
-            <td>
-              <ul>
-                {% for technique_name in study.studyTechniques|map(attribute="short_name_with_subject_type")|unique: %}
-                  <li>{{ technique_name }}</li>
-                {% endfor %}
-              </ul>
-            </td>
+            {% if study.strains: %}
+              <td>
+                <ul>
+                  {% for strain in study.strains if strain.notUnknown: %}
+                    <li class="{{ 'highlight' if strain.ncbiId in search.ncbiIds else '' }}">
+                      {{ render_strain_link(strain) }}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </td>
+            {% endif %}
 
-            <td>
-              <ul>
-                {% for strain in study.strains if strain.notUnknown: %}
-                  <li class="{{ 'highlight' if strain.ncbiId in search.ncbiIds else '' }}">
-                    {{ render_strain_link(strain) }}
-                  </li>
-                {% endfor %}
-              </ul>
-            </td>
-
-            <td>
-              <ul>
-                {% for metabolite in study.metabolites: %}
-                  <li class="{{ 'highlight' if metabolite.chebiId in search.chebiIds else '' }}">
-                    <a href="{{ url_for('metabolite_show_page', chebiId=metabolite.chebiId) }}">
-                      {{ metabolite.name }}
-                    </a>
-                  </li>
-                {% endfor %}
-              </ul>
-            </td>
+            {% if study.metabolites: %}
+              <td>
+                <ul>
+                  {% for metabolite in study.metabolites: %}
+                    <li class="{{ 'highlight' if metabolite.chebiId in search.chebiIds else '' }}">
+                      <a href="{{ url_for('metabolite_show_page', chebiId=metabolite.chebiId) }}">
+                        {{ metabolite.name }}
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              </td>
+            {% endif %}
           </tr>
         </table>
       </div>
