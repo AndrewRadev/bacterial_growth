@@ -202,8 +202,6 @@ class ModelingResult(OrmBase):
             return MODEL_DESCRIPTIONS[self.type]
 
     def get_chart_label(self):
-        from markupsafe import Markup, escape
-
         model_name = self.short_model_name or self.model_name
 
         return self.measurementContext.get_chart_label(model_name=model_name)
@@ -279,6 +277,7 @@ class ModelingResult(OrmBase):
         log_y = np.log(y0) + mumax * A - np.log(1 + (np.exp(mumax * A) - 1)/np.exp(np.log(K) - np.log(y0)))
 
         return np.exp(log_y)
+
 
 def _map_float(decimal_list):
     result = []
