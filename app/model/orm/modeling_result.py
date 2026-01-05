@@ -15,27 +15,11 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
-
-MODEL_NAMES = {
-    'easy_linear':     '"Easy linear" method',
-    'logistic':        'Logistic model',
-    'baranyi_roberts': 'Baranyi-Roberts model',
-}
-"The human-readable names of the supported models/methods"
-
-SHORT_MODEL_NAMES = {
-    'easy_linear':     'EL',
-    'logistic':        'Log.',
-    'baranyi_roberts': 'B.-R.',
-}
-"Shortened model names to show in charts"
-
-MODEL_DESCRIPTIONS = {
-    'easy_linear':     'A phenomenological method that estimates growth rate based on a regression line between observed points.',
-    'logistic':        'A model that describes exponential growth limited by a carrying capacity.',
-    'baranyi_roberts': 'A mechanistic model that aims to quantify the lag phase.',
-}
-"One-sentence descriptions of the supported models/methods"
+from app.model.lib.modeling import (
+    MODEL_NAMES,
+    SHORT_MODEL_NAMES,
+    MODEL_DESCRIPTIONS,
+)
 
 _VALID_TYPES = [
     'easy_linear',

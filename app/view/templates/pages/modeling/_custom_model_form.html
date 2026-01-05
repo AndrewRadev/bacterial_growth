@@ -1,4 +1,4 @@
-{% macro render_custom_model_form(study, custom_model=None) %}
+{% macro render_custom_model_form(study, model_param_info, custom_model=None) %}
   {% if custom_model: %}
     <div class="preview js-preview" data-custom-model-id="{{ custom_model.id }}">
       <button
@@ -115,26 +115,19 @@
             multiple="multiple"
             name="coefficientNames"
             class="form-input-blue form-input-full js-coefficients-select">
-          <option
-              {{ "selected" if "mumax" in custom_model.coefficientNames }}
-              data-description="μ<sub>max</sub>: Maximum growth rate (in h<sup>-1</sup>)">
-            mumax
-          </option>
-          <option
-              {{ "selected" if "lag" in custom_model.coefficientNames }}
-              data-description="Time duration of the lag phase (in hours)">
-            lag
-          </option>
-          <option
-              {{ "selected" if "y0" in custom_model.coefficientNames }}
-              data-description="y<sub>0</sub>: initial value of abundance">
-            y0
-          </option>
-          <option
-              {{ "selected" if "K" in custom_model.coefficientNames }}
-              data-description="Carrying capacity (maximum abundance)">
-            K
-          </option>
+          {% for param_name, info in model_param_info.items(): %}
+            {% if info['name_html'] == param_name: %}
+              {% set prefix = '' %}
+            {% else: %}
+              {% set prefix = info['name_html']|safe + ': ' %}
+            {% endif %}
+
+            <option
+                {{ "selected" if param_name in custom_model.coefficientNames }}
+                data-description="{{ prefix }}{{ info['description_html'] }}">
+              {{ param_name }}
+            </option>
+          {% endfor %}
         </select>
       </label>
 

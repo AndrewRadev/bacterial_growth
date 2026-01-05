@@ -52,10 +52,10 @@
 
       <div class="box margin-top-10 hidden js-custom-model-form">
         {% for custom_model in study.customModels: %}
-          {{ render_custom_model_form(study, custom_model) }}
+          {{ render_custom_model_form(study, model_param_info, custom_model) }}
         {% endfor %}
 
-        {{ render_custom_model_form(study, custom_model=None) }}
+        {{ render_custom_model_form(study, model_param_info, custom_model=None) }}
       </div>
 
       <div class="box margin-top-10 hidden js-custom-upload-form">
