@@ -85,7 +85,7 @@
 
         {{ render_param_input(model_params['coefficients'], "y0",    "y₀: initial value of abundance", show_units=True) }}
         {{ render_param_input(model_params['coefficients'], "y0_lm", "y₀ calculated as the intersection of the fit with the abscissa, the initial abundance if there was no lag", show_units=True) }}
-        {{ render_param_input(model_params['coefficients'], "mumax", "μ: maximum growth rate (1/time)") }}
+        {{ render_param_input(model_params['coefficients'], "mumax", "μ: maximum growth rate (1/h)") }}
         {{ render_param_input(model_params['coefficients'], "K",     "K: carrying capacity (max. abundance)", show_units=True) }}
         {{ render_param_input(model_params['coefficients'], "lag",   "time duration of lag phase") }}
         {{ render_param_input(model_params['coefficients'], "h0",    "h₀: parameter specifying the initial physiological state of organisms (e.g. cells) and in consequence the lag phase (h0 = max growth rate * lag phase)") }}

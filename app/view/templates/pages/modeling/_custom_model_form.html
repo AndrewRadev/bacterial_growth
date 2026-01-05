@@ -100,6 +100,50 @@
       </div>
     </div>
 
+    <div class="form-row columns">
+      <label class="full">
+        <span>Coefficients</span>
+        <select
+            multiple="multiple"
+            name="coefficients"
+            class="form-input-blue form-input-full js-coefficients-select">
+          <option
+              data-description="μ<sub>max</sub>: Maximum growth rate (in h<sup>-1</sup>)">
+            mumax
+          </option>
+          <option
+              data-description="Time duration of the lag phase (in hours)">
+            lag
+          </option>
+          <option
+              data-description="y<sub>0</sub>: initial value of abundance">
+            y0
+          </option>
+          <option
+              data-description="Carrying capacity (maximum abundance)">
+            K
+          </option>
+        </select>
+      </label>
+
+      <label class="full">
+        <span>Measures of fit</span>
+        <select
+            multiple="multiple"
+            name="fit"
+            class="form-input-blue form-input-full js-fit-select">
+          <option
+              data-description="R<sup>2</sup>: coefficient of determination">
+            r2
+          </option>
+          <option
+              data-description="RSS: residual sum of squares">
+            rss
+          </option>
+        </select>
+      </label>
+    </div>
+
     <div class="flex-row full">
       <input
           type="submit"

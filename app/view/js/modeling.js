@@ -16,6 +16,19 @@ Page('.study-modeling-page', function($page) {
     checkForUpdates();
   }
 
+  $page.find('.js-coefficients-select,.js-fit-select').each(function() {
+    let $select = $(this);
+
+    $select.select2({
+      multiple: true,
+      theme: 'custom',
+      width: '100%',
+      templateResult: select2WithDescription,
+    });
+
+    $select.trigger('change');
+  });
+
   $page.find('.js-experiment-container').each(function(e) {
     let $container = $(this);
 

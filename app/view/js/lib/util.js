@@ -39,7 +39,7 @@ function wrapSubstrings(text, words, prefix, suffix) {
   return result;
 }
 
-function select2Highlighter(state) {
+function select2Highlighter(state, textClasses='') {
   $searchField = $('.select2-container--open .select2-search__field');
 
   let query = $.trim($searchField.val());
@@ -50,7 +50,22 @@ function select2Highlighter(state) {
     '</span>',
   );
 
-  return $('<div>' + text + '</div>');
+  return $(`<div class="${textClasses}">${text}</div>`);
+}
+
+function select2WithDescription(state) {
+  let $element    = $(state.element);
+  let text        = $.trim(state.text);
+  let description = $element.data('description');
+
+  let $text        = select2Highlighter(state, textClasses='select2-title');
+  let $description = $(`<div class="select2-description">${description}</div>`);
+
+  let $container = $('<div>');
+  $container.append($text);
+  $container.append($description);
+
+  return $container;
 }
 
 function select2TransportWithLoader($select) {
