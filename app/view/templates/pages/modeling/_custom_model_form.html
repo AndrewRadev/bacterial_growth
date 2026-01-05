@@ -15,15 +15,23 @@
         {% endif %}
       </h3>
 
-      {% if custom_model.url: %}
-        <p>{{ custom_model.url|external_link }}</p>
-      {% endif %}
+      <ul class="small">
+        {% if custom_model.url: %}
+          <li><strong>URL</strong>: {{ custom_model.url|external_link }}</li>
+        {% endif %}
 
-      {% if custom_model.description: %}
-        <p class="small">
-          {{ custom_model.description }}
-        </p>
-      {% endif %}
+        {% if custom_model.description: %}
+          <li><strong>Description</strong>: {{ custom_model.description }}</li>
+        {% endif %}
+
+        {% if custom_model.coefficientNames: %}
+          <li><strong>Coefficients</strong>: {{ custom_model.coefficientNames|join(', ') }}</li>
+        {% endif %}
+
+        {% if custom_model.fitNames: %}
+          <li><strong>Quality-of-fit measurements</strong>: {{ custom_model.fitNames|join(', ') }}</li>
+        {% endif %}
+      </ul>
     </div>
   {% endif %}
 
@@ -105,21 +113,25 @@
         <span>Coefficients</span>
         <select
             multiple="multiple"
-            name="coefficients"
+            name="coefficientNames"
             class="form-input-blue form-input-full js-coefficients-select">
           <option
+              {{ "selected" if "mumax" in custom_model.coefficientNames }}
               data-description="μ<sub>max</sub>: Maximum growth rate (in h<sup>-1</sup>)">
             mumax
           </option>
           <option
+              {{ "selected" if "lag" in custom_model.coefficientNames }}
               data-description="Time duration of the lag phase (in hours)">
             lag
           </option>
           <option
+              {{ "selected" if "y0" in custom_model.coefficientNames }}
               data-description="y<sub>0</sub>: initial value of abundance">
             y0
           </option>
           <option
+              {{ "selected" if "K" in custom_model.coefficientNames }}
               data-description="Carrying capacity (maximum abundance)">
             K
           </option>
@@ -130,13 +142,15 @@
         <span>Measures of fit</span>
         <select
             multiple="multiple"
-            name="fit"
+            name="fitNames"
             class="form-input-blue form-input-full js-fit-select">
           <option
+              {{ "selected" if "r2" in custom_model.fitNames }}
               data-description="R<sup>2</sup>: coefficient of determination">
             r2
           </option>
           <option
+              {{ "selected" if "rss" in custom_model.fitNames }}
               data-description="RSS: residual sum of squares">
             rss
           </option>

@@ -228,6 +228,8 @@ def modeling_custom_model_update_action(publicId):
         shortName=request.form['shortName'],
         url=request.form['url'],
         description=request.form['description'],
+        coefficientNames=request.form.getlist('coefficientNames'),
+        fitNames=request.form.getlist('fitNames'),
     )
     g.db_session.add(custom_model)
     g.db_session.commit()

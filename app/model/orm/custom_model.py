@@ -29,5 +29,8 @@ class CustomModel(OrmBase):
     url:         Mapped[str] = mapped_column(sql.String(255))
     description: Mapped[str] = mapped_column(sql.String)
 
+    coefficientNames: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    fitNames:         Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+
     createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())

@@ -124,6 +124,8 @@ CREATE TABLE CustomModels (
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   shortName varchar(5) DEFAULT NULL,
+  coefficientNames json DEFAULT (json_array()),
+  fitNames json DEFAULT (json_array()),
   PRIMARY KEY (id),
   KEY CustomModels_studyId (studyId),
   CONSTRAINT CustomModels_studyId FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
@@ -707,5 +709,6 @@ INSERT INTO MigrationVersions VALUES
 (101,'2025_12_14_121007_create_custom_models','2025-12-15 15:15:04'),
 (102,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-15 15:15:04'),
 (103,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-15 15:15:04'),
-(105,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 14:35:08');
+(105,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 14:35:08'),
+(107,'2026_01_05_113846_add-params-to-custom-models','2026-01-05 09:41:49');
 
