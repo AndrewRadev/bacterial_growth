@@ -23,7 +23,7 @@
 
     <div class="form-row">
       <label class="flex-1 box">
-        <span>Data CSV</data>
+        <span>Data CSV</span>
         <input
             required
             name="predictions"
@@ -41,6 +41,50 @@
         </ul>
       </div>
     </div>
+
+    {% if custom_model.coefficientNames: %}
+      <br>
+      <h4>Model parameters:</h4>
+
+      <div class="form-row">
+        {% for info in custom_model.coefficientInfo:  %}
+          <label class="flex-1">
+            <span>{{ info['name'] }}</span>
+            <input
+                name="coefficients[{{ info['name'] }}]"
+                type="number"
+                step="any"
+                value="{{ modeling_result and modeling_result.params['coefficients'][info['name']] }}"
+                class="form-input-full form-input-blue" />
+            <p class="help small">
+              {{ info['name_html']|safe }}: {{ info['description_html']|safe }}
+            </p>
+          </label>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if custom_model.fitNames: %}
+      <br>
+      <h4>Quality of fit:</h4>
+
+      <div class="form-row">
+        {% for info in custom_model.fitInfo: %}
+          <label class="flex-1">
+            <span>{{ info['name'] }}</span>
+            <input
+                name="fit[{{ info['name'] }}]"
+                type="number"
+                step="any"
+                value="{{ modeling_result and modeling_result.params['fit'][info['name']] }}"
+                class="form-input-full form-input-blue" />
+            <p class="help small">
+              {{ info['name_html']|safe }}: {{ info['description_html']|safe }}
+            </p>
+          </label>
+        {% endfor %}
+      </div>
+    {% endif %}
 
     <div class="form-row">
       <input type="submit" class="flex-right" value="Submit" />

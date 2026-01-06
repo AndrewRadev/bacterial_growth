@@ -252,7 +252,7 @@ def init_admin(app):
     admin.add_view(ExperimentEntityView(Perturbation,          db_session, category="Experiments"))
 
     class ModelingResultView(AppView):
-        column_exclude_list = ['rSummary']
+        column_exclude_list = ['rSummary', 'xValues', 'yValues', 'yErrors']
 
     admin.add_view(AppView(StudyTechnique,            db_session, category="Measurements"))
     admin.add_view(AppView(MeasurementTechnique,      db_session, category="Measurements"))

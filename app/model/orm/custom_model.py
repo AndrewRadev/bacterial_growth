@@ -10,6 +10,10 @@ from sqlalchemy.orm import (
 from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
+from app.model.lib.modeling import (
+    ALL_MODEL_PARAMETERS,
+    FIT_PARAMETERS,
+)
 
 
 class CustomModel(OrmBase):
@@ -34,3 +38,17 @@ class CustomModel(OrmBase):
 
     createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     updatedAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
+
+    @property
+    def coefficientInfo(self):
+        return [
+            {'name': name, **ALL_MODEL_PARAMETERS[name]}
+            for name in self.coefficientNames
+        ]
+
+    @property
+    def fitInfo(self):
+        return [
+            {'name': name, **FIT_PARAMETERS[name]}
+            for name in self.fitNames
+        ]

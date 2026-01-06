@@ -13,6 +13,7 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utc.sqltypes import UtcDateTime
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.model.orm.orm_base import OrmBase
 from app.model.lib.modeling import (
@@ -104,6 +105,11 @@ class ModelingResult(OrmBase):
 
     @classmethod
     def empty_params(Self, model_type):
+        fit = {
+            'r2': None,
+            'rss': None,
+        }
+
         if model_type == 'easy_linear':
             inputs = {'pointCount': '5'}
             coefficients = {
@@ -129,21 +135,15 @@ class ModelingResult(OrmBase):
             }
         elif model_type.startswith('custom_'):
             inputs = {}
-            coefficients = {
-                'mumax': None,
-                'lag':   None,
-                'K':     None,
-            }
+            coefficients = {}
+            fit = {}
         else:
             raise ValueError(f"Don't know what the coefficients are for model type: {repr(model_type)}")
 
         return {
             'coefficients': coefficients,
             'inputs': inputs,
-            'fit': {
-                'r2': None,
-                'rss': None,
-            }
+            'fit': fit,
         }
 
     @hybrid_property
@@ -262,9 +262,36 @@ class ModelingResult(OrmBase):
 
         return np.exp(log_y)
 
+    def update_model_params(self, form):
+        if not self.customModel:
+            raise "Tried to update non-custom modeling result"
+
+        coefficients = self.params.get('coefficients', {})
+        fit          = self.params.get('fit', {})
+
+        for name in self.customModel.coefficientNames:
+            key = f"coefficients[{name}]"
+            if key in form:
+                coefficients[name] = form[key]
+
+        for name in self.customModel.fitNames:
+            key = f"fit[{name}]"
+            if key in form:
+                fit[name] = form[key]
+
+        self.params['coefficients'] = coefficients
+        self.params['fit']          = fit
+
+        flag_modified(self, 'params')
+
 
 def _map_float(decimal_list):
     result = []
+
+    if len(decimal_list) == 1 and isinstance(decimal_list[0], list):
+        # Fix for an odd serialization bug where a list of nulls gets stored as
+        # a nested list:
+        decimal_list = decimal_list[0]
 
     for value in decimal_list:
         if isinstance(value, Decimal):

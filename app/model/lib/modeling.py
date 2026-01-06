@@ -51,3 +51,14 @@ ALL_MODEL_PARAMETERS = {
     },
 }
 "Names and descriptions for all model parameters used by models we know of"
+
+FIT_PARAMETERS = {
+    'r2': {
+        'name_html': 'R<sup>2</sup>',
+        'description_html': 'Coefficient of determination',
+    },
+    'rss': {
+        'name_html': 'RSS',
+        'description_html': 'Residual sum of squares',
+    },
+}

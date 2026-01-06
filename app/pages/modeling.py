@@ -1,4 +1,5 @@
 import io
+import math
 from datetime import datetime, UTC
 
 from flask import (
@@ -298,7 +299,9 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     modeling_result.update(
         xValues=predictions_df['time'].tolist(),
         yValues=predictions_df['value'].tolist(),
+        yErrors=predictions_df['error'].tolist(),
     )
+    modeling_result.update_model_params(request.form.to_dict())
 
     if 'error' in predictions_df:
         modeling_result.yErrors = predictions_df['error'].replace({np.nan: None}).tolist(),
