@@ -123,7 +123,6 @@ def modeling_chart_fragment(publicId, measurementContextId):
 
     chart = Chart(
         time_units=study.timeUnits,
-        title=measurement_context.get_chart_label(),
         legend_position='right',
         log_left=log_transform,
     )
@@ -134,7 +133,7 @@ def modeling_chart_fragment(publicId, measurementContextId):
     chart.add_df(
         measurement_df,
         units=units,
-        label="Measurements",
+        label=measurement_context.get_chart_label(),
     )
 
     modeling_record = g.db_session.scalars(

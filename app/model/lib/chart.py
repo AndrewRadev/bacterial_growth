@@ -31,7 +31,6 @@ class Chart:
         log_left=False,
         log_right=False,
         width=None,
-        title=None,
         legend_position='top',
         clamp_x_data=False,
         show_std=True,
@@ -44,7 +43,6 @@ class Chart:
         self.cfu_count_units  = cfu_count_units
         self.metabolite_units = metabolite_units
         self.width            = width
-        self.title            = title
         self.legend_position  = legend_position
         self.clamp_x_data     = clamp_x_data
         self.show_std         = show_std
@@ -151,15 +149,11 @@ class Chart:
         if self.log_right:
             right_yaxis['type'] = 'log'
 
-        if self.title:
-            title = dict(text=self.title)
-        else:
-            title = dict(x=0)
-
         fig.update_layout(
+            showlegend=True,
             template=PLOTLY_TEMPLATE,
             margin=dict(l=0, r=0, t=60, b=40),
-            title=title,
+            title=dict(x=0),
             hovermode='x unified',
             legend=dict(
                 yanchor="bottom",
