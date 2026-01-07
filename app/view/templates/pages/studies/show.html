@@ -93,6 +93,13 @@
                 {% if model_info.description != '': %}
                   <div class="small">{{ model_info.description }}</div>
                 {% endif %}
+
+                {% if model_info.params.get('coefficients'): %}
+                  <div class="small model-parameters">
+                    <strong>Parameters</strong>:
+                    {{ model_info.params['coefficients']|map(attribute="name_html")|join(', ')|safe }}
+                  </div>
+                {% endif %}
               </li>
             {% endfor %}
           </ol>

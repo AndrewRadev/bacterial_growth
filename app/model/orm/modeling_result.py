@@ -20,6 +20,8 @@ from app.model.lib.modeling import (
     MODEL_NAMES,
     SHORT_MODEL_NAMES,
     MODEL_DESCRIPTIONS,
+    ALL_MODEL_PARAMETERS,
+    FIT_PARAMETERS,
 )
 
 _VALID_TYPES = [
@@ -35,11 +37,12 @@ _VALID_STATES = [
 
 
 class ModelInfo:
-    def __init__(self, *, type, name, url, description):
+    def __init__(self, *, type, name, url, description, params):
         self.type        = type
         self.name        = name
         self.url         = url
         self.description = description
+        self.params      = params
 
     def __eq__(self, other):
         return self.type == other.type
@@ -157,6 +160,7 @@ class ModelingResult(OrmBase):
             name=self.model_name,
             url=self.model_url,
             description=self.model_description,
+            params=self.model_params,
         )
 
     @property
@@ -185,6 +189,24 @@ class ModelingResult(OrmBase):
         else:
             return MODEL_DESCRIPTIONS[self.type]
 
+    @property
+    def model_params(self):
+        coefficient_names = []
+        fit_names = []
+
+        if self.type.startswith('custom_'):
+            coefficient_names = self.customModel.coefficientNames
+            fit_names         = self.customModel.fitNames
+        else:
+            empty_params = self.__class__.empty_params(self.type)
+            coefficient_names = empty_params['coefficients'].keys()
+            fit_names         = empty_params['fit'].keys()
+
+        return {
+            'coefficients': [ALL_MODEL_PARAMETERS[c] for c in coefficient_names],
+            'fit':          [FIT_PARAMETERS[f] for f in fit_names],
+        }
+
     def get_chart_label(self):
         model_name = self.short_model_name or self.model_name
 
@@ -212,6 +234,28 @@ class ModelingResult(OrmBase):
         df = pd.DataFrame.from_dict(data)
 
         return df
+
+    def update_model_params(self, form):
+        if not self.customModel:
+            raise "Tried to update non-custom modeling result"
+
+        coefficients = self.params.get('coefficients', {})
+        fit          = self.params.get('fit', {})
+
+        for name in self.customModel.coefficientNames:
+            key = f"coefficients[{name}]"
+            if key in form:
+                coefficients[name] = form[key]
+
+        for name in self.customModel.fitNames:
+            key = f"fit[{name}]"
+            if key in form:
+                fit[name] = form[key]
+
+        self.params['coefficients'] = coefficients
+        self.params['fit']          = fit
+
+        flag_modified(self, 'params')
 
     def _predict(self, timepoints):
         if self.type == 'easy_linear':
@@ -261,28 +305,6 @@ class ModelingResult(OrmBase):
         log_y = np.log(y0) + mumax * A - np.log(1 + (np.exp(mumax * A) - 1)/np.exp(np.log(K) - np.log(y0)))
 
         return np.exp(log_y)
-
-    def update_model_params(self, form):
-        if not self.customModel:
-            raise "Tried to update non-custom modeling result"
-
-        coefficients = self.params.get('coefficients', {})
-        fit          = self.params.get('fit', {})
-
-        for name in self.customModel.coefficientNames:
-            key = f"coefficients[{name}]"
-            if key in form:
-                coefficients[name] = form[key]
-
-        for name in self.customModel.fitNames:
-            key = f"fit[{name}]"
-            if key in form:
-                fit[name] = form[key]
-
-        self.params['coefficients'] = coefficients
-        self.params['fit']          = fit
-
-        flag_modified(self, 'params')
 
 
 def _map_float(decimal_list):
