@@ -56,8 +56,10 @@ class Chart:
         self.mixed_units_left  = False
         self.mixed_units_right = False
 
-        self.model_df_indices = []
-        self.regions          = []
+        self.model_df_left_indices  = []
+        self.model_df_right_indices = []
+
+        self.regions = []
 
     def add_df(self, df, *, units, label=None, axis='left', metabolite_mass=None):
         entry = (df, units, label, metabolite_mass)
@@ -70,12 +72,13 @@ class Chart:
             raise ValueError(f"Unexpected axis: {axis}")
 
     def add_model_df(self, df, *, units, label=None, axis='left'):
-        self.model_df_indices.append(len(self.data_left) + len(self.data_right))
         entry = (df, units, label, None)
 
         if axis == 'left':
+            self.model_df_left_indices.append(len(self.data_left))
             self.data_left.append(entry)
         elif axis == 'right':
+            self.model_df_right_indices.append(len(self.data_right))
             self.data_right.append(entry)
         else:
             raise ValueError(f"Unexpected axis: {axis}")
@@ -110,12 +113,20 @@ class Chart:
         else:
             xaxis_range = None
 
-        left_yaxis_range  = self._calculate_y_range(converted_data_left, log=self.log_left)
-        right_yaxis_range = self._calculate_y_range(converted_data_right, log=self.log_right)
+        left_yaxis_range  = self._calculate_y_range(
+            converted_data_left,
+            model_df_indices=self.model_df_left_indices,
+            log=self.log_left,
+        )
+        right_yaxis_range = self._calculate_y_range(
+            converted_data_right,
+            model_df_indices=self.model_df_right_indices,
+            log=self.log_right,
+        )
 
         if self.regions:
             # No log-transformation applied for the region-drawing:
-            y0, y1 = self._calculate_y_range(converted_data_left)
+            y0, y1 = self._calculate_y_range(converted_data_left, self.model_df_left_indices)
 
             for index, (x0, x1, label, text) in enumerate(self.regions):
                 fig.add_trace(
@@ -261,7 +272,7 @@ class Chart:
         padding = (global_max_x - global_min_x) * 0.05
         return [global_min_x - padding, global_max_x + padding]
 
-    def _calculate_y_range(self, data, log=False):
+    def _calculate_y_range(self, data, model_df_indices, log=False):
         """
         Find the limit for the y axis, ignoring model dataframes, since they
         might have exponentials that shoot up.
@@ -271,7 +282,7 @@ class Chart:
         global_positive_min_y = math.inf
 
         for (i, (df, _)) in enumerate(data):
-            if i in self.model_df_indices:
+            if i in model_df_indices:
                 # A model's data might shoot up exponentially, so we don't
                 # consider it for the chart range
                 continue
