@@ -22,14 +22,31 @@
     </div>
 
     <div class="form-row">
-      <label class="flex-1 box">
-        <span>Data CSV</span>
-        <input
-            required
-            name="predictions"
-            type="file"
-            class="form-input-full" />
-      </label>
+      <div class="flex-1 js-upload-container">
+        <div class="upload-container js-file-upload">
+          <img
+              src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
+              height="40"
+              title="Upload" />
+
+          <div class="instructions">
+            <span class="required">Drag and drop data CSV</span>
+            <span class="hint">Limit 200MB per file</span>
+
+            <span class="small js-preview"></span>
+
+            <label class="upload-button white-button">
+              Browse files
+              <input
+                  required
+                  name="predictions"
+                  accept=".csv"
+                  type="file"
+                  class="hidden" />
+            </label>
+          </div>
+        </div>
+      </div>
       <div class="help small flex-2">
         Provide the predictions of your model that are fitted to the selected
         measurements. The data should be a CSV with columns:

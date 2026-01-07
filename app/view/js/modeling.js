@@ -2,6 +2,13 @@ Page('.study-modeling-page', function($page) {
   let studyId = $page.data('studyId');
   let $form   = $page.find('.js-modeling-form');
 
+  let $uploadContainer = $('.js-upload-container');
+  $uploadContainer.customFileInput();
+  $uploadContainer.on('change', 'input[type=file]', function() {
+    let filename = this.files[0].name;
+    $uploadContainer.find('.js-preview').html(filename);
+  });
+
   updateFormVisibility($form);
   let $activeRadio = $('.js-technique-row:visible input[type=radio]:checked');
 

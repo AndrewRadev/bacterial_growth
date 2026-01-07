@@ -1,4 +1,4 @@
-$.fn.customFileInput = function(options) {
+$.fn.customFileInput = function(options = {}) {
   let $container = $(this);
 
   let $fileInput = options.$input || $container.find('input[type=file]');

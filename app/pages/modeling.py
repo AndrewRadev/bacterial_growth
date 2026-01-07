@@ -277,6 +277,9 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     if custom_model.studyId != publicId:
         raise Forbidden
 
+    # TODO (2026-01-07) Check if file is valid, return error
+    # TODO (2026-01-07) Javascript: validate on the client side
+
     predictions_df = pd.read_csv(request.files['predictions'])
 
     modeling_result = g.db_session.scalars(
@@ -295,10 +298,15 @@ def modeling_custom_model_upload_action(publicId, customModelId):
             state='ready',
         )
 
+    if 'error' in predictions_df.columns:
+        y_errors = predictions_df['error'].tolist()
+    else:
+        y_errors = []
+
     modeling_result.update(
         xValues=predictions_df['time'].tolist(),
         yValues=predictions_df['value'].tolist(),
-        yErrors=predictions_df['error'].tolist(),
+        yErrors=y_errors,
     )
     modeling_result.update_model_params(request.form.to_dict())
 

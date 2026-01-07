@@ -107,4 +107,38 @@
       }
     }
   }
+
+  .upload-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    column-gap: 10px;
+    background-color: var(--light-blue);
+    border-radius: var(--border-radius);
+    padding: 8px;
+    border: 2px solid var(--light-blue);
+
+    &.drop-hover {
+      border: 2px dashed var(--border-color);
+    }
+
+    img {
+      align-self: center;
+    }
+
+    .instructions {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hint {
+      opacity: 0.6;
+      font-size: 14px;
+    }
+
+    .upload-button {
+      cursor: pointer;
+      align-self: flex-start;
+    }
+  }
 }
