@@ -1,25 +1,12 @@
 Page('.upload-page .step-content.step-6.active', function($step6) {
-  $step6.on('dragover', '.js-file-upload', function(e) {
-    e.preventDefault();
-    $(this).addClass('drop-hover');
-  });
-  $step6.on('dragleave', '.js-file-upload', function(e) {
-    e.preventDefault();
-    $(this).removeClass('drop-hover');
-  });
-  $step6.on('drop', '.js-file-upload', function(e) {
-    e.preventDefault();
+  let $uploadContainer = $('.js-upload-container');
+  // Real file input is outside the container:
+  let $fileInput = $('#data-template-input');
 
-    let $container = $step6.find('.js-upload-container');
-    let $input = $('#data-template-input');
-    $input[0].files = e.originalEvent.dataTransfer.files;
+  $uploadContainer.customFileInput({ $input: $fileInput });
 
-    $(this).removeClass('drop-hover');
-    submitExcelForm($container);
-  });
-  $step6.on('change', 'input[type=file]', function(e) {
-    let $container = $step6.find('.js-upload-container');
-    submitExcelForm($container);
+  $fileInput.on('change', function() {
+    submitExcelForm();
   });
 
   $step6.on('change', '.js-preview select', function() {
@@ -37,9 +24,8 @@ Page('.upload-page .step-content.step-6.active', function($step6) {
   // Trigger initial sheet preview
   $('.js-preview select').trigger('change');
 
-  function submitExcelForm($container) {
-    let url        = $container.prop('action')
-    let $fileInput = $('#data-template-input');
+  function submitExcelForm() {
+    let url        = $uploadContainer.prop('action')
     let formData   = new FormData();
     let file       = $fileInput[0].files[0];
     let $preview   = $step6.find('.js-preview');
