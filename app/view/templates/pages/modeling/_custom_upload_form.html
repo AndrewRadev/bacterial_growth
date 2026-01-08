@@ -1,4 +1,4 @@
-{% macro render_custom_upload_form(study, custom_model) %}
+{% macro render_custom_upload_form(study, custom_model, modeling_result=None) %}
 
   {% set form_url = url_for(
     'modeling_custom_model_upload_action',

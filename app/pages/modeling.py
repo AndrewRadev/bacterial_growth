@@ -56,9 +56,17 @@ def modeling_page(publicId):
     if not study.manageable_by_user(g.current_user):
         raise Forbidden()
 
+    if modeling_result_id := request.args.get('modelingResultId'):
+        modeling_result = g.db_session.get(ModelingResult, modeling_result_id)
+        if modeling_result and modeling_result.study != study:
+            modeling_result = None
+    else:
+        modeling_result = None
+
     return render_template(
         "pages/modeling/show.html",
         study=study,
+        modeling_result=modeling_result,
         model_param_info=COMMON_COEFFICIENTS,
     )
 
@@ -277,9 +285,6 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     if custom_model.studyId != publicId:
         raise Forbidden
 
-    # TODO (2026-01-07) Check if file is valid, return error
-    # TODO (2026-01-07) Javascript: validate on the client side
-
     predictions_df = pd.read_csv(request.files['predictions'])
 
     modeling_result = g.db_session.scalars(
@@ -324,6 +329,7 @@ def modeling_custom_model_upload_action(publicId, customModelId):
         selectedMeasurementContextId=modeling_result.measurementContext.id,
         selectedTechniqueId=modeling_result.measurementContext.technique.id,
         selectedCustomModelId=custom_model.id,
+        modelingResultId=modeling_result.id,
     )
 
     return redirect(redirect_url)
