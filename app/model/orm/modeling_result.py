@@ -237,7 +237,7 @@ class ModelingResult(OrmBase):
 
     def update_model_params(self, form):
         if not self.customModel:
-            raise "Tried to update non-custom modeling result"
+            raise RuntimeError("Tried to update non-custom modeling result")
 
         coefficients = self.params.get('coefficients', {})
         fit          = self.params.get('fit', {})

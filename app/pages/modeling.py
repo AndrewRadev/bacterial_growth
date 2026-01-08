@@ -293,9 +293,10 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     if modeling_result is None:
         modeling_result = ModelingResult(
             measurementContextId=request.form['selectedMeasurementContextId'],
-            customModelId=custom_model.id,
+            customModel=custom_model,
             type=f"custom_{custom_model.id}",
             state='ready',
+            params={},
         )
 
     if 'error' in predictions_df.columns:
