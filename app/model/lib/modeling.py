@@ -19,7 +19,7 @@ MODEL_DESCRIPTIONS = {
 }
 "One-sentence descriptions of the supported models/methods"
 
-COMMON_MODEL_PARAMETERS = {
+COMMON_COEFFICIENTS = {
     "mumax": {
         "name_html": "μ<sub>max</sub>",
         "description_html": "Maximum growth rate (in h<sup>-1</sup>)"
@@ -39,8 +39,8 @@ COMMON_MODEL_PARAMETERS = {
 }
 "Names and descriptions for common model parameters (growth rate, lag time, etc)"
 
-ALL_MODEL_PARAMETERS = {
-    **COMMON_MODEL_PARAMETERS,
+ALL_COEFFICIENTS = {
+    **COMMON_COEFFICIENTS,
     "y0_lm": {
         "name_html": "y<sub>0</sub>_lm",
         "description_html": "y<sub>0</sub> calculated as the intersection of the fit with the abscissa, the initial abundance if there was no lag"

@@ -27,7 +27,7 @@ from app.model.orm import (
 from app.model.lib.chart import Chart
 from app.model.lib.modeling_tasks import process_modeling_request
 from app.model.lib.model_export import export_model_csv
-from app.model.lib.modeling import COMMON_MODEL_PARAMETERS
+from app.model.lib.modeling import COMMON_COEFFICIENTS
 
 
 def modeling_page(publicId):
@@ -59,7 +59,7 @@ def modeling_page(publicId):
     return render_template(
         "pages/modeling/show.html",
         study=study,
-        model_param_info=COMMON_MODEL_PARAMETERS,
+        model_param_info=COMMON_COEFFICIENTS,
     )
 
 

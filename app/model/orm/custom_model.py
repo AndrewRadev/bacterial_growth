@@ -11,7 +11,7 @@ from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
 from app.model.lib.modeling import (
-    ALL_MODEL_PARAMETERS,
+    ALL_COEFFICIENTS,
     FIT_PARAMETERS,
 )
 
@@ -42,7 +42,7 @@ class CustomModel(OrmBase):
     @property
     def coefficientInfo(self):
         return [
-            {'name': name, **ALL_MODEL_PARAMETERS[name]}
+            {'name': name, **ALL_COEFFICIENTS[name]}
             for name in self.coefficientNames
         ]
 

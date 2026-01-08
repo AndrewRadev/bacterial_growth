@@ -20,7 +20,7 @@ from app.model.lib.modeling import (
     MODEL_NAMES,
     SHORT_MODEL_NAMES,
     MODEL_DESCRIPTIONS,
-    ALL_MODEL_PARAMETERS,
+    ALL_COEFFICIENTS,
     FIT_PARAMETERS,
 )
 
@@ -203,7 +203,7 @@ class ModelingResult(OrmBase):
             fit_names         = empty_params['fit'].keys()
 
         return {
-            'coefficients': [ALL_MODEL_PARAMETERS[c] for c in coefficient_names],
+            'coefficients': [ALL_COEFFICIENTS[c] for c in coefficient_names],
             'fit':          [FIT_PARAMETERS[f] for f in fit_names],
         }
 
