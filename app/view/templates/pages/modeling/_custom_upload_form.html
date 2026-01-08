@@ -24,27 +24,23 @@
     <div class="form-row">
       <div class="flex-1 js-upload-container">
         <div class="upload-container js-file-upload">
-          <img
-              src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
-              height="40"
-              title="Upload" />
-
-          <div class="instructions">
-            <span class="required">Drag and drop data CSV</span>
-            <span class="hint">Limit 200MB per file</span>
-
-            <span class="small js-preview"></span>
-
-            <label class="upload-button white-button">
-              Browse files
-              <input
-                  required
-                  name="predictions"
-                  accept=".csv"
-                  type="file"
-                  class="hidden" />
-            </label>
+          <div class="flex-row flex-gap-10">
+            <img
+                src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
+                height="40"
+                title="Upload" />
+            <div class="instructions">
+              <span class="required">Drag and drop data CSV</span>
+              <span class="hint">Limit 200MB per file</span>
+            </div>
           </div>
+
+          <input
+              required
+              class="small"
+              name="predictions"
+              accept=".csv"
+              type="file" />
         </div>
       </div>
       <div class="help small flex-2">

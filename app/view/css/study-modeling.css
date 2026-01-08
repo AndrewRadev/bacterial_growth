@@ -110,9 +110,9 @@
 
   .upload-container {
     display: flex;
-    justify-content: space-around;
+    flex-direction: column;
+    gap: 10px;
     align-items: center;
-    column-gap: 10px;
     background-color: var(--light-blue);
     border-radius: var(--border-radius);
     padding: 8px;
