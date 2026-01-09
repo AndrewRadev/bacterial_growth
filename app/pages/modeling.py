@@ -9,6 +9,7 @@ from flask import (
     request,
     redirect,
     url_for,
+    flash,
 )
 from werkzeug.exceptions import Forbidden
 import sqlalchemy as sql
@@ -280,12 +281,28 @@ def modeling_custom_model_upload_action(publicId, customModelId):
         raise Forbidden()
 
     measurement_context_id = request.form['selectedMeasurementContextId']
-
-    custom_model = g.db_session.get_one(CustomModel, customModelId)
-    if custom_model.studyId != publicId:
+    measurement_context = g.db_session.get_one(MeasurementContext, measurement_context_id)
+    if measurement_context.study != study:
         raise Forbidden
 
+    custom_model = g.db_session.get_one(CustomModel, customModelId)
+    if custom_model.study != study:
+        raise Forbidden
+
+    redirect_params = {
+        'selectedExperimentId':         measurement_context.bioreplicate.experimentId,
+        'selectedMeasurementContextId': measurement_context.id,
+        'selectedTechniqueId':          measurement_context.technique.id,
+        'selectedCustomModelId':        custom_model.id,
+    }
+
     predictions_df = pd.read_csv(request.files['predictions'])
+    df_columns = set(predictions_df.columns)
+    required_columns = {'time', 'value'}
+
+    if not required_columns.issubset(df_columns):
+        flash(f"Columns missing from data file: {', '.join(required_columns - df_columns)}", 'upload_error')
+        return redirect(url_for('modeling_page', publicId=study.publicId, **redirect_params))
 
     modeling_result = g.db_session.scalars(
         sql.select(ModelingResult)
@@ -304,15 +321,10 @@ def modeling_custom_model_upload_action(publicId, customModelId):
             params={},
         )
 
-    if 'error' in predictions_df.columns:
-        y_errors = predictions_df['error'].tolist()
-    else:
-        y_errors = []
-
     modeling_result.update(
         xValues=predictions_df['time'].tolist(),
         yValues=predictions_df['value'].tolist(),
-        yErrors=y_errors,
+        yErrors=predictions_df['error'].tolist() if 'error' in df_columns else [],
     )
     modeling_result.update_model_params(request.form.to_dict())
 
@@ -325,11 +337,8 @@ def modeling_custom_model_upload_action(publicId, customModelId):
     redirect_url = url_for(
         'modeling_page',
         publicId=study.publicId,
-        selectedExperimentId=modeling_result.measurementContext.bioreplicate.experimentId,
-        selectedMeasurementContextId=modeling_result.measurementContext.id,
-        selectedTechniqueId=modeling_result.measurementContext.technique.id,
-        selectedCustomModelId=custom_model.id,
         modelingResultId=modeling_result.id,
+        **redirect_params,
     )
 
     return redirect(redirect_url)

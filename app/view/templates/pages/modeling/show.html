@@ -58,6 +58,14 @@
         {{ render_custom_model_form(study, model_param_info, custom_model=None) }}
       </div>
 
+      {% with messages = get_flashed_messages(category_filter=('upload_error')) %}
+        {% if messages %}
+          <div class="flashes">
+            <p class="flash-error">{{ messages[0] }}</p>
+          </div>
+        {% endif %}
+      {% endwith %}
+
       <div class="box margin-top-10 hidden js-custom-upload-form">
         {% for custom_model in study.customModels: %}
           {{ render_custom_upload_form(study, custom_model, modeling_result) }}
