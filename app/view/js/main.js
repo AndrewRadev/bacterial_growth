@@ -46,13 +46,10 @@ $(document).ready(function() {
   $(document).on('x-sidebar-resize', function() {
     $('.js-plotly-plot').each(function() {
       let $chart          = $(this);
-      let $chartContainer = $chart.parents('.chart');
+      let $chartContainer = $chart.parents('.chart-container');
 
       let width = Math.floor($chartContainer.width());
 
-      // Triggered twice, because there seems to be a visual bug with the
-      // horizontal legend
-      Plotly.relayout($chart[0], { 'width': width });
       Plotly.relayout($chart[0], { 'width': width });
     });
   });

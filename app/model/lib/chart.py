@@ -189,7 +189,7 @@ class Chart:
         return fig.to_html(
             full_html=False,
             include_plotlyjs=False,
-            default_width=(f"{self.width}px" if self.width is not None else None),
+            default_width=(f"{self.width}px" if self.width is not None else '100%'),
             config={
                 'toImageButtonOptions': {
                     'format': 'svg',
