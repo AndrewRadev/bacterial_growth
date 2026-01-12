@@ -67,11 +67,16 @@ def init_assets(app):
 
     assets.register('app_css', flask_assets.Bundle(
         '../app/view/css/vendor/select2-4.0.13.css',
-        '../app/view/css/vendor/katex-0.16.27.css',
         '../app/view/css/vendor/tippy-fix.css',
         *app_css_files,
         filters='cssmin',
         output='build/app.css'
+    ))
+
+    assets.register('katex_css', flask_assets.Bundle(
+        '../app/view/css/vendor/katex-0.16.27.css',
+        filters='cssmin',
+        output='build/katex.css'
     ))
 
     return app
