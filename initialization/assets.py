@@ -57,10 +57,17 @@ def init_assets(app):
         output='build/plotly.js'
     ))
 
+    assets.register('katex_js', flask_assets.Bundle(
+        '../app/view/js/vendor/katex-0.16.27.js',
+        '../app/view/js/vendor/katex-0.16.27-auto-render.js',
+        output='build/katex.js'
+    ))
+
     app_css_files = [f"../app/view/css/{p.name}" for p in Path('app/view/css').glob('*.css')]
 
     assets.register('app_css', flask_assets.Bundle(
         '../app/view/css/vendor/select2-4.0.13.css',
+        '../app/view/css/vendor/katex-0.16.27.css',
         '../app/view/css/vendor/tippy-fix.css',
         *app_css_files,
         filters='cssmin',
