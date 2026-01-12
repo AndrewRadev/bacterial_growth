@@ -4,7 +4,7 @@ A study uploaded to μGrowthDB provides multiple different views of its data. Yo
 
 <p>
     <div style="width: 100%; text-align: center">
-    <img style="width: 80%; margin: 0 auto;" title="Study navigation bar" src="/static/images/help/data-analysis/study_show_1.png" />
+    <img style="width: 80%; margin: 0 auto;" title="Study navigation bar" src="/static/images/help/study-pages/study_show_1.png" />
     </div>
 </p>
 
@@ -19,10 +19,10 @@ This particular example is taken from the study <a target="_blank" href="{{ url_
 
 <div class="image-container" style="width: 40%; float: right; margin-left: 20px; margin-top: 20px;">
     <img
-        src="/static/images/help/data-analysis/study_show_2.png"
+        src="/static/images/help/study-pages/study_show_2.png"
         title="Basic study information" />
     <img
-        src="/static/images/help/data-analysis/study_show_4.png"
+        src="/static/images/help/study-pages/study_show_4.png"
         title="Biological replicates" />
 </div>
 
@@ -38,10 +38,10 @@ The double-arrows icon adds the measurements represented by the line to the "Com
 
 <div class="image-container" style="width: 50%; float: right; margin-left: 20px; margin-top: 20px;">
     <img
-        src="/static/images/help/data-analysis/bt_mucin_growth.png"
+        src="/static/images/help/study-pages/bt_mucin_growth.png"
         title="Two different compartments shown on one chart" />
     <img
-        src="/static/images/help/data-analysis/chart_left_right_controls.png"
+        src="/static/images/help/study-pages/chart_left_right_controls.png"
         title="Left/right axis controls" />
 </div>
 
@@ -63,7 +63,7 @@ After picking data from different studies, you can click the sidebar menu button
 
 <p>
     <div style="width: 100%; text-align: center">
-    <img style="width: 80%; margin: 0 auto;" title="Compare view" src="/static/images/help/data-analysis/compare_view_1.png" />
+    <img style="width: 80%; margin: 0 auto;" title="Compare view" src="/static/images/help/study-pages/compare_view_1.png" />
     </div>
 </p>
 
@@ -74,13 +74,13 @@ The chart works in a very similar way to the one described in section the previo
 
 <div class="image-container" style="width: 40%; float: right; margin-left: 20px; margin-top: 20px;">
     <img
-        src="/static/images/help/data-analysis/modeling_interface_1_2.png"
+        src="/static/images/help/study-pages/modeling_interface_1_2.png"
         title="Modeling form" />
     <img
-        src="/static/images/help/data-analysis/modeling_params_2.png"
+        src="/static/images/help/study-pages/modeling_params_2.png"
         title="Model visualization chart" />
     <img
-        src="/static/images/help/data-analysis/modeling_params_3.png"
+        src="/static/images/help/study-pages/modeling_params_3.png"
         title="Parameter information" />
 </div>
 
@@ -98,7 +98,7 @@ For the logistic model and Baranyi-Roberts, the current parameterization is for 
 
 <img
     style="width: 50%; float: right; margin-left: 20px;"
-    src="/static/images/help/data-analysis/export_ui_1_2.png"
+    src="/static/images/help/study-pages/export_ui_1_2.png"
     title="Export interface" />
 
 The study navigation interface includes an "Export data" button. Pressing it leads to a page where you can download data from selected biological replicates of a study in CSV format. The form allows selecting individual biological replicates to export and changing the checkboxes updates the preview on the right-hand side.

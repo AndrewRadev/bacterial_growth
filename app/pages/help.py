@@ -16,7 +16,7 @@ from app.model.lib.util import is_ajax
 class HelpPages:
     def __init__(self):
         self.templates_dir = Path('app/view/templates')
-        self.root_dir      = self.templates_dir / Path('pages/help/pages')
+        self.root_dir      = self.templates_dir / 'help'
 
         self.markdown = MarkdownIt().enable('table')
 

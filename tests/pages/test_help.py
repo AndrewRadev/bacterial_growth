@@ -19,7 +19,7 @@ class TestHelpPages(PageTest):
     def test_simple_page_rendering(self):
         self.assertIn(
             '<h2>Study navigation</h2>',
-            str(self.help_pages.render_html('data-analysis')),
+            str(self.help_pages.render_html('study-pages')),
         )
 
         self.assertIn(
