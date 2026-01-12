@@ -86,9 +86,13 @@
               <li>
                 <strong>{{ model_info.name }}</strong>
 
-                {% if model_info.url: %}
-                  ({{ model_info.url|external_link }})
-                {% endif %}
+                <span class="small">
+                  {% if not model_info.is_custom: %}
+                    {{ "modeling-techniques"|help_link(text="ℹ️ Info", section=model_info.type, css_class="white-button small-button") }}
+                  {% elif model_info.url: %}
+                    {{ model_info.url|external_link(text="ℹ️ Info", css_class="white-button small-button") }}
+                  {% endif %}
+                </span>
 
                 {% if model_info.description != '': %}
                   <div class="small">{{ model_info.description }}</div>

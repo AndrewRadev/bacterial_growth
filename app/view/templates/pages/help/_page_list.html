@@ -1,58 +1,93 @@
 {% if search_results is not none: %}
-  {% for result in search_results: %}
-    <li>
-      <a href="{{ url_for('help_show_page', name=result['name']) }}">
-        {{ result['name']|replace('-', ' ')|title }}
-      </a>
+  <ul>
 
-      <p>{{ result['excerpt_html']|safe }}</p>
-    </li>
-  {% else: %}
-    <li class="warning-message">
-      No results match your query
-    </li>
-  {% endfor %}
+    {% for result in search_results: %}
+      <li>
+        <a href="{{ url_for('help_show_page', name=result['name']) }}">
+          {{ result['name']|replace('-', ' ')|title }}
+        </a>
+
+        <p>{{ result['excerpt_html']|safe }}</p>
+      </li>
+    {% else: %}
+      <li class="warning-message">
+        No results match your query
+      </li>
+    {% endfor %}
+
+  </ul>
 {% else: %}
-  <li>
-    <a href="{{ url_for('help_show_page', name="main-concepts") }}">
-      Main Concepts
-    </a>
-    <p class="description">
-      Terminology used across the application and in the help pages.
-    </p>
-  </li>
-  <li>
-    <a href="{{ url_for('help_show_page', name="bacterial-growth-data") }}">
-      Bacterial Growth Data
-    </a>
-    <p class="description">
-      Biological information relevant to understanding bacterial growth.
-    </p>
-  </li>
-  <li>
-    <a href="{{ url_for('help_show_page', name="searching") }}">
-      Searching
-    </a>
-    <p class="description">
-      How to find studies on the site by their title, included strains, or
-      other properties.
-    </p>
-  </li>
-  <li>
-    <a href="{{ url_for('help_show_page', name="upload-process") }}">
-      Upload Process
-    </a>
-    <p class="description">
-      Step-by-step instructions on uploading a new study.
-    </p>
-  </li>
-  <li>
-    <a href="{{ url_for('help_show_page', name="study-pages") }}">
-      Study pages
-    </a>
-    <p class="description">
-      Exploring a single study: Visualizing data traces, comparing experiments
-      between studies, exporting data.
-    </p>
-  </li>
+
+  <div class="flex-row">
+    <div class="flex-1">
+      <h3>Biological</h3>
+      <p class="description">
+        How to understand microbial growth
+      </p>
+
+      <ul>
+        <li>
+          <a href="{{ url_for('help_show_page', name="main-concepts") }}">
+            Main Concepts
+          </a>
+          <p class="description">
+            Terminology used across the application and in the help pages.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="bacterial-growth-data") }}">
+            Bacterial Growth Data
+          </a>
+          <p class="description">
+            Common concerns when measuring bacterial growth, measurement techniques.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="modeling-techniques") }}">
+            Modeling Techniques
+          </a>
+          <p class="description">
+            Explanations of the modeling methods supported by the application.
+          </p>
+        </li>
+      </ul>
+    </div>
+
+    <div class="flex-1">
+      <h3>Technical</h3>
+      <p class="description">
+        How to use the site
+      </p>
+
+      <ul>
+        <li>
+          <a href="{{ url_for('help_show_page', name="searching") }}">
+            Searching
+          </a>
+          <p class="description">
+            How to find studies on the site by their title, included strains, or
+            other properties.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="upload-process") }}">
+            Upload Process
+          </a>
+          <p class="description">
+            Step-by-step instructions on uploading a new study.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="study-pages") }}">
+            Study pages
+          </a>
+          <p class="description">
+            Exploring a single study: Visualizing data traces, comparing experiments
+            between studies, exporting data.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </div>
+
 {% endif %}

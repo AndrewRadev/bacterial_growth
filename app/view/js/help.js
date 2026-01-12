@@ -1,5 +1,5 @@
 Page('.help-page-index', function($page) {
-  let $pageList = $page.find('.js-page-list');
+  let $pageListContainer = $page.find('.js-page-list-container');
   let $searchInput = $('.js-search-input');
 
   if ($searchInput.val().length >= 0) {
@@ -13,13 +13,17 @@ Page('.help-page-index', function($page) {
 
   function updatePage($searchInput) {
     let $form = $searchInput.parents('form');
-    $pageList.addClass('loading');
+    $pageListContainer.addClass('loading');
 
     $form.ajaxSubmit({
       success: function(response) {
-        $pageList.html(response);
-        $pageList.removeClass('loading');
+        $pageListContainer.html(response);
+        $pageListContainer.removeClass('loading');
       }
     });
   }
+});
+
+Page('.help-page', function($page) {
+  renderMathInElement($page[0]);
 });

@@ -3,7 +3,7 @@
     background-color: #fafa44;
   }
 
-  .page-list {
+  .page-list-container {
     transition: opacity var(--transition-length) ease;
   }
 

@@ -3,6 +3,7 @@
 {% block title %}: Help{% endblock %}
 
 {% block content %}
+
   <div class="container help-page">
     <h1>
       <span class="icon icon-emoji">❓</span>
@@ -15,5 +16,9 @@
       {{ content }}
     </article>
   </div>
+
+  {% assets "katex_js" %}
+  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
+  {% endassets %}
 
 {% endblock %}
