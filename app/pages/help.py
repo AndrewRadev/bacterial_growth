@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import (
     request,
     render_template,
+    current_app,
 )
 from markdown_it import MarkdownIt
 from markupsafe import Markup
@@ -76,7 +77,7 @@ class HelpPages:
         return results
 
     def process_once(self):
-        if self._html_cache:
+        if self._html_cache and not current_app.config['DEBUG']:
             return
 
         for file in self.root_dir.iterdir():
