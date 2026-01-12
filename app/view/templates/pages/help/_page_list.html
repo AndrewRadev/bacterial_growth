@@ -28,23 +28,23 @@
       <ul>
         <li>
           <a href="{{ url_for('help_show_page', name="main-concepts") }}">
-            Main Concepts
+            Main concepts
           </a>
           <p class="description">
             Terminology used across the application and in the help pages.
           </p>
         </li>
         <li>
-          <a href="{{ url_for('help_show_page', name="bacterial-growth-data") }}">
-            Bacterial Growth Data
+          <a href="{{ url_for('help_show_page', name="microbial-growth-data") }}">
+            Microbial growth data
           </a>
           <p class="description">
-            Common concerns when measuring bacterial growth, measurement techniques.
+            Common concerns when measuring microbial growth, measurement techniques.
           </p>
         </li>
         <li>
           <a href="{{ url_for('help_show_page', name="modeling-techniques") }}">
-            Modeling Techniques
+            Modeling techniques
           </a>
           <p class="description">
             Explanations of the modeling methods supported by the application.
@@ -71,7 +71,7 @@
         </li>
         <li>
           <a href="{{ url_for('help_show_page', name="upload-process") }}">
-            Upload Process
+            Upload process
           </a>
           <p class="description">
             Step-by-step instructions on uploading a new study.
@@ -84,6 +84,22 @@
           <p class="description">
             Exploring a single study: Visualizing data traces, comparing experiments
             between studies, exporting data.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="downloading-data") }}">
+            Downloading data
+          </a>
+          <p class="description">
+            Getting data out of the application, either in batches or in a fine-grained way.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="modeling-interface") }}">
+            Modeling interface
+          </a>
+          <p class="description">
+            Using the application to fit growth data or uploading your own models.
           </p>
         </li>
       </ul>

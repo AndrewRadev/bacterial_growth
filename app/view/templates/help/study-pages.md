@@ -1,6 +1,6 @@
 ## Study navigation
 
-A study uploaded to μGrowthDB provides multiple different views of its data. You can navigate between them by using a navigation bar that jumps between 4 different sections:
+A study uploaded to μGrowthDB provides multiple different views of its data. You can navigate between them by using a navigation bar that jumps between 5 different sections:
 
 <p>
     <div style="width: 100%; text-align: center">
@@ -11,7 +11,8 @@ A study uploaded to μGrowthDB provides multiple different views of its data. Yo
 - **View information**: Shows the study homepage with general information about the study and its experiments
 - **Visualize**:        Allows plotting the data of this particular study
 - **Export data**:      Provides an interface to download the raw measurements in CSV format
-- **Manage**:           Allows the owners of the study to make changes to it and fit models to the data
+- **Manage**:           Allows the owners of the study to make minor changes to it
+- **Fit models**:       Allows the owners of the study to fit models to the data
 
 This particular example is taken from the study <a target="_blank" href="{{ url_for("study_show_page", publicId="SMGDB00000002") }}">SMGDB00000002</a>.
 
@@ -84,7 +85,7 @@ The chart works in a very similar way to the one described in section the previo
         title="Parameter information" />
 </div>
 
-The modeling functionality can be found on a study's "Manage" page. You can reach it by pressing the rightmost button on the navigation interface. This page and the button that links to it are only visible to users that have managing permissions on the study, which is why the button is colored orange to highlight its different nature. Executing code to fit models is a potentially time- and resource-consuming action, which is why it is limited to the owners of the study and not to all visitors. Additionally, models can be parameterized in different ways, which is an active choice that should be made by the researchers the data belongs to in the first place.
+The modeling functionality can be found on a study's "Fit models" page. You can reach it by pressing the rightmost button on the navigation interface. This page and the button that links to it are only visible to users that have managing permissions on the study, which is why the button is colored orange to highlight its different nature. Executing code to fit models is a potentially time- and resource-consuming action, which is why it is limited to the owners of the study and not to all visitors. Additionally, models can be parameterized in different ways, which is an active choice that should be made by the researchers the data belongs to in the first place.
 
 On the "Manage" page, you can scroll down to the "Growth models" section where you can see a similar interface to the one in the "Visualize" page. In both forms, experiments and measurement techniques are available in dropdowns to select individual measurement subjects. A difference in the modeling form is that you can only examine one subject at a time, selecting it with a radio button.
 
@@ -93,6 +94,8 @@ The form submits a request to model a particular collection of data points that 
 Be advised that the specific parameters you pick can make a big difference in the results. The application will attempt to fit the data you provide, but it might fail, depending on its form. The models provided are intended for the lag, exponential, and stationary phases of microbial growth.
 
 For the logistic model and Baranyi-Roberts, the current parameterization is for the end time for the data points that will be fitted. For the "Easy linear" method, you can pick the number of data points used to determine the slope of the fit. Once you have fitted the separate models to the desired data traces, you can download all the model parameters by using a button at the top of the page labeled "Download completed models as CSV". The resulting file has one row per fitted model and columns for its individual parameters.
+
+In the "Modeling type" dropdown, it's possible to choose "Custom model" to upload your own predictions rather than to calculate them through μGrowthDB. For more information, see the dedicated help topic "[Modeling interface](/help/modeling-interface/)".
 
 ## Data exports
 
@@ -107,12 +110,6 @@ Once the desired combination of data is selected, the "Download ZIP file" button
 
 The URL shown next to the download button can be used to fetch the selected subset of data on the command-line. This can be particularly useful when working on a remote server, or when the data from multiple studies needs to be processed in batches.
 
-## Bulk downloads and API access
+It's possible to fetch all of the data of a single study or the entire database by navigating to the [/static/export](/static/export) page. It's also possible to get fine-grained access to the data by using the application's REST API, described in the developer documentation: <https://mgrowthdb.readthedocs.io/en/stable/api.html>.
 
-It's possible to fetch all of the data of a single study or the entire database by navigating to the [/static/export](/static/export) page. There, you can find folders and zip files with the study design and the observational data. There is also an `all_studies.zip` file that includes the entirety of the database.
-
-This data is "raw", in the sense that it's preserved in the format that it was uploaded in. The file `study_design.json` contains all the metadata we collect from an uploader to describe the study. We may have changed the database structure since it was uploaded, but this JSON will reflect the format as it was at the time.
-
-The data is uploaded as an excel spreadsheet, but its individual sheets are extracted into CSV files for the purpose of this bulk export. This is done for the sake of effective compression. As with the metadata, it reflects the structure that was requested at the time it was uploaded.
-
-It's also possible to get fine-grained access to the data by using the application's REST API, described in the developer documentation: <https://mgrowthdb.readthedocs.io/en/stable/api.html>
+These options are described in more detail in a separate help topic: "[Downloading data](/help/downloading-data)".
