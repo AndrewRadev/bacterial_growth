@@ -105,7 +105,7 @@ Page('.search-page', function($page) {
 
     $checkbox.parents('.form-row').after(`
       <div class="form-row">
-        <a href="#" class="green-button add-clause">Add clause</a>
+        <a href="#" class="green-button add-clause js-add-clause">Add clause</a>
       </div>
     `);
     $checkbox.parents('.form-row').after(new_clause);
