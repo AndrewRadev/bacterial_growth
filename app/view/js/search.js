@@ -48,13 +48,20 @@ Page('.search-page', function($page) {
     $checkbox.prop('checked', true);
   }
 
+  $page.on('click', '.js-load-more', function(e) {
+    e.preventDefault();
+    loadNextPage($(this));
+  });
+
+  // Old search:
+
   $page.on('change', '#advanced-search-input', function(e) {
     let checkbox = $(e.currentTarget);
 
     if (checkbox.is(':checked')) {
-      add_advanced_search();
+      addAdvancedSearch();
     } else {
-      remove_advanced_search();
+      removeAdvancedSearch();
     }
   });
 
@@ -69,7 +76,7 @@ Page('.search-page', function($page) {
     e.preventDefault();
 
     $button = $(e.currentTarget);
-    let new_clause = build_new_clause();
+    let new_clause = buildNewClause();
     $button.parents('.form-row').before(new_clause);
   });
 
@@ -87,7 +94,21 @@ Page('.search-page', function($page) {
     });
   }
 
-  function remove_advanced_search() {
+  function loadNextPage($button) {
+    let offset = $page.find('.js-search-result').length;
+    let $searchForm  = $page.find('.js-search-form');
+
+    $button.addClass('loading');
+
+    $searchForm.ajaxSubmit({
+      urlParams: { offset },
+      success: function(response) {
+        $button.replaceWith(response);
+      }
+    });
+  }
+
+  function removeAdvancedSearch() {
     // We find the checkbox and remove all form rows after it:
     let $checkbox = $page.find('#advanced-search-input');
     let $inputs = $checkbox.parents('.form-row').nextAll('.form-row.clause');
@@ -98,10 +119,10 @@ Page('.search-page', function($page) {
     $page.find('.add-clause').parents('.form-row').remove();
   }
 
-  function add_advanced_search() {
+  function addAdvancedSearch() {
     // We find the checkbox and add a single clause afterwards:
     let $checkbox = $page.find('#advanced-search-input');
-    let new_clause = build_new_clause();
+    let new_clause = buildNewClause();
 
     $checkbox.parents('.form-row').after(`
       <div class="form-row">
@@ -111,7 +132,7 @@ Page('.search-page', function($page) {
     $checkbox.parents('.form-row').after(new_clause);
   }
 
-  function build_new_clause() {
+  function buildNewClause() {
     let template_clause = $page.find('#form-clause-template').html();
 
     // We need to prepend all names and ids with "clause-N" for uniqueness:

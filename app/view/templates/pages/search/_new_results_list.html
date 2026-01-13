@@ -9,7 +9,7 @@
   {% endif %}
 
   {% for study in studies: %}
-    <li>
+    <li class="js-search-result">
       <div class="search-study">
         <h3 class="flex-row flex-gap-10">
           <a href="{{ url_for('study_show_page', publicId=study.publicId) }}">
@@ -101,4 +101,10 @@
       </div>
     </li>
   {% endfor %}
+
+  {% if search.has_more: %}
+    <a href="#" class="white-button load-more js-load-more">
+      Load more
+    </a>
+  {% endif %}
 {% endmacro %}

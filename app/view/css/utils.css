@@ -339,6 +339,9 @@ form.simple-form {
   text-decoration: none;
   line-height: 1.1;
   white-space: nowrap;
+  transition:
+    color var(--transition-length) ease-in,
+    background-color var(--transition-length) ease-in;
 
   &.flex-row {
     display: flex;
@@ -365,6 +368,7 @@ form.simple-form {
   line-height: 1.1;
   color: var(--black);
   white-space: nowrap;
+  transition: background-color var(--transition-length) ease-in;
 
   &.flex-row {
     display: flex;

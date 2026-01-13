@@ -20,7 +20,7 @@ from app.model.orm import (
 from app.model.lib.study_search import StudySearch
 from app.model.lib.util import is_ajax
 
-_PER_PAGE = 20
+_PER_PAGE = 5
 
 
 def new_search_index_page():
@@ -31,6 +31,7 @@ def new_search_index_page():
         ncbiIds=request.args.getlist('ncbiIds'),
         chebiIds=request.args.getlist('chebiIds'),
         per_page=_PER_PAGE,
+        offset=int(request.args.get('offset', '0')),
     )
 
     studies = search.fetch_results()
