@@ -49,6 +49,14 @@
             {{ study.studyTechniques|map(attribute="short_name")|unique|join(", ") }}
             <br>
           {% endif %}
+
+          {% set model_info_list = study.get_model_info_list() %}
+
+          {% if model_info_list: %}
+            <strong>Modeling techniques</strong>:
+            {{ model_info_list|map(attribute="name")|unique|join(", ") }}
+            <br>
+          {% endif %}
         </p>
 
         <table class="simple-table margin-top-10 small">
