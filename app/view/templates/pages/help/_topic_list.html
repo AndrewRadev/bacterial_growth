@@ -1,13 +1,13 @@
-{% if search_results is not none: %}
+{% if topics is not none: %}
   <ul>
 
-    {% for result in search_results: %}
+    {% for topic in topics: %}
       <li>
-        <a href="{{ url_for('help_show_page', name=result['name']) }}">
-          {{ result['name']|replace('-', ' ')|title }}
+        <a href="{{ url_for('help_show_page', name=topic['name']) }}">
+          {{ topic['name']|replace('-', ' ')|title }}
         </a>
 
-        <p>{{ result['excerpt_html']|safe }}</p>
+        <p>{{ topic['excerpt_html']|safe }}</p>
       </li>
     {% else: %}
       <li class="warning-message">
