@@ -1,0 +1,114 @@
+{% from 'utils/_form_errors.html' import render_form_errors %}
+{% from 'pages/search/_advanced_results_list.html' import render_results_list %}
+
+{% extends '_layout.html' %}
+
+{% block title %}: Search{% endblock %}
+
+{% block content %}
+  <div class="container search-page">
+    <div style="font-size: 14px; float: right">
+      {{ "searching"|help_link("❓ Help", css_class="white-button small-button") }}
+    </div>
+
+    <h1>
+      <span class="icon icon-emoji">🔍</span>
+      Search Microbial Growth Studies
+    </h1>
+
+    <article>
+      <p>
+        When conducting an advanced search, you can choose multiple logical
+        operators to refine your query and extract precise information from the
+        database. (<a href="{{ url_for('search_index_page') }}">Back to simple search</a>.)
+      </p>
+
+      <p>
+        <form
+            action="{{ url_for('advanced_search_index_page') }}"
+            class="simple-form js-advanced-search-form">
+          {% for clause in form.clauses: %}
+            <div class="form-row clause">
+              {% if loop.index > 1: %}
+                <label>
+                  <span>Select logic operator:</span>
+                  {{ clause.logic_operator(class="form-input-full form-input-blue") }}
+                </label>
+              {% endif %}
+
+              <label>
+                <span>Select an option:</span>
+                {{ clause.option(class="form-input-full form-input-blue") }}
+              </label>
+
+              <label class="flex-grow">
+                <span>Enter text here:</span>
+                {{ clause.value(class="form-input-full form-input-blue") }}
+              </label>
+
+              {% if loop.index > 1: %}
+                <div class="no-label">
+                  <a href="#" class="white-button flex-row js-remove-clause">
+                    <span class="icon icon-remove"></span> Remove
+                  </a>
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="form-row">
+            <a href="#" class="white-button flex-row js-add-clause">
+              <span class="icon icon-add"></span> Add clause
+            </a>
+          </div>
+
+          <div class="form-row">
+            <div class="flex-right flex-row flex-gap-6">
+              <input type="submit" value="🔍 Search" />
+              <a href="{{ url_for('advanced_search_index_page') }}" class="white-button">
+                🧹 Clear
+              </a>
+            </div>
+          </div>
+        </form>
+
+        {% if results: %}
+          <ol class="results-list">
+            {{ render_results_list(results, offset) }}
+          </ol>
+        {% else: %}
+          <p>
+            <div class="error-message">Couldn't find a study with these parameters.</div>
+          </p>
+        {% endif %}
+      </p>
+    </article>
+
+    <template id="form-clause-template">
+      <div class="form-row clause">
+        {{ template_clause.csrf_token }}
+
+        <label>
+          <span>Select logic operator:</span>
+          {{ template_clause.logic_operator(class="form-input-full form-input-blue") }}
+        </label>
+
+        <label>
+          <span>Select an option:</span>
+          {{ template_clause.option(class="form-input-full form-input-blue") }}
+        </label>
+
+        <label class="flex-grow">
+          <span>Enter text here:</span>
+          {{ template_clause.value(class="form-input-full form-input-blue") }}
+        </label>
+
+        <div class="no-label">
+          <a href="#" class="white-button flex-row js-remove-clause">
+            <span class="icon icon-remove"></span> Remove
+          </a>
+        </div>
+      </div>
+    </template>
+  </div>
+{% endblock %}

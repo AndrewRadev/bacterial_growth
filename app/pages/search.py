@@ -36,20 +36,16 @@ def search_index_page():
 
     studies = search.fetch_results()
 
+    render_params = dict(
+        search=search,
+        studies=studies,
+        offset=0,
+    )
+
     if is_ajax(request):
-        return render_template(
-            "pages/search/_new_index_update.html",
-            search=search,
-            studies=studies,
-            offset=0,
-        )
+        return render_template("pages/search/_index_update.html", **render_params)
     else:
-        return render_template(
-            "pages/search/new_index.html",
-            search=search,
-            studies=studies,
-            offset=0,
-        )
+        return render_template("pages/search/index.html", **render_params)
 
 
 def advanced_search_index_page():
@@ -98,17 +94,9 @@ def advanced_search_index_page():
             .order_by(Study.createdAt.desc())
         ).all()
 
-    if results:
-        return render_template(
-            "pages/search/index.html",
-            form=form,
-            template_clause=template_clause,
-            results=results,
-        )
-    else:
-        return render_template(
-            "pages/search/index.html",
-            form=form,
-            template_clause=template_clause,
-            error="Couldn't find a study with these parameters.",
-        )
+    return render_template(
+        "pages/search/advanced.html",
+        form=form,
+        template_clause=template_clause,
+        results=results,
+    )
