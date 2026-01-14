@@ -23,7 +23,7 @@ from app.model.lib.util import is_ajax
 _PER_PAGE = 5
 
 
-def new_search_index_page():
+def search_index_page():
     search = StudySearch(
         g.db_session,
         user=g.current_user,
@@ -52,7 +52,7 @@ def new_search_index_page():
         )
 
 
-def search_index_page():
+def advanced_search_index_page():
     form = SearchForm(request.args)
 
     template_clause = SearchFormClause()
