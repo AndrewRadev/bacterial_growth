@@ -76,7 +76,7 @@
           <ol class="results-list">
             {{ render_results_list(results, offset) }}
           </ol>
-        {% else: %}
+        {% elif search_submitted: %}
           <p>
             <div class="error-message">Couldn't find a study with these parameters.</div>
           </p>

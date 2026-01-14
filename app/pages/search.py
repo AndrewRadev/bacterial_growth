@@ -51,51 +51,43 @@ def search_index_page():
 def advanced_search_index_page():
     form = SearchForm(request.args)
 
-    template_clause = SearchFormClause()
-    results = []
-
-    if g.current_user and g.current_user.isAdmin:
-        # Noop, show everything
-        publish_clause = Study.publicId.isnot(None)
-    elif g.current_user:
-        publish_clause = sql.or_(
-            Study.isPublished,
-            StudyUser.userUniqueID == g.current_user.uuid
-        )
-    else:
-        publish_clause = Study.isPublished
+    template_clause  = SearchFormClause()
+    search_submitted = False
+    study_ids        = []
+    results          = []
 
     if form.data['clauses'] and form.data['clauses'][0]['value']:
-        if not form.data['clauses'][0]['option']:
-            form.data
+        search_submitted = True
+
+        if g.current_user and g.current_user.isAdmin:
+            # Noop, show everything
+            publish_clause = Study.publicId.isnot(None)
+        elif g.current_user:
+            publish_clause = sql.or_(
+                Study.isPublished,
+                StudyUser.userUniqueID == g.current_user.uuid
+            )
+        else:
+            publish_clause = Study.isPublished
 
         query, values = dynamical_query(form.data['clauses'])
         value_dict = {f"value_{i}": v for i, v in enumerate(values)}
-        studyIds = [
+        study_ids = [
             studyId for (studyId,)
             in g.db_conn.execute(sql.text(query), value_dict)
         ]
-    else:
-        # TODO (2025-04-15) Extract, test with multiple users
-        studyIds = g.db_session.scalars(
-            sql.select(Study.publicId)
-            .join(StudyUser, isouter=True)
-            .where(publish_clause)
-            .group_by(Study)
-            .limit(_PER_PAGE)
-        ).all()
 
-    if studyIds:
         results = g.db_session.scalars(
             sql.select(Study)
             .distinct()
-            .where(Study.publicId.in_(studyIds))
+            .where(Study.publicId.in_(study_ids))
             .where(publish_clause)
             .order_by(Study.createdAt.desc())
         ).all()
 
     return render_template(
         "pages/search/advanced.html",
+        search_submitted=search_submitted,
         form=form,
         template_clause=template_clause,
         results=results,
