@@ -11,6 +11,8 @@ This data is "raw", in the sense that it's preserved in the format that it was u
 
 The data is uploaded as an excel spreadsheet, but its individual sheets are extracted into CSV files for the purpose of this bulk export. This is done for the sake of effective compression. As with the metadata, it reflects the structure that was requested at the time it was uploaded.
 
+If using the site for meta-studies, be warned that the same experimental data may be uploaded to multiple different studies, if it's used for different scientific purposes. For instance, growth experiments of a particular microbial community may be shared in one study as targets of a particular modeling approach, and in another study as a control for perturbation experiments. Be sure to examine the study descriptions to understand the connections between them.
+
 ## Export of a single study
 
 <img

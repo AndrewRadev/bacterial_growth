@@ -1,5 +1,9 @@
 To upload a study, first you need to log in using an {{ "https://orcid.org/"|external_link("ORCID") }}. After that, you can follow the step-by-step process in the "Upload data" section of the navigation sidebar.
 
+A "study" in μGrowthDB could contain the data of a publication, either a paper or a pre-print, but it could also be unpublished data that is currently being worked on. Upon finishing the upload process, the study will receive a stable identifier of the form "SMGDBxxx..." that you can share in your publications.
+
+You are free to upload the same experimental data in multiple different studies, if it's used for a different purpose. For instance, growth experiments of a particular microbial community may be shared in one study as targets of a particular modeling approach, and in another study as a control for perturbation experiments. You may consider grouping said studies under the same "project".
+
 ## Form components
 
 Many of the forms in the upload process use similar components, some of which are illustrated in the figure below:
@@ -47,6 +51,8 @@ Each of the two dropdowns can either be "New project"/"New study" or it can be a
 Depending on whether you pick existing uploads or new ones, the submission process will result in updating a new version of a study, adding a new study to an existing project, or starting a new project and study. The first two cases also allow you to change the textual descriptions or add a publication link if it is available.
 
 The bottom dropdown allows you to copy a previous study's design for the following steps. This is only useful if you're creating a new study, but you'd like to avoid entering some of the details. In this particular example, we have an existing "Controls" study that contains some of the vessels in the larger project and we are adding a "Perturbations" study with another set of vessels. Many parts of the experimental design will be the same, so we can reuse the previous upload.
+
+In the description of the study, you can refer to an existing study, project, or experiment, by writing down its public identifier, e.g. "PMGDB000001", "SMGDB00000011", or "EMGDB000000051". This will be turned into a link to that entity on the site. In case the study is connected to a different one or if some of its data is reused elsewhere, you are encouraged to add that link to the description.
 
 <h2 id="step-2">Step 2: Microbial strains</h2>
 

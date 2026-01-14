@@ -24,7 +24,7 @@
       </p>
 
       {% if experiment.description: %}
-        <p>{{ experiment.description }}</p>
+        {{ experiment.description|format_text }}
       {% endif %}
 
       <br>
