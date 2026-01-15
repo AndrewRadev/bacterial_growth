@@ -1,3 +1,26 @@
+## Phases of growth
+
+<div class="image-container" style="width: 50%; float: right; margin-left: 20px; margin-top: 20px;">
+    <img
+        class="no-border"
+        src="/static/images/help/microbial-growth-experiments/growth_phases.svg"
+        title="Phases of growth" />
+</div>
+
+The starting point of a growth experiment in the lab is the inoculation of a cell culture in a chosen medium. Cells use nutrients from this medium to grow and replicate. The first phase of growth is known as the **lag phase** (1). [Baranyi et al](https://doi.org/10.1006/fmic.1993.1005) describe this period as a time of adaptation of the cell culture to the new environment it finds itself in. For instance, new enzymes need to be synthesized to activate metabolic pathways that can take full advantage of the environment. Each cell expends some energy shifting its metabolism before it starts to replicate.
+
+As the cells accumulate biomass, they divide, so we expect to see them double their number after a certain period of time. As each one replicates again and again, their number will grow exponentially. The mean number of doublings per cell per unit of time is their **specific growth rate**. In the **exponential phase** (2), the cell culture has reached its maximum specific growth rate for this medium. This is the number of replications that each cell is capable of in this environment per unit of time.
+
+This second phase is also referred to as a "log phase" for "logarithm", since log-transforming the growth data shows a linear increase in the logarithm of the population, driven by the constant growth rate. According to [Ghenu et al](https://doi.org/10.3389/fevo.2023.1313500), the maximum growth rate is the trait that has the greatest impact when cells need to compete for resources, making it a good proxy for fitness. Researchers looking to, for example, develop novel antibiotics or to investigate the impact of mutations are likely to rely on this value.
+
+In the **stationary phase** (3), the rate of cell division slows down and becomes equal to the cell death rate. As a result, the total population is maintained constant. The decrease in net growth is inevitable given the physical limits of the containing vessel, but it can also be triggered by nutrient depletion or an accumulation of waste products. It is also possible that cell cultures detect crowding and slow down their own growth before starvation kicks in. Within microbial multi-species communities, competition may also play a factor.
+
+In the **death phase** (4), the cell death rate overtakes the growth rate and cell abundances show a gradual decline. Some microorganisms might transition into a more resilient state, arresting growth and maintaining a minimal population. This kind of long-term stationary phase may continue for months to years, depending on the organism.
+
+None of these phases are guaranteed to be present in any given experiment, and they do not necessarily transition cleanly into one another. The exponential phase may continue indefinitely in a continuous-growth culture. The lag phase may be missing if cells are inoculated from one medium to a comparable one. The stationary phase may be undetectable if conditions change quickly enough that cells move from exponential growth almost directly to a dying state.
+
+In addition to that, a cell culture may be capable of metabolizing multiple kinds of nutrients with a hierarchy of preferences for them. For example, if our medium is abundant in two different sources of carbon, organisms may prefer to utilize one of them until depletion before switching to the other. This leads to another lag phase of adaptation, followed by another exponential phase, driven by the new limiting factor, a pattern described as "diauxic growth". Applying perturbations to a running experiment, like changing temperature, community composition, or modifying the medium, might also cause a non-canonical pattern of growth.
+
 ## Factors Affecting Growth
 
 Microbial growth is only possible when all essential nutrients are provided and chemical and environmental conditions are met. Yet, there is a range of conditions that a species can live in. Therefore, their growth will be influenced by these factors. For instance, the temperature, pH, and oxygen level are some of the environmental factors that will affect their growth. On the other hand, the presence and availability of certain nutrients like carbon, nitrogen, and sulfur, will also influence their growth, as well as the competition for nutrients with other microorganisms if present.
