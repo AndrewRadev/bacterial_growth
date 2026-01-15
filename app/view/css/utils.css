@@ -74,9 +74,12 @@
 
 .small {
   font-size: 14px;
-  p {
-    margin-top: 0;
-  }
+  p { margin-top: 0; }
+}
+
+.smaller {
+  font-size: 12px;
+  p { margin-top: 0; }
 }
 
 button {
