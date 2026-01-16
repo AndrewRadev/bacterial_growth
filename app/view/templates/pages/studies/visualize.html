@@ -12,10 +12,12 @@
       <h1 class="flex-row flex-gap-10">
         {{ study.name }}
 
-        <span
-            class="icon icon-invisible"
-            data-tooltip="This study is not published yet. You're seeing this page because you uploaded it, you have permission to manage it, or you're an admin.">
-        </span>
+        {% if not study.isPublished: %}
+          <span
+              class="icon icon-invisible"
+              data-tooltip="This study is not published yet. You're seeing this page because you uploaded it, you have permission to manage it, or you're an admin.">
+          </span>
+        {% endif %}
       </h1>
 
       {% include 'pages/studies/_navigation_buttons.html' %}

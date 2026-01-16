@@ -109,6 +109,30 @@ CREATE TABLE Compartments (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `CustomModels`
+--
+
+DROP TABLE IF EXISTS CustomModels;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE CustomModels (
+  id int NOT NULL AUTO_INCREMENT,
+  studyId varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text,
+  createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updatedAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  shortName varchar(5) DEFAULT NULL,
+  coefficientNames json DEFAULT (json_array()),
+  fitNames json DEFAULT (json_array()),
+  PRIMARY KEY (id),
+  KEY CustomModels_studyId (studyId),
+  CONSTRAINT CustomModels_studyId FOREIGN KEY (studyId) REFERENCES Studies (publicId) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `ExcelFiles`
 --
 
@@ -316,7 +340,7 @@ DROP TABLE IF EXISTS ModelingResults;
 CREATE TABLE ModelingResults (
   id int NOT NULL AUTO_INCREMENT,
   `type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
-  requestId int NOT NULL,
+  requestId int DEFAULT NULL,
   state varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `error` text,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -325,9 +349,16 @@ CREATE TABLE ModelingResults (
   measurementContextId int NOT NULL,
   rSummary text,
   params json DEFAULT (json_object()),
+  xValues json DEFAULT (json_array()),
+  yValues json DEFAULT (json_array()),
+  yErrors json DEFAULT (json_array()),
+  customModelId int DEFAULT NULL,
+  publishedAt datetime DEFAULT NULL,
   PRIMARY KEY (id),
   KEY Calculations_calculationTechniqueId (requestId),
-  CONSTRAINT Calculations_calculationTechniqueId FOREIGN KEY (requestId) REFERENCES ModelingRequests (id) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY ModelingResults_customModelId (customModelId),
+  CONSTRAINT Calculations_calculationTechniqueId FOREIGN KEY (requestId) REFERENCES ModelingRequests (id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT ModelingResults_customModelId FOREIGN KEY (customModelId) REFERENCES CustomModels (id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -673,5 +704,11 @@ INSERT INTO MigrationVersions VALUES
 (77,'2025_11_19_173702_add_include_unknown_flag_to_study_techniques','2025-11-20 14:00:51'),
 (79,'2025_11_26_151231_rename_ncbi_id_in_study_strains','2025-11-26 14:13:39'),
 (81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20'),
-(83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13');
+(83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13'),
+(85,'2025_12_08_172450_remove_modeling_request_id_constraint','2025-12-08 16:26:02'),
+(101,'2025_12_14_121007_create_custom_models','2025-12-15 15:15:04'),
+(102,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-15 15:15:04'),
+(103,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-15 15:15:04'),
+(105,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 14:35:08'),
+(107,'2026_01_05_113846_add-params-to-custom-models','2026-01-05 09:41:49');
 

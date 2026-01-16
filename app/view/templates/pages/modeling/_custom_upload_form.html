@@ -1,0 +1,105 @@
+{% macro render_custom_upload_form(study, custom_model, modeling_result=None) %}
+
+  {% set form_url = url_for(
+    'modeling_custom_model_upload_action',
+    publicId=study.publicId,
+    customModelId=custom_model.id
+  )  %}
+
+  <form
+      data-custom-model-id="{{ custom_model.id }}"
+      enctype="multipart/form-data"
+      action="{{ form_url }}"
+      method="POST"
+      class="simple-form hidden">
+    <h3>Upload {{ custom_model.name }} predictions</h3>
+
+    <input type="hidden" name="selectedMeasurementContextId" />
+
+    <div>
+      Model predictions for:
+      <span class="js-measurement-label"></span>
+    </div>
+
+    <div class="form-row">
+      <div class="flex-1 js-upload-container">
+        <div class="upload-container js-file-upload">
+          <div class="flex-row flex-gap-10">
+            <img
+                src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
+                height="40"
+                title="Upload" />
+            <div class="instructions">
+              <span class="required">Drag and drop data CSV</span>
+              <span class="hint">Limit 200MB per file</span>
+            </div>
+          </div>
+
+          <input
+              required
+              class="small"
+              name="predictions"
+              accept=".csv"
+              type="file" />
+        </div>
+      </div>
+      <div class="help small flex-2">
+        Provide the predictions of your model that are fitted to the selected
+        measurements. The data should be a CSV with columns:
+
+        <ul>
+          <li>"<strong>time</strong>" in hours</li>
+          <li>"<strong>value</strong>" in <span class="js-units-label"></span></li>
+          <li>"<strong>error</strong>" (optional)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="flex-row flex-gap-6 columns">
+      {% if custom_model.coefficientNames: %}
+        <div class="flex-column flex-1">
+          <h4>Coefficients:</h4>
+
+          {% for info in custom_model.coefficientInfo:  %}
+            <div class="form-row">
+              <label class="flex-1">
+                <span>{{ info['name'] }}</span>
+                <input
+                    name="coefficients[{{ info['name'] }}]"
+                    type="number"
+                    step="any"
+                    value="{{ modeling_result and modeling_result.params['coefficients'][info['name']] }}"
+                    class="form-input-full form-input-blue" />
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      {% if custom_model.fitNames: %}
+        <div class="flex-column flex-1">
+          <h4>Quality of fit:</h4>
+
+          {% for info in custom_model.fitInfo: %}
+            <div class="form-row">
+              <label class="flex-1">
+                <span>{{ info['name'] }}</span>
+                <input
+                    name="fit[{{ info['name'] }}]"
+                    type="number"
+                    step="any"
+                    value="{{ modeling_result and modeling_result.params['fit'][info['name']] }}"
+                    class="form-input-full form-input-blue" />
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="form-row">
+      <input type="submit" class="flex-right" value="Submit" />
+    </div>
+  </form>
+
+{% endmacro %}

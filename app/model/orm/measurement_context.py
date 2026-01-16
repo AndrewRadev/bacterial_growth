@@ -67,6 +67,10 @@ class MeasurementContext(OrmBase):
         ('bioreplicate', 'strain', 'metabolite'),
     ), deferred=True)
 
+    @property
+    def publishedModelingResults(self):
+        return [mr for mr in self.modelingResults if mr.isPublished]
+
     def get_df(self, db_session):
         from app.model.orm import Measurement
 
@@ -86,7 +90,7 @@ class MeasurementContext(OrmBase):
 
         return execute_into_df(db_session, query)
 
-    def get_chart_label(self):
+    def get_chart_label(self, model_name=None):
         from markupsafe import Markup, escape
 
         technique    = self.technique
@@ -100,6 +104,9 @@ class MeasurementContext(OrmBase):
                 label_parts.append(f"<b>({escape(self.technique.studyTechnique.label)})</b>")
         else:
             label_parts = [escape(technique.short_name)]
+
+        if model_name:
+            label_parts.append(f"({escape(model_name)} fit)")
 
         bioreplicate_label = f"<b>{escape(bioreplicate.name)}</b>"
 

@@ -1,3 +1,4 @@
+{% from 'pages/experiments/_bioreplicates_list.html' import render_bioreplicates_list %}
 {% from 'pages/experiments/_bioreplicates_toc.html' import render_bioreplicates_toc %}
 {% from 'pages/perturbations/_perturbation.html' import render_perturbation %}
 {% from 'utils/_strain_link.html' import render_strain_link %}
@@ -74,68 +75,7 @@
           <div class="bioreplicates full">
             <h2>Biological replicates</h2>
 
-            <ol class="bioreplicates-list">
-              {% for bioreplicate in experiment.bioreplicates %}
-                {% set measurement_context_ids = bioreplicate.measurementContexts|map(attribute="id") %}
-
-                <li>
-                  <h4 id="bioreplicate-{{ bioreplicate.id }}">{{ bioreplicate.name }}</h4>
-
-                  <span class="js-compare-container" data-context-ids="{{ measurement_context_ids|join(',') }}">
-                    <span class="js-compare" data-tooltip="Compare">
-                      <a href="#" class="white-button no-border small-button">↔</a>
-                    </span>
-
-                    <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
-                      👆
-                      <a href="#" class="white-button no-border small-button">➖</a>
-                    </span>
-                  </span>
-
-                  <a
-                      href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context_ids|join(',')) }}"
-                      class="white-button no-border small-button"
-                      data-tooltip="Visualize">
-                    📈
-                  </a>
-
-                  <br>
-
-                  <strong>Measurements</strong>:
-
-                  <ul class="measurement-techniques">
-                    {% for measurement_context in bioreplicate.measurementContexts: %}
-                      <li class="measurement-context-container">
-                        {% set measurements = measurement_context.measurements %}
-                        {% set technique = measurement_context.technique %}
-
-                        <div class="js-table-row">
-                          <span class="js-compare-container" data-context-ids="{{ measurement_context.id }}">
-                            <span class="js-compare" data-tooltip="Compare">
-                              <a href="#" class="white-button no-border small-button">↔</a>
-                            </span>
-
-                            <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
-                              👆
-                              <a href="#" class="white-button no-border small-button">➖</a>
-                            </span>
-                          </span>
-
-                          <a
-                              href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context.id) }}"
-                              class="white-button no-border small-button"
-                              data-tooltip="Visualize">
-                            📈
-                          </a>
-
-                          {{ measurement_context.get_chart_label() }}
-                        </div>
-                      </li>
-                    {% endfor %}
-                  </ul>
-                </li>
-              {% endfor %}
-            </ol>
+            {{ render_bioreplicates_list(experiment) }}
           </div>
 
           <div class="toc-container">

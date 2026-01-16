@@ -1,10 +1,16 @@
 {% macro render_chart_form(form, study) %}
+
+  {% set selectedExperimentId = request.args.get('selectedExperimentId', '') %}
+  {% set selectedTechniqueId  = request.args.get('selectedTechniqueId',  '0')|int %}
+
   <div class="form-row">
     <label>
       <span>Experiment:</span>
       <select name="experimentId" class="form-input-blue full">
         {% for experiment in study.experiments: %}
-          <option value="{{ experiment.publicId }}">
+          <option
+              {{ "selected" if experiment.publicId == selectedExperimentId }}
+              value="{{ experiment.publicId }}">
             {{- experiment.name }}: {{ experiment.description|truncate(80) -}}
           </option>
         {% endfor %}
@@ -20,12 +26,6 @@
     </div>
   {% endfor %}
 
-  <div class="form-row margin-top-10 small">
-    <a href="#" class="white-button small-button flex-right js-clear-chart">
-      🧹 Clear chart
-    </a>
-  </div>
-
   <div class="form-row margin-top-10">
     <label class="full">
       <span>Measurement technique:</span>
@@ -34,15 +34,21 @@
           {% if study_technique.measurementTechniques|length > 1: %}
             <optgroup label="{{- study_technique.long_name_with_subject_type -}}">
               {% for measurement_technique in study_technique.measurementTechniques: %}
-                <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-                {{- measurement_technique.short_name -}}
+                <option
+                    {{ "selected" if measurement_technique.id == selectedTechniqueId }}
+                    value="{{ measurement_technique.id }}"
+                    data-subject-type="{{ measurement_technique.subjectType }}">
+                  {{- measurement_technique.short_name -}}
                 </option>
               {% endfor %}
             </optgroup>
           {% else: %}
             {% set measurement_technique = study_technique.measurementTechniques[0] %}
-            <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-            {{- measurement_technique.long_name_with_subject_type -}}
+            <option
+                {{ "selected" if measurement_technique.id == selectedTechniqueId }}
+                value="{{ measurement_technique.id }}"
+                data-subject-type="{{ measurement_technique.subjectType }}">
+              {{- measurement_technique.long_name_with_subject_type -}}
             </option>
           {% endif %}
         {% endfor %}
@@ -114,6 +120,31 @@
                   {% endif %}
                 </label>
               </div>
+
+              {% for modeling_result in measurement_context.publishedModelingResults: %}
+                {% set key = "modelingResult|{}".format(modeling_result.id) %}
+
+                <div
+                    class="form-row small model-row hidden js-technique-row"
+                    data-technique-id="{{ measurement_context.techniqueId }}">
+                  <span class="icon icon-arrow-down-right"></span>
+                  <input
+                      type="checkbox"
+                      name="{{ key }}"
+                      id="{{ key }}"
+                      {{ "checked" if modeling_result.id in form.modeling_result_ids }}
+                      {{ "data-axis-left" if modeling_result.id in form.left_axis_model_ids }}
+                      {{ "data-axis-right" if modeling_result.id in form.right_axis_model_ids }}
+                      class="js-measurement-toggle" />
+                  <label for="{{ key }}">
+                    {{ modeling_result.model_name }}
+
+                    {% if modeling_result.short_model_name: %}
+                      ({{ modeling_result.short_model_name }})
+                    {% endif %}
+                  </label>
+                </div>
+              {% endfor %}
             {% endfor %}
           {% endfor %}
         {% endfor %}
@@ -121,4 +152,11 @@
       </div>
     </div>
   {% endfor %}
+
+  <div class="form-row margin-top-10 small">
+    <a href="#" class="white-button small-button flex-right js-clear-chart">
+      🧹 Clear chart
+    </a>
+  </div>
+
 {% endmacro %}

@@ -19,6 +19,7 @@ def init_template_filters(app):
     """
     app.template_filter('flatten')(lists.flatten)
     app.template_filter('join_tag')(lists.join_tag)
+    app.template_filter('stable_groupby')(lists.stable_groupby)
     app.template_filter('relative_time')(time.relative_time)
     app.template_filter('relative_date')(time.relative_date)
     app.template_filter('map_scientific')(numbers.map_scientific)

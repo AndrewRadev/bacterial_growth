@@ -7,18 +7,10 @@ from tests.database_test import DatabaseTest
 
 
 class TestModelingTasks(DatabaseTest):
-    def test_modeling_request_status_change(self):
-        modeling_request = self.create_modeling_request(state='error')
-
-        _process_modeling_request(self.db_session, modeling_request.id, [])
-        self.assertEqual(modeling_request.state, 'ready')
-
     def test_baranyi_roberts_calculation(self):
         strain              = self.create_study_strain()
         measurement_context = self.create_measurement_context(subjectId=strain.id, subjectType='strain')
-        modeling_request    = self.create_modeling_request()
-
-        modeling_request.create_results(self.db_session, [measurement_context.id])
+        modeling_result     = self.create_modeling_result(type='baranyi_roberts', measurementContextId=measurement_context.id)
 
         data = [
             (0.0,   2146.0),
@@ -46,11 +38,7 @@ class TestModelingTasks(DatabaseTest):
                 value=value,
             )
 
-        _process_modeling_request(self.db_session, modeling_request.id, [measurement_context.id])
-
-        self.assertEqual(len(modeling_request.results), 1)
-
-        modeling_result = modeling_request.results[0]
+        modeling_result = _process_modeling_request(self.db_session, modeling_result.id, measurement_context.id)
 
         self.assertEqual(len(modeling_result.params['coefficients']), 4)
         self.assertEqual(set(modeling_result.params['coefficients'].keys()), {'y0', 'h0', 'K', 'mumax'})

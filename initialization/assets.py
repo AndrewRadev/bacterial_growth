@@ -1,3 +1,4 @@
+from pathlib import Path
 import flask_assets
 
 
@@ -30,6 +31,7 @@ def init_assets(app):
         '../app/view/js/lib/page.js',
         '../app/view/js/lib/tooltips.js',
         '../app/view/js/lib/compare_buttons.js',
+        '../app/view/js/lib/custom_file_input.js',
         # Pages:
         '../app/view/js/upload/step1.js',
         '../app/view/js/upload/step2.js',
@@ -42,7 +44,7 @@ def init_assets(app):
         '../app/view/js/export.js',
         '../app/view/js/study.js',
         '../app/view/js/study_visualize.js',
-        '../app/view/js/study_manage.js',
+        '../app/view/js/modeling.js',
         '../app/view/js/experiment.js',
         '../app/view/js/comparison.js',
         '../app/view/js/help.js',
@@ -51,31 +53,16 @@ def init_assets(app):
     ))
 
     assets.register('plotly_js', flask_assets.Bundle(
-        '../app/view/js/vendor/plotly-2.34.0.min.js',
+        '../app/view/js/vendor/plotly-basic-3.3.1.js',
         output='build/plotly.js'
     ))
+
+    app_css_files = [f"../app/view/css/{p.name}" for p in Path('app/view/css').glob('*.css')]
 
     assets.register('app_css', flask_assets.Bundle(
         '../app/view/css/vendor/select2-4.0.13.css',
         '../app/view/css/vendor/tippy-fix.css',
-        '../app/view/css/select2-custom.css',
-        '../app/view/css/reset.css',
-        '../app/view/css/utils.css',
-        '../app/view/css/fonts.css',
-        '../app/view/css/main.css',
-        '../app/view/css/sidebar.css',
-        '../app/view/css/home.css',
-        '../app/view/css/search.css',
-        '../app/view/css/upload.css',
-        '../app/view/css/export.css',
-        '../app/view/css/login.css',
-        '../app/view/css/profile.css',
-        '../app/view/css/study.css',
-        '../app/view/css/study-visualize.css',
-        '../app/view/css/study-manage.css',
-        '../app/view/css/experiment.css',
-        '../app/view/css/comparison.css',
-        '../app/view/css/help.css',
+        *app_css_files,
         filters='cssmin',
         output='build/app.css'
     ))

@@ -98,10 +98,11 @@ Page('.study-visualize-page', function($page) {
     let $experiment = $form.find(`.js-experiment-container[data-experiment-id="${selectedExperimentId}"]`);
     $experiment.removeClass('hidden');
 
-    let selectedTechniqueId = $form.
-      find('select[name="techniqueId"]').val();
-    let selectedTechniqueSubjectType = $form.
-      find('select[name="techniqueId"] option:selected').data('subjectType');
+    let selectedOption = $form.
+      find('select[name="techniqueId"] option:selected');
+
+    let selectedTechniqueId          = selectedOption.val();
+    let selectedTechniqueSubjectType = selectedOption.data('subjectType');
 
     $experiment.
       find(`.js-technique-row[data-technique-id="${selectedTechniqueId}"]`).
@@ -139,8 +140,8 @@ Page('.study-visualize-page', function($page) {
         let compareData = JSON.parse(response);
 
         let countText;
-        if (compareData.contextCount > 0) {
-          countText = `(${compareData.contextCount})`;
+        if (compareData.contextCount > 0 || compareData.modelCount > 0) {
+          countText = `(${compareData.contextCount + compareData.modelCount})`;
         } else {
           countText = '';
         }

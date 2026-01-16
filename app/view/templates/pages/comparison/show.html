@@ -32,15 +32,17 @@
       {% endif %}
 
       <form class="js-chart-form">
-        {% for (study, measurement_contexts) in measurement_contexts_by_study.items(): %}
+        {% for (study, records) in records_by_study.items(): %}
+          {% set measurement_contexts = records['measurement_contexts'] %}
+          {% set modeling_results     = records['modeling_results'] %}
+
           <h4>
             [<a href="{{ url_for('study_show_page', publicId=study.publicId) }}">{{ study.publicId }}</a>]
             {{ study.name }}
           </h4>
 
           {% for measurement_context in measurement_contexts: %}
-            {% set subjectType = measurement_context.subjectType %}
-            {% set experiment  = measurement_context.bioreplicate.experiment %}
+            {% set experiment = measurement_context.bioreplicate.experiment %}
 
             {% set key = "measurementContext|{}".format(measurement_context.id) %}
 
@@ -59,6 +61,31 @@
                   class="js-measurement-toggle" />
               <label for="{{ key }}">
                 {{ experiment.name }}: {{ measurement_context.get_chart_label() }}
+              </label>
+            </div>
+          {% endfor %}
+
+          {% for modeling_result in modeling_results: %}
+            {% set measurement_context = modeling_result.measurementContext %}
+            {% set experiment          = measurement_context.bioreplicate.experiment %}
+
+            {% set key = "modelingResult|{}".format(modeling_result.id) %}
+
+            <div
+                class="form-row js-technique-row"
+                data-technique-id="{{ measurement_context.techniqueId }}"
+                data-bioreplicate-id="{{ measurement_context.bioreplicateId }}"
+                data-compartment-id="{{ measurement_context.compartmentId }}">
+              <input
+                  type="checkbox"
+                  name="{{ key }}"
+                  id="{{ key }}"
+                  {{ "checked" if modeling_result.id in chart_form.modeling_result_ids }}
+                  {{ "data-axis-left" if modeling_result.id in chart_form.left_axis_model_ids }}
+                  {{ "data-axis-right" if modeling_result.id in chart_form.right_axis_model_ids }}
+                  class="js-measurement-toggle" />
+              <label for="{{ key }}">
+                {{ experiment.name }}: {{ modeling_result.get_chart_label() }}
               </label>
             </div>
           {% endfor %}

@@ -2,7 +2,7 @@
 __pycache__
 
 # Ignore route dump used for tooling purposes and other Vim stuff:
-.routes.json
+.flask_tools.json
 .projections.json
 _project.vim
 

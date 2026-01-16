@@ -10,8 +10,18 @@ Page('.comparison-page', function($page) {
     // the left or right:
     $form.find('.js-contexts-list .js-row').each(function() {
       let $chartRow = $(this);
+
       let contextId = $chartRow.data('contextId');
-      let $formRow = $form.find(`input[name="measurementContext|${contextId}"]`);
+      let modelId = $chartRow.data('modelId');
+      let $formRow;
+
+      if (contextId) {
+        $formRow = $form.find(`input[name="measurementContext|${contextId}"]`);
+      } else if (modelId) {
+        $formRow = $form.find(`input[name="measurementContext|${modelId}"]`);
+      } else {
+        console.error("Missing context or model id");
+      }
 
       if (($formRow).is('[data-axis-right]')) {
         $chartRow.find('.js-axis-left').prop('checked', false);

@@ -1,0 +1,144 @@
+.study-modeling-page {
+  h4 {
+    margin-top: 0;
+  }
+
+  .experiment-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-bottom: 10px;
+  }
+
+  .model-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--border-radius);
+
+    input[type="radio"] {
+      margin: 0;
+    }
+    label {
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
+  }
+
+  .publish-box {
+    border-color: darksalmon;
+    &.is-published {
+      border-color: seagreen;
+    }
+
+    .message {
+      height: 28px;
+      line-height: 28px;
+    }
+
+    .icon {
+      vertical-align: middle;
+    }
+
+  }
+
+  .r-summary pre {
+    padding: 10px;
+    background-color: #eee;
+  }
+
+  .form-input-blue {
+    padding: 0.5rem !important;
+  }
+
+  .modeling-form {
+    margin-top: 20px;
+
+    .columns {
+      display: flex;
+      flex-direction: row;
+      column-gap: 10px;
+
+      .controls-column {
+        width: 30%;
+      }
+
+      .chart-column {
+        width: 70%;
+        overflow-x: hidden;
+        align-self: flex-start;
+        min-height: 300px;
+      }
+
+      .chart {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    }
+
+    .experiment {
+      display: flex;
+      flex-direction: column;
+      row-gap: 6px;
+    }
+
+    .highlight {
+      background-color: var(--light-blue);
+    }
+
+    .modeling-fields {
+      display: flex;
+      flex-direction: column;
+      row-gap: 10px;
+      border-top: 2px solid lightgray;
+      padding-top: 10px;
+    }
+  }
+
+  .measurement-subjects {
+    .box {
+      padding-left: 0;
+      padding-right: 0;
+
+      > .flex-row {
+        padding: 3px 10px;
+      }
+    }
+  }
+
+  .upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    background-color: var(--light-blue);
+    border-radius: var(--border-radius);
+    padding: 8px;
+    border: 2px solid var(--light-blue);
+
+    &.drop-hover {
+      border: 2px dashed var(--border-color);
+    }
+
+    img {
+      align-self: center;
+    }
+
+    .instructions {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hint {
+      opacity: 0.6;
+      font-size: 14px;
+    }
+
+    .upload-button {
+      cursor: pointer;
+      align-self: flex-start;
+    }
+  }
+}

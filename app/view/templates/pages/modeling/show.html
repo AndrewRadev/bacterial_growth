@@ -1,0 +1,80 @@
+{% from 'utils/_post_button.html' import post_button %}
+{% from 'pages/modeling/_experiment_form.html' import render_experiment_form %}
+{% from 'pages/modeling/_custom_model_form.html' import render_custom_model_form %}
+{% from 'pages/modeling/_custom_upload_form.html' import render_custom_upload_form %}
+
+{% extends '_layout.html' %}
+
+{% block title %}: Models for study {{ study.publicId }}{% endblock %}
+
+{% block content %}
+  <div class="container study-page study-modeling-page" data-study-id="{{ study.publicId }}">
+    {% include 'pages/studies/_header.html' %}
+
+    <article>
+      <h1>{{ study.name }}</h1>
+
+      {% include 'pages/studies/_navigation_buttons.html' %}
+
+      <div class="flex-row flex-gap-10">
+        <p class="help">
+          Select a type of model to fit on the study's measurements. The results
+          will be available for visualization once the calculation is finished.
+          {{ "data-analysis"|help_link("Read more") }}.
+        </p>
+
+        <div class="flex-row">
+          {{ post_button(
+            "Download model parameters",
+            url_for('modeling_params_csv', publicId=study.publicId),
+            class="flex-right flex-end"
+          ) }}
+        </div>
+      </div>
+
+      <form
+          action="{{ url_for('modeling_submit_action', publicId=study.publicId) }}"
+          class="simple-form modeling-form js-modeling-form">
+        <div class="columns">
+          <div class="controls-column">
+            {{ render_experiment_form(study) }}
+          </div>
+
+          <div class="chart-column">
+            <div class="chart js-chart">
+              <div class="chart-placeholder box chart-container">
+                📊
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="box margin-top-10 hidden js-custom-model-form">
+        {% for custom_model in study.customModels: %}
+          {{ render_custom_model_form(study, model_param_info, custom_model) }}
+        {% endfor %}
+
+        {{ render_custom_model_form(study, model_param_info, custom_model=None) }}
+      </div>
+
+      {% with messages = get_flashed_messages(category_filter=('upload_error')) %}
+        {% if messages %}
+          <div class="flashes">
+            <p class="flash-error">{{ messages[0] }}</p>
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="box margin-top-10 hidden js-custom-upload-form">
+        {% for custom_model in study.customModels: %}
+          {{ render_custom_upload_form(study, custom_model, modeling_result) }}
+        {% endfor %}
+      </div>
+    </article>
+  </div>
+
+  {% assets "plotly_js" %}
+  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
+  {% endassets %}
+{% endblock %}

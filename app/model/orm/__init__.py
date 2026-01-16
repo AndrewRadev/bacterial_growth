@@ -2,6 +2,7 @@ from .bioreplicate import Bioreplicate
 from .community import Community
 from .community_strain import CommunityStrain
 from .compartment import Compartment
+from .custom_model import CustomModel
 from .excel_file import ExcelFile
 from .experiment import Experiment
 from .experiment_compartment import ExperimentCompartment
@@ -9,7 +10,6 @@ from .measurement import Measurement
 from .measurement_context import MeasurementContext
 from .measurement_technique import MeasurementTechnique
 from .metabolite import Metabolite
-from .modeling_request import ModelingRequest
 from .modeling_result import ModelingResult
 from .perturbation import Perturbation
 from .project import Project

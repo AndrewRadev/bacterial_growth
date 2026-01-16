@@ -55,7 +55,7 @@ class TestSearch(unittest.TestCase):
                     SELECT
                         studyId as publicId,
                         Metabolites.name as name,
-                        chebiId
+                        Metabolites.chebiId
                     FROM StudyMetabolites
                     INNER JOIN Metabolites ON Metabolites.chebiId = StudyMetabolites.chebiId
                 ) as StudyMetabolites_Alias

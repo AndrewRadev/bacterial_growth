@@ -1,0 +1,178 @@
+{% macro render_custom_model_form(study, model_param_info, custom_model=None) %}
+  {% if custom_model: %}
+    <div class="preview js-preview" data-custom-model-id="{{ custom_model.id }}">
+      <button
+          type="button"
+          class="white-button small-button small float-right js-edit-model">
+        📝 Edit
+      </button>
+
+      <h3>
+        Model: {{ custom_model.name }}
+
+        {% if custom_model.shortName: %}
+          ({{ custom_model.shortName }})
+        {% endif %}
+      </h3>
+
+      <ul class="small">
+        {% if custom_model.url: %}
+          <li><strong>URL</strong>: {{ custom_model.url|external_link }}</li>
+        {% endif %}
+
+        {% if custom_model.description: %}
+          <li><strong>Description</strong>: {{ custom_model.description }}</li>
+        {% endif %}
+
+        {% if custom_model.coefficientNames: %}
+          <li><strong>Coefficients</strong>: {{ custom_model.coefficientNames|join(', ') }}</li>
+        {% endif %}
+
+        {% if custom_model.fitNames: %}
+          <li><strong>Quality-of-fit measurements</strong>: {{ custom_model.fitNames|join(', ') }}</li>
+        {% endif %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <form
+      data-custom-model-id="{{ custom_model.id or 'new' }}"
+      action="{{ url_for('modeling_custom_model_update_action', publicId=study.publicId) }}"
+      method="POST"
+      class="simple-form hidden">
+    <div class="form-row">
+      <h3>Describe custom model</h3>
+
+      <button
+          type="button"
+          class="white-button small-button small flex-right js-cancel-edit-model">
+        📝 Cancel edit
+      </button>
+    </div>
+
+    {% if custom_model: %}
+      <input type="hidden" name="customModelId" value="{{ custom_model.id }}" />
+    {% endif %}
+
+    <input type="hidden" name="selectedMeasurementContextId" />
+
+    <div class="form-row columns">
+      <div class="column flex-1">
+        <label class="full">
+          <span class="required">Model name</span>
+          <input
+              required
+              name="name"
+              type="text"
+              value="{{ custom_model.name or '' }}"
+              class="form-input-blue form-input-full"
+              placeholder="Full name of the model" />
+        </label>
+
+        <label class="full">
+          <span>Short name</span>
+          <input
+              maxlength=5
+              name="shortName"
+              type="text"
+              value="{{ custom_model.shortName or '' }}"
+              class="form-input-blue form-input-full"
+              placeholder="A short label for charts (max 5 characters)" />
+        </label>
+
+
+        <label
+            class="full"
+            data-tooltip="Where can people find more information about the modeling process?">
+          <span>Information URL</span>
+          <input
+              name="url"
+              type="url"
+              value="{{ custom_model.url or '' }}"
+              class="form-input-blue form-input-full"
+              placeholder="https://example.com" />
+        </label>
+      </div>
+
+      <div class="column flex-2">
+        <label class="full">
+          <span>Description</span>
+          <textarea
+              rows=3
+              name="description"
+              class="form-input-blue form-input-full"
+              placeholder="Provide a short description of your modeling methodology">
+            {{- custom_model.description or '' -}}
+          </textarea>
+        </label>
+      </div>
+    </div>
+
+    <div class="form-row columns">
+      <label class="full">
+        <span>Coefficients</span>
+        <select
+            multiple="multiple"
+            name="coefficientNames"
+            class="form-input-blue form-input-full js-coefficients-select">
+          {% for param_name, info in model_param_info.items(): %}
+            {% if info['name_html'] == param_name: %}
+              {% set prefix = '' %}
+            {% else: %}
+              {% set prefix = info['name_html']|safe + ': ' %}
+            {% endif %}
+
+            <option
+                {{ "selected" if param_name in custom_model.coefficientNames }}
+                data-description="{{ prefix }}{{ info['description_html'] }}">
+              {{ param_name }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="full">
+        <span>Measures of fit</span>
+        <select
+            multiple="multiple"
+            name="fitNames"
+            class="form-input-blue form-input-full js-fit-select">
+          <option
+              {{ "selected" if "r2" in custom_model.fitNames }}
+              data-description="R<sup>2</sup>: coefficient of determination">
+            r2
+          </option>
+          <option
+              {{ "selected" if "rss" in custom_model.fitNames }}
+              data-description="RSS: residual sum of squares">
+            rss
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <div class="flex-row full">
+      <input
+          type="submit"
+          value="{{ 'Update' if custom_model else 'Create' }}"
+          class="flex-start" />
+
+      {% if custom_model: %}
+        {% set delete_url = url_for(
+          'modeling_custom_model_delete_action',
+          publicId=study.publicId,
+          customModelId=custom_model.id
+        ) %}
+
+        <button
+            type="button"
+            data-url="{{ delete_url }}"
+            data-confirm="This will delete this model and all of its uploaded measurements. Are you sure?"
+            class="flex-right white-button orange-border js-delete-model">
+          🗑 Delete
+        </button>
+      {% endif %}
+    </div>
+  </form>
+
+{% endmacro %}

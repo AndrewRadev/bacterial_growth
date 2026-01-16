@@ -1,4 +1,6 @@
+import re
 from datetime import datetime
+from decimal import Decimal
 
 import numpy as np
 import pandas as pd
@@ -9,16 +11,18 @@ from sqlalchemy.orm import (
     relationship,
     validates,
 )
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy_utc.sqltypes import UtcDateTime
+from sqlalchemy.orm.attributes import flag_modified
 
 from app.model.orm.orm_base import OrmBase
-
-MODEL_NAMES = {
-    'easy_linear':     '"Easy linear" method',
-    'logistic':        'Logistic model',
-    'baranyi_roberts': 'Baranyi-Roberts model',
-}
-"The human-readable names of the supported models/methods"
+from app.model.lib.modeling import (
+    MODEL_NAMES,
+    SHORT_MODEL_NAMES,
+    MODEL_DESCRIPTIONS,
+    ALL_COEFFICIENTS,
+    FIT_PARAMETERS,
+)
 
 _VALID_TYPES = [
     'easy_linear',
@@ -30,6 +34,21 @@ _VALID_STATES = [
     'ready',
     'error',
 ]
+
+
+class ModelInfo:
+    def __init__(self, *, type, name, url, description, params):
+        self.type        = type
+        self.name        = name
+        self.url         = url
+        self.description = description
+        self.params      = params
+
+    def __eq__(self, other):
+        return self.type == other.type
+
+    def __hash__(self):
+        return self.type.__hash__()
 
 
 class ModelingResult(OrmBase):
@@ -46,14 +65,19 @@ class ModelingResult(OrmBase):
     id:   Mapped[int] = mapped_column(primary_key=True)
     type: Mapped[str] = mapped_column(sql.String(100), nullable=False)
 
-    requestId: Mapped[int] = mapped_column(sql.ForeignKey('ModelingRequests.id'), nullable=False)
-    request: Mapped['ModelingRequest'] = relationship(back_populates='results')
-
     measurementContextId: Mapped[int] = mapped_column(
         sql.ForeignKey('MeasurementContexts.id'),
         nullable=False,
     )
     measurementContext: Mapped['MeasurementContext'] = relationship(back_populates='modelingResults')
+
+    study: Mapped['Study'] = relationship(
+        secondary='MeasurementContexts',
+        viewonly=True
+    )
+
+    customModelId: Mapped[int] = mapped_column(sql.ForeignKey('CustomModels.id'))
+    customModel: Mapped['CustomModel'] = relationship()
 
     params: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
@@ -64,10 +88,19 @@ class ModelingResult(OrmBase):
     createdAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     updatedAt:    Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     calculatedAt: Mapped[datetime] = mapped_column(UtcDateTime)
+    publishedAt:  Mapped[datetime] = mapped_column(UtcDateTime)
+
+    # For custom models:
+    xValues: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    yValues: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    yErrors: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
 
     @validates('type')
     def _validate_type(self, key, value):
-        return self._validate_inclusion(key, value, _VALID_TYPES)
+        if re.fullmatch(r'custom_\d+', value):
+            return value
+        else:
+            return self._validate_inclusion(key, value, _VALID_TYPES)
 
     @validates('state')
     def _validate_state(self, key, value):
@@ -75,6 +108,11 @@ class ModelingResult(OrmBase):
 
     @classmethod
     def empty_params(Self, model_type):
+        fit = {
+            'r2': None,
+            'rss': None,
+        }
+
         if model_type == 'easy_linear':
             inputs = {'pointCount': '5'}
             coefficients = {
@@ -98,33 +136,126 @@ class ModelingResult(OrmBase):
                 'K':     None,
                 'h0':    None,
             }
+        elif model_type.startswith('custom_'):
+            inputs = {}
+            coefficients = {}
+            fit = {}
         else:
             raise ValueError(f"Don't know what the coefficients are for model type: {repr(model_type)}")
 
         return {
             'coefficients': coefficients,
             'inputs': inputs,
-            'fit': {
-                'r2': None,
-                'rss': None,
-            }
+            'fit': fit,
         }
+
+    @hybrid_property
+    def isPublished(self):
+        return self.publishedAt != None
+
+    @property
+    def info(self):
+        return ModelInfo(
+            type=self.type,
+            name=self.model_name,
+            url=self.model_url,
+            description=self.model_description,
+            params=self.model_params,
+        )
 
     @property
     def model_name(self):
-        return MODEL_NAMES[self.type]
+        if self.type.startswith('custom_'):
+            return self.customModel.name
+        else:
+            return MODEL_NAMES[self.type]
+
+    @property
+    def short_model_name(self):
+        if self.type.startswith('custom_'):
+            return self.customModel.shortName
+        else:
+            return SHORT_MODEL_NAMES[self.type]
+
+    @property
+    def model_url(self):
+        if self.type.startswith('custom_'):
+            return self.customModel.url
+
+    @property
+    def model_description(self):
+        if self.type.startswith('custom_'):
+            return self.customModel.description
+        else:
+            return MODEL_DESCRIPTIONS[self.type]
+
+    @property
+    def model_params(self):
+        coefficient_names = []
+        fit_names = []
+
+        if self.type.startswith('custom_'):
+            coefficient_names = self.customModel.coefficientNames
+            fit_names         = self.customModel.fitNames
+        else:
+            empty_params = self.__class__.empty_params(self.type)
+            coefficient_names = empty_params['coefficients'].keys()
+            fit_names         = empty_params['fit'].keys()
+
+        return {
+            'coefficients': [ALL_COEFFICIENTS[c] for c in coefficient_names],
+            'fit':          [FIT_PARAMETERS[f] for f in fit_names],
+        }
+
+    def get_chart_label(self):
+        model_name = self.short_model_name or self.model_name
+
+        return self.measurementContext.get_chart_label(model_name=model_name)
 
     def generate_chart_df(self, measurements_df):
         start_time = measurements_df['time'].min()
         end_time   = measurements_df['time'].max()
 
-        timepoints = np.linspace(start_time, end_time, 200)
-        values = self._predict(timepoints)
+        if self.type.startswith('custom_'):
+            timepoints = _map_float(self.xValues)
+            values     = _map_float(self.yValues)
+            errors     = _map_float(self.yErrors)
+        else:
+            timepoints = np.linspace(start_time, end_time, 200)
+            values     = self._predict(timepoints)
+            errors     = None
 
-        return pd.DataFrame.from_dict({
-            'time': timepoints,
+        data = {
+            'time':  timepoints,
             'value': values,
-        })
+            'std': errors or [float('nan') for _ in range(len(timepoints))],
+        }
+
+        df = pd.DataFrame.from_dict(data)
+
+        return df
+
+    def update_model_params(self, form):
+        if not self.customModel:
+            raise RuntimeError("Tried to update non-custom modeling result")
+
+        coefficients = self.params.get('coefficients', {})
+        fit          = self.params.get('fit', {})
+
+        for name in self.customModel.coefficientNames:
+            key = f"coefficients[{name}]"
+            if key in form:
+                coefficients[name] = form[key]
+
+        for name in self.customModel.fitNames:
+            key = f"fit[{name}]"
+            if key in form:
+                fit[name] = form[key]
+
+        self.params['coefficients'] = coefficients
+        self.params['fit']          = fit
+
+        flag_modified(self, 'params')
 
     def _predict(self, timepoints):
         if self.type == 'easy_linear':
@@ -174,3 +305,20 @@ class ModelingResult(OrmBase):
         log_y = np.log(y0) + mumax * A - np.log(1 + (np.exp(mumax * A) - 1)/np.exp(np.log(K) - np.log(y0)))
 
         return np.exp(log_y)
+
+
+def _map_float(decimal_list):
+    result = []
+
+    if len(decimal_list) == 1 and isinstance(decimal_list[0], list):
+        # Fix for an odd serialization bug where a list of nulls gets stored as
+        # a nested list:
+        decimal_list = decimal_list[0]
+
+    for value in decimal_list:
+        if isinstance(value, Decimal):
+            result.append(float(value))
+        else:
+            result.append(value)
+
+    return result

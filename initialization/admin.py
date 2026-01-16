@@ -24,6 +24,7 @@ from app.model.orm import (
     Bioreplicate,
     Community,
     Compartment,
+    CustomModel,
     ExcelFile,
     Experiment,
     ExperimentCompartment,
@@ -31,7 +32,6 @@ from app.model.orm import (
     MeasurementContext,
     MeasurementTechnique,
     Metabolite,
-    ModelingRequest,
     ModelingResult,
     Perturbation,
     Project,
@@ -193,7 +193,7 @@ def init_admin(app):
         form_excluded_columns = [
             'measurements', 'measurementContexts', 'studyTechniques', 'measurementTechniques',
             'studyUsers', 'experiments', 'strains', 'communities', 'compartments',
-            'modelingRequests', 'modelingResults', 'bioreplicates',
+            'modelingResults', 'bioreplicates',
             'studyMetabolites', 'metabolites',
         ]
 
@@ -252,14 +252,14 @@ def init_admin(app):
     admin.add_view(ExperimentEntityView(Perturbation,          db_session, category="Experiments"))
 
     class ModelingResultView(AppView):
-        column_exclude_list = ['rSummary']
+        column_exclude_list = ['rSummary', 'xValues', 'yValues', 'yErrors']
 
     admin.add_view(AppView(StudyTechnique,            db_session, category="Measurements"))
     admin.add_view(AppView(MeasurementTechnique,      db_session, category="Measurements"))
     admin.add_view(AppView(MeasurementContext,        db_session, category="Measurements"))
     admin.add_view(AppView(Measurement,               db_session, category="Measurements"))
-    admin.add_view(AppView(ModelingRequest,           db_session, category="Measurements"))
     admin.add_view(ModelingResultView(ModelingResult, db_session, category="Measurements"))
+    admin.add_view(ModelingResultView(CustomModel,    db_session, category="Measurements"))
 
     class MetaboliteView(AppView):
         column_searchable_list = ['name']

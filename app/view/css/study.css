@@ -18,15 +18,24 @@
     padding-bottom: 4px;
   }
 
-  h3 {
+  h3,h4 {
     margin-top: 0;
   }
 
   .navigation-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    a {
+      padding: 8px;
+    }
+
     .icon {
       display: inline-block;
-      width: 18px;
-      height: 18px;
+      width: 14px;
+      height: 14px;
       vertical-align: bottom;
     }
   }
@@ -47,7 +56,7 @@
   }
 
   .chart-placeholder {
-    height: 100%;
+    height: 300px;
     display: flex;
     justify-content: center;
     align-items: center;

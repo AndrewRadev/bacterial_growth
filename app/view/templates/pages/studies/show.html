@@ -1,7 +1,9 @@
 {% from 'utils/_dataframe.html' import render_dataframe %}
 {% from 'utils/_time_tag.html' import time_tag %}
 {% from 'utils/_strain_link.html' import render_strain_link %}
+{% from 'utils/_post_button.html' import post_button %}
 {% from 'pages/studies/_experiments_toc.html' import render_experiments_toc %}
+{% from 'pages/experiments/_bioreplicates_list.html' import render_bioreplicates_list %}
 {% from 'pages/perturbations/_perturbation.html' import render_perturbation %}
 
 {% extends '_layout.html' %}
@@ -73,6 +75,45 @@
         </ol>
       </p>
 
+      {% set model_info_list = study.get_model_info_list() %}
+
+      {% if model_info_list: %}
+        <h2>Modeling techniques</h2>
+
+        <p>
+          <ol>
+            {% for model_info in model_info_list: %}
+              <li>
+                <strong>{{ model_info.name }}</strong>
+
+                {% if model_info.url: %}
+                  ({{ model_info.url|external_link }})
+                {% endif %}
+
+                {% if model_info.description != '': %}
+                  <div class="small">{{ model_info.description }}</div>
+                {% endif %}
+
+                {% if model_info.params.get('coefficients'): %}
+                  <div class="small model-parameters">
+                    <strong>Parameters</strong>:
+                    {{ model_info.params['coefficients']|map(attribute="name_html")|join(', ')|safe }}
+                  </div>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ol>
+        </p>
+
+        <div>
+          {{ post_button(
+            "Download model parameters",
+            url_for('modeling_params_csv', publicId=study.publicId),
+            class="small"
+          ) }}
+        </div>
+      {% endif %}
+
       <div class="flex-row">
         <div class="experiments full">
           {% for experiment in study.experiments: %}
@@ -140,86 +181,7 @@
 
               <h3>Biological replicates</h3>
 
-              <ol class="bioreplicates-list">
-                {% for bioreplicate in experiment.bioreplicates %}
-                  {% set measurement_context_ids = bioreplicate.measurementContexts|map(attribute="id")|list %}
-
-                  <li>
-                    <strong>{{ bioreplicate.name }}</strong>
-
-                    <span class="js-compare-container" data-context-ids="{{ measurement_context_ids|join(',') }}">
-                      <span class="js-compare" data-tooltip="Compare">
-                        <a href="#" class="white-button no-border small-button">↔</a>
-                      </span>
-
-                      <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
-                        👆
-                        <a href="#" class="white-button no-border small-button">➖</a>
-                      </span>
-                    </span>
-
-                    <a
-                        href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context_ids|join(',')) }}"
-                        class="white-button no-border small-button"
-                        data-tooltip="Visualize">
-                      📈
-                    </a>
-
-                    <a
-                        href="{{ url_for('bioreplicate_csv', id=bioreplicate.id) }}"
-                        class="white-button no-border small-button"
-                        style="vertical-align: top"
-                        download="bioreplicate_{{ bioreplicate.id }}.csv"
-                        data-tooltip="Download data">
-                      <span class="flex-row icon icon-download-black"></span>
-                    </a>
-
-                    <br>
-
-                    <strong>Measurements</strong>:
-
-                    <ul class="measurement-techniques">
-                      {% for measurement_context in bioreplicate.measurementContexts: %}
-                        <li class="measurement-context-container">
-                          {% set measurements = measurement_context.measurements %}
-                          {% set technique    = measurement_context.technique %}
-
-                          <div class="js-table-row">
-                            <span class="js-compare-container" data-context-ids="{{ measurement_context.id }}">
-                              <span class="js-compare" data-tooltip="Compare">
-                                <a href="#" class="white-button no-border small-button">↔</a>
-                              </span>
-
-                              <span class="js-uncompare hidden" data-tooltip="Comparing, click to remove from comparison">
-                                👆
-                                <a href="#" class="white-button no-border small-button">➖</a>
-                              </span>
-                            </span>
-
-                            <a
-                                href="{{ url_for('study_visualize_page', publicId=study.publicId, l=measurement_context.id) }}"
-                                class="white-button no-border small-button"
-                                data-tooltip="Visualize">
-                              📈
-                            </a>
-
-                            {{ measurement_context.get_chart_label() }}
-
-                            <a
-                                href="{{ url_for('measurement_context_csv', id=measurement_context.id) }}"
-                                class="white-button no-border small-button"
-                                style="vertical-align: top"
-                                download="measurement_context_{{ measurement_context.id }}.csv"
-                                data-tooltip="Download data">
-                              <span class="flex-row icon icon-download-black"></span>
-                            </a>
-                          </div>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  </li>
-                {% endfor %}
-              </ol>
+              {{ render_bioreplicates_list(experiment) }}
             </div>
           {% endfor %}
         </div>

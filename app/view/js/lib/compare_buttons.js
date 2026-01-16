@@ -40,9 +40,17 @@ function initCompareButtons($page) {
     let $wrapper   = $button.parents('.js-compare');
     let $container = $button.parents('.js-compare-container');
 
-    let contextIds = $container.data('contextIds').toString().split(',');
+    let contextIds = [];
+    let modelIds   = [];
 
-    updateCompareData('add', contextIds, function(compareData) {
+    if ($container.data('contextIds')) {
+      contextIds = $container.data('contextIds').toString().split(',');
+    }
+    if ($container.data('modelIds')) {
+      modelIds = $container.data('modelIds').toString().split(',');
+    }
+
+    updateCompareData('add', contextIds, modelIds, function(compareData) {
       // Hide "compare" button, show "uncompare" button
       $wrapper.addClass('hidden');
       $container.find('.js-uncompare').removeClass('hidden');
@@ -60,8 +68,9 @@ function initCompareButtons($page) {
     let $container = $button.parents('.js-compare-container');
 
     let contextIds = $container.data('contextIds').toString().split(',');
+    let modelIds   = $container.data('modelIds').toString().split(',');
 
-    updateCompareData('remove', contextIds, function(compareData) {
+    updateCompareData('remove', contextIds, modelIds, function(compareData) {
       // Hide "uncompare" section, show "compare" button
       $wrapper.addClass('hidden');
       $container.find('.js-compare').removeClass('hidden');
@@ -75,20 +84,20 @@ function initCompareButtons($page) {
 // This function makes an ajax request to update the "compare data" stored in
 // the session.
 //
-function updateCompareData(action, contexts, successCallback) {
+function updateCompareData(action, contexts, models, successCallback) {
   $.ajax({
     type: 'POST',
     url: `/comparison/update/${action}.json`,
-    data: JSON.stringify({'contexts': contexts}),
+    data: JSON.stringify({'contexts': contexts, 'models': models}),
     cache: false,
     contentType: 'application/json',
     processData: true,
     success: function(response) {
       let compareData = JSON.parse(response);
+      let recordCount = compareData.contextCount + compareData.modelCount;
 
-      let contextCount;
-      if (compareData.contextCount > 0) {
-        countText = `(${compareData.contextCount})`;
+      if (recordCount > 0) {
+        countText = `(${compareData.contextCount + compareData.modelCount})`;
       } else {
         countText = '';
       }

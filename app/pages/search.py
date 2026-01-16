@@ -20,7 +20,7 @@ from app.model.orm import (
 from app.model.lib.study_search import StudySearch
 from app.model.lib.util import is_ajax
 
-_PER_PAGE = 10
+_PER_PAGE = 20
 
 
 def new_search_index_page():

@@ -1,0 +1,125 @@
+{% set units = measurement_context.technique.units %}
+
+{% macro render_param_input(data, name, description, show_units=False) %}
+  {% if data and name in data: %}
+    <div class="form-row">
+      <label class="full">
+        <span data-tooltip="{{ description }}">
+          {% if show_units and units != '': %}
+            {{ name }} ({{ units }}):
+          {% else: %}
+            {{ name }}:
+          {% endif %}
+        </span>
+        <input
+            type="text"
+            name="param-{{ name }}"
+            class="form-input-blue form-input-full"
+            value="{{ data[name] or '' }}"
+            readonly />
+      </label>
+    </div>
+  {% endif %}
+{% endmacro %}
+
+<div class="box">
+  <div class="chart-container js-chart-preview">
+    {{ chart.to_html()|safe }}
+  </div>
+
+  <div class="form-row">
+    <label>
+      <input
+          type="checkbox"
+          class="js-log"
+          name="logTransform"
+          {{ "checked" if log_transform }} />
+      <span>Log view</span>
+    </label>
+  </div>
+</div>
+
+{% if modeling_record: %}
+  <div class="form-row box publish-box {{ "is-published" if modeling_record.isPublished }}">
+    {% set toggle_publish_url = url_for(
+      'modeling_toggle_published_action',
+      publicId=study_id,
+      modelingResultId=modeling_record.id
+    ) %}
+
+    {% if modeling_record.isPublished: %}
+      <span class="help small message">
+        <span class="icon icon-inline icon-visible"></span>
+        This model is visible to everyone though the
+        <a href="{{ url_for('study_visualize_page', publicId=study_id) }}">Visualize</a>
+        page
+      </span>
+
+      <button
+          data-url="{{ toggle_publish_url }}"
+          type="button"
+          class="white-button small small-button orange-border flex-right js-toggle-published">
+        Unpublish
+      </button>
+    {% else: %}
+      <button
+          data-url="{{ toggle_publish_url }}"
+          type="button"
+          class="green-button small small-button js-toggle-published">
+        Publish
+      </button>
+
+      <span class="flex-right help small message">
+        <span class="icon icon-inline icon-invisible"></span>
+        This model is only accessible on this page until you publish it
+      </span>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% if model_params['coefficients'] or model_params['fit']: %}
+  <div class="box">
+    <div class="columns">
+      <div class="column" style="width: 50%;">
+        <h3 class="margin-top-10">Coefficients:</h3>
+
+        {{ render_param_input(model_params['coefficients'], "y0",    "y₀: initial value of abundance", show_units=True) }}
+        {{ render_param_input(model_params['coefficients'], "y0_lm", "y₀ calculated as the intersection of the fit with the abscissa, the initial abundance if there was no lag", show_units=True) }}
+        {{ render_param_input(model_params['coefficients'], "mumax", "μ: maximum growth rate (1/h)") }}
+        {{ render_param_input(model_params['coefficients'], "K",     "K: carrying capacity (max. abundance)", show_units=True) }}
+        {{ render_param_input(model_params['coefficients'], "lag",   "time duration of lag phase") }}
+        {{ render_param_input(model_params['coefficients'], "h0",    "h₀: parameter specifying the initial physiological state of organisms (e.g. cells) and in consequence the lag phase (h0 = max growth rate * lag phase)") }}
+      </div>
+
+      <div class="column" style="width: 50%;">
+        {% if model_params['inputs']|length > 0: %}
+          <h3 class="margin-top-10">Input parameters:</h3>
+
+          {{ render_param_input(model_params['inputs'], "pointCount", "Number of points used to determine the greatest upward slope") }}
+          {{ render_param_input(model_params['inputs'], "endTime",    "Time threshold to avoid fitting a death phase") }}
+        {% endif %}
+
+        <h3 class="margin-top-10">Quality of fit:</h3>
+
+        {{ render_param_input(model_params['fit'], "r2",  "R²: coefficient of determination") }}
+        {{ render_param_input(model_params['fit'], "rss", "RSS: residual sum of squares") }}
+      </div>
+    </div>
+
+    {% if r_summary: %}
+      <div class="r-summary">
+        <h3 class="margin-top-10">
+          Output from
+          {{ "https://cran.r-project.org/web/packages/growthrates/index.html"|external_link("growthrates") }}
+        </h3>
+
+        <pre>{{ r_summary }}</pre>
+      </div>
+
+      <ul>
+        <li>R version:           {{ model_params['r_version'] }}</li>
+        <li>growthrates version: {{ model_params['growthrates_version'] }}</li>
+      </ul>
+    {% endif %}
+  </div>
+{% endif %}

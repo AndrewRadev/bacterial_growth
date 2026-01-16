@@ -3,7 +3,8 @@
     {{ strain.ncbiId|ncbi_url|external_link(strain.name) }}
   {% else: %}
     {{ strain.name }}
-    (from {{ strain.ncbiId|ncbi_url|external_link("NCBI:{}".format(strain.ncbiId)) }})
+    <br>
+    (derived from {{ strain.ncbiId|ncbi_url|external_link("NCBI:{}".format(strain.ncbiId)) }})
     {%- if strain.description: -%}
       <div class="small">
         {{ strain.description|format_text }}

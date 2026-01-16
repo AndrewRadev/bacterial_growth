@@ -1,13 +1,18 @@
-{% macro render_modeling_form(study) %}
+{% macro render_experiment_form(study) %}
 
-  <input type="hidden" name="selectedMeasurementContextId" />
+  {% set selectedExperimentId         = request.args.get('selectedExperimentId',         '') %}
+  {% set selectedTechniqueId          = request.args.get('selectedTechniqueId',          '0')|int %}
+  {% set selectedMeasurementContextId = request.args.get('selectedMeasurementContextId', '0')|int %}
+  {% set selectedCustomModelId        = request.args.get('selectedCustomModelId',        '0')|int %}
 
   <div class="form-row">
     <label>
       <span>Experiment:</span>
       <select name="experimentId" class="form-input-blue full">
         {% for experiment in study.experiments: %}
-          <option value="{{ experiment.publicId }}">
+          <option
+              {{ "selected" if experiment.publicId == selectedExperimentId }}
+              value="{{ experiment.publicId }}">
           {{- experiment.name }}: {{ experiment.description -}}
           </option>
         {% endfor %}
@@ -31,15 +36,21 @@
           {% if study_technique.measurementTechniques|length > 1: %}
             <optgroup label="{{- study_technique.long_name_with_subject_type -}}">
               {% for measurement_technique in study_technique.measurementTechniques: %}
-                <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-                {{- measurement_technique.short_name -}}
+                <option
+                    {{ "selected" if measurement_technique.id == selectedTechniqueId }}
+                    value="{{ measurement_technique.id }}"
+                    data-subject-type="{{ measurement_technique.subjectType }}">
+                  {{- measurement_technique.short_name -}}
                 </option>
               {% endfor %}
             </optgroup>
           {% else: %}
             {% set measurement_technique = study_technique.measurementTechniques[0] %}
-            <option value="{{ measurement_technique.id }}" data-subject-type="{{ measurement_technique.subjectType }}">
-            {{- measurement_technique.long_name_with_subject_type -}}
+            <option
+                {{ "selected" if measurement_technique.id == selectedTechniqueId }}
+                value="{{ measurement_technique.id }}"
+                data-subject-type="{{ measurement_technique.subjectType }}">
+              {{- measurement_technique.long_name_with_subject_type -}}
             </option>
           {% endif %}
         {% endfor %}
@@ -83,10 +94,13 @@
                 <input
                     type="radio"
                     name="selectedContext"
+                    data-measurement-label="{{ measurement_context.get_chart_label() }}"
+                    data-units-label="{{ measurement_context.technique.studyTechnique.units }}"
+                    {{ "checked" if selectedMeasurementContextId == measurement_context.id else "" }}
                     value="{{ key }}"
                     id="{{ key }}"
                     class="js-measurement-toggle" />
-                <label for="{{ key }}">
+                <label class="full" for="{{ key }}">
                   {% if subjectType == 'bioreplicate' and experiment.compartments|length > 1 %}
                     {{ measurement_context.subjectName }}<sub>{{ measurement_context.compartment.name }}</sub>
                   {% else: %}
@@ -94,7 +108,7 @@
                   {% endif %}
                 </label>
 
-                <div class="js-modeling-result-state flex-right">
+                <div class="js-modeling-result-state">
                   {% for modeling_result in measurement_context.modelingResults: %}
                     <div
                         data-modeling-result-id="{{ modeling_result.id }}"
@@ -119,8 +133,6 @@
     </div>
   {% endfor %}
 
-  <hr>
-
   <div class="modeling-fields">
     <div class="form-row">
       <label class="full">
@@ -129,22 +141,41 @@
           <option value="easy_linear">"Easy linear" method</option>
           <option value="logistic">Logistic model</option>
           <option value="baranyi_roberts">Baranyi-Roberts model</option>
+
+          {% if study.customModels: %}
+            {% for m in study.customModels:  %}
+              <option
+                  {{ "selected" if m.id == selectedCustomModelId }}
+                  value="custom_{{ m.id }}"
+                  data-custom-model-id="{{ m.id }}">
+                Custom: {{ m.name }}
+              </option>
+            {% endfor %}
+
+            <option value="custom_new" data-custom-model-id="new">
+              Custom: New model
+            </option>
+          {% else: %}
+            <option value="custom_new" data-custom-model-id="new">
+              Custom model
+            </option>
+          {% endif %}
         </select>
       </label>
     </div>
 
     <div class="form-row hidden" data-modeling-input data-modeling-input-easy_linear>
-      <div class="form-row margin-top-10">
-        <label data-tooltip="Set to limit the number of points to use to determine the slope">
-          <span>Point count:</span>
-          <input
-              type="number"
-              name="pointCount"
-              min="2"
-              class="form-input-blue form-input-full"
-              value="{{ request.form['pointCount'] or 5 }}" />
-        </label>
-      </div>
+      <label
+          class="full"
+          data-tooltip="Set to limit the number of points to use to determine the slope">
+        <span>Point count:</span>
+        <input
+            type="number"
+            name="pointCount"
+            min="2"
+            class="form-input-blue form-input-full"
+            value="{{ request.form['pointCount'] or 5 }}" />
+      </label>
     </div>
 
     <div class="form-row full hidden" data-modeling-input data-modeling-input-logistic data-modeling-input-baranyi_roberts>
@@ -159,16 +190,18 @@
       </label>
     </div>
 
-    <h3>Calculation status</h3>
+    <div class="js-calculation-status">
+      <h3>Calculation status</h3>
 
-    <div class="help">
-      <div class="js-calculation-result">
-        Pending, submit the form to start calculation process.
+      <div class="help">
+        <div class="js-calculation-result">
+          Pending, submit the form to start calculation process.
+        </div>
       </div>
-    </div>
 
-    <div class="flex-column flex-gap-10">
-      <input type="submit" class="flex-end" value="Calculate" />
+      <div class="flex-column flex-gap-10">
+        <input type="submit" class="flex-end" value="Calculate" />
+      </div>
     </div>
   </div>
 

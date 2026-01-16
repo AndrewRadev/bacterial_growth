@@ -1,4 +1,4 @@
-<p class="navigation-buttons">
+<p class="navigation-buttons small">
   <a href="{{ url_for('study_show_page', publicId=study.publicId) }}" class="white-button">
     <span class="icon icon-info"></span>
     View information
@@ -20,6 +20,13 @@
         class="white-button orange-border">
       <span class="icon icon-tool"></span>
       Manage
+    </a>
+
+    <a
+        href="{{ url_for('modeling_page', publicId=study.publicId) }}"
+        class="white-button orange-border">
+      <span class="icon icon-calculated-orange"></span>
+      Fit models
     </a>
   {% endif %}
 </p>

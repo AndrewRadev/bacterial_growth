@@ -31,7 +31,6 @@ class Chart:
         log_left=False,
         log_right=False,
         width=None,
-        title=None,
         legend_position='top',
         clamp_x_data=False,
         show_std=True,
@@ -44,7 +43,6 @@ class Chart:
         self.cfu_count_units  = cfu_count_units
         self.metabolite_units = metabolite_units
         self.width            = width
-        self.title            = title
         self.legend_position  = legend_position
         self.clamp_x_data     = clamp_x_data
         self.show_std         = show_std
@@ -58,8 +56,10 @@ class Chart:
         self.mixed_units_left  = False
         self.mixed_units_right = False
 
-        self.model_df_indices = []
-        self.regions          = []
+        self.model_df_left_indices  = []
+        self.model_df_right_indices = []
+
+        self.regions = []
 
     def add_df(self, df, *, units, label=None, axis='left', metabolite_mass=None):
         entry = (df, units, label, metabolite_mass)
@@ -72,12 +72,13 @@ class Chart:
             raise ValueError(f"Unexpected axis: {axis}")
 
     def add_model_df(self, df, *, units, label=None, axis='left'):
-        self.model_df_indices.append(len(self.data_left) + len(self.data_right))
         entry = (df, units, label, None)
 
         if axis == 'left':
+            self.model_df_left_indices.append(len(self.data_left))
             self.data_left.append(entry)
         elif axis == 'right':
+            self.model_df_right_indices.append(len(self.data_right))
             self.data_right.append(entry)
         else:
             raise ValueError(f"Unexpected axis: {axis}")
@@ -96,11 +97,6 @@ class Chart:
         if right_units_label == '[mixed units]':
             self.mixed_units_right = True
 
-        if self.log_left:
-            left_units_label = f"ln({left_units_label})"
-        if self.log_right:
-            right_units_label = f"ln({right_units_label})"
-
         for (df, label) in converted_data_left:
             scatter_params = self._get_scatter_params(df, label, log=self.log_left)
             fig.add_trace(go.Scatter(**scatter_params), secondary_y=False)
@@ -117,51 +113,73 @@ class Chart:
         else:
             xaxis_range = None
 
-        left_yaxis_range  = self._calculate_y_range(converted_data_left, log=self.log_left)
-        right_yaxis_range = self._calculate_y_range(converted_data_right, log=self.log_right)
+        left_yaxis_range  = self._calculate_y_range(
+            converted_data_left,
+            model_df_indices=self.model_df_left_indices,
+            log=self.log_left,
+        )
+        right_yaxis_range = self._calculate_y_range(
+            converted_data_right,
+            model_df_indices=self.model_df_right_indices,
+            log=self.log_right,
+        )
 
-        for index, (x0, x1, label, text) in enumerate(self.regions):
-            y0, y1 = left_yaxis_range
+        if self.regions:
+            # No log-transformation applied for the region-drawing:
+            y0, y1 = self._calculate_y_range(converted_data_left, self.model_df_left_indices)
 
-            fig.add_trace(
-                go.Scatter(
-                    name=label,
-                    x=[x0, x0, x1, x1, x0],
-                    y=[y0, y0, y0, y1, y1],
-                    opacity=0.15,
-                    line_width=0,
-                    fill="toself",
-                    hovertemplate=text,
-                    mode="text",
-                ),
-            )
+            for index, (x0, x1, label, text) in enumerate(self.regions):
+                fig.add_trace(
+                    go.Scatter(
+                        name=label,
+                        x=[x0, x0, x1, x1, x0],
+                        y=[y0, y0, y0, y1, y1],
+                        opacity=0.15,
+                        line_width=0,
+                        fill="toself",
+                        hovertemplate=text,
+                        mode="text",
+                    ),
+                )
 
-        fig.update_yaxes(title_text=left_units_label,  secondary_y=False)
-        fig.update_yaxes(title_text=right_units_label, secondary_y=True)
+        left_yaxis = dict(
+            side="left",
+            title_text=left_units_label,
+            exponentformat="power",
+            range=left_yaxis_range,
+        )
+        if self.log_left:
+            left_yaxis['type'] = 'log'
 
-        if self.title:
-            title = dict(text=self.title)
-        else:
-            title = dict(x=0)
+        right_yaxis = dict(
+            side="right",
+            title_text=right_units_label,
+            exponentformat="power",
+            range=right_yaxis_range,
+        )
+        if self.log_right:
+            right_yaxis['type'] = 'log'
 
         fig.update_layout(
+            showlegend=True,
             template=PLOTLY_TEMPLATE,
             margin=dict(l=0, r=0, t=60, b=40),
-            title=title,
+            title=dict(x=0),
             hovermode='x unified',
-            legend=dict(yanchor="bottom", y=1, xanchor="left", x=0, orientation='h'),
+            legend=dict(
+                yanchor="bottom",
+                y=1,
+                xanchor="left",
+                x=0,
+                orientation='h',
+                maxheight=0.25,
+                entrywidthmode='fraction',
+                entrywidth=0.9,
+            ),
             modebar=dict(orientation='v'),
             font_family="Public Sans",
-            yaxis=dict(
-                exponentformat="power",
-                side="left",
-                range=left_yaxis_range,
-            ),
-            yaxis2=dict(
-                exponentformat="power",
-                side="right",
-                range=right_yaxis_range,
-            ),
+            yaxis=left_yaxis,
+            yaxis2=right_yaxis,
             xaxis=dict(
                 title=dict(text='Time (h)'),
                 range=xaxis_range,
@@ -171,7 +189,7 @@ class Chart:
         return fig.to_html(
             full_html=False,
             include_plotlyjs=False,
-            default_width=(f"{self.width}px" if self.width is not None else None),
+            default_width=(f"{self.width}px" if self.width is not None else '100%'),
             config={
                 'toImageButtonOptions': {
                     'format': 'svg',
@@ -210,22 +228,12 @@ class Chart:
         return converted_data, tuple(converted_units)[0]
 
     def _get_scatter_params(self, df, label, log=False):
-        if log:
-            value = df['log_value']
-        else:
-            value = df['value']
+        value = df['value']
 
         if self.show_std and 'std' in df:
             if df['std'].isnull().all():
                 # STD values were blank, don't draw error bars
                 error_y = None
-            elif log:
-                # data should have been transformed, the std will be split into
-                # upper and lower:
-                error_y = go.scatter.ErrorY(
-                    array=df['log_std_upper'],
-                    arrayminus=df['log_std_lower'],
-                )
             else:
                 # We want to clip negative error bars to 0
                 positive_err = df['std']
@@ -264,16 +272,17 @@ class Chart:
         padding = (global_max_x - global_min_x) * 0.05
         return [global_min_x - padding, global_max_x + padding]
 
-    def _calculate_y_range(self, data, log=False):
+    def _calculate_y_range(self, data, model_df_indices, log=False):
         """
         Find the limit for the y axis, ignoring model dataframes, since they
         might have exponentials that shoot up.
         """
-        global_max_y = 0
-        global_min_y = math.inf
+        global_max_y          = 0
+        global_min_y          = math.inf
+        global_positive_min_y = math.inf
 
         for (i, (df, _)) in enumerate(data):
-            if i in self.model_df_indices:
+            if i in model_df_indices:
                 # A model's data might shoot up exponentially, so we don't
                 # consider it for the chart range
                 continue
@@ -282,10 +291,7 @@ class Chart:
             lowers = []
             uppers = []
 
-            if log:
-                entries = zip(df['log_value'], df['log_std_upper'], df['log_std_lower'])
-            else:
-                entries = zip(df['value'], df['std'], df['std'])
+            entries = zip(df['value'], df['std'], df['std'])
 
             for value, upper_std, lower_std in entries:
                 # For some reason, pandas might give us a None here, or it might
@@ -304,12 +310,34 @@ class Chart:
             max_y = max(uppers)
             min_y = min(lowers)
 
+            positive_ys = [y for y in lowers if y > 0]
+            if positive_ys:
+                positive_min_y = min(positive_ys)
+            else:
+                positive_min_y = None
+
             if max_y > global_max_y:
                 global_max_y = max_y
             if min_y < global_min_y:
                 global_min_y = min_y
+            if positive_min_y is not None and positive_min_y < global_positive_min_y:
+                global_positive_min_y = positive_min_y
 
         # The range of the chart is given a padding depending on the data range
         # to make sure the content is visible:
         padding = (global_max_y - global_min_y) * 0.05
-        return [global_min_y - padding, global_max_y + padding]
+
+        if log:
+            # Fifth of an order of magnitude of padding:
+            padding = 0.2
+            global_max_y = np.log10(global_max_y)
+
+            if global_min_y <= 0.0:
+                global_min_y = np.log10(global_positive_min_y)
+            else:
+                global_min_y = np.log10(global_min_y)
+
+        lower = global_min_y - padding
+        upper = global_max_y + padding
+
+        return [lower, upper]

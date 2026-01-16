@@ -3,6 +3,14 @@
   display: none;
 }
 
+.select2-title {
+  font-weight: bold;
+}
+.select2-description {
+  font-size: 14px;
+  font-style: italic;
+}
+
 .select2-container {
   /* Make it relative to contain the spinner */
   position: relative;
@@ -25,6 +33,10 @@
 }
 .select2-container--custom .select2-results__option--highlighted[aria-selected] div {
   color: white;
+
+  sub,sup {
+    color: white;
+  }
 }
 
 .select2-container--custom .select2-selection--single {
