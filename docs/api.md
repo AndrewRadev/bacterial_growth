@@ -1,20 +1,20 @@
 # API documentation
 
-All published studies in the app should be exportable through an API of several different granularities:
+All published study data in the app should be downloadable at several different granularities:
 
-1. Full study metadata and uploaded data spreadsheet for batch downloads
-2. Export UI with selectable bioreplicates per-study (currently exists under `/study/<studyId>/export`, example: [SMGDB00000001/export](https://mgrowthdb.gbiomed.kuleuven.be/study/SMGDB00000001/export/))
-3. Fine-grained access to entities by their ID and by searching
+1. Full study metadata and uploaded data spreadsheet for batch downloads under [/static/export](https://mgrowthdb.gbiomed.kuleuven.be/static/export/).
+2. Export UI with selectable bioreplicates per-study under `/study/<studyId>/export`, for example: [SMGDB00000001/export](https://mgrowthdb.gbiomed.kuleuven.be/study/SMGDB00000001/export/)).
+3. Fine-grained API access to entities through their ID or by performing a search.
 
-Only the second functionality is currently implemented, the rest is in progress as of this version. The following document describes the third functionality, fine-grained API access.
+The following document describes the third functionality, fine-grained API access. To learn more about the first two, take a look at the user documentation in the help files in the "[Downloading Data](https://mgrowthdb.gbiomed.kuleuven.be/help/downloading-data/)" topic.
 
-For the examples, we'll use curl to demonstrate responses. We'll use a `$ROOT_URL` that could be set to your localhost installation, or could be the public database:
+For the following examples, we'll use curl to demonstrate responses. We'll use a `$ROOT_URL` that could be set to your localhost installation, or could be the public database:
 
 ```bash
 export ROOT_URL="https://mgrowthdb.gbiomed.kuleuven.be"
 ```
 
-The JSON output will be formatted for readability and in some places, truncated with a message like `"[...N more entries...]"`.
+The JSON output will be formatted for readability and in some places, truncated with a message like `"[...N more entries...]"`. There will be a general "output structure" description that describes the general shape of the JSON with the types of its fields.
 
 Requests for specific global identifiers like `SMGDB00000001` or `EMGDB000000026` should work for you as well, so you should be able to replicate them by running them in the console. NCBI IDs and ChEBI IDs should also work for you. However, other numeric ids may be different, since updates to the underlying data might force them to be recreated. Try these out by fetching a specific study or experiment and picking bioreplicate ID or measurement context ID from the public entity's metadata.
 
@@ -31,9 +31,53 @@ The `measurementTimeUnits` key describes what time units measurements will be fe
 
 Successful results will be returned with an HTTP status code of `200`. A request that somehow doesn't fit the requirements of the API will have a response code of `400` ("bad request"). A request for a missing entity will return the code `404` ("not found"). For a JSON endpoint, the body of an unsuccessful response will have an "error" key that describes the issue. For a CSV endpoint, you can expect an error message as a single line of text.
 
+## Types of values
+
+Decimal values will be encoded as strings, since JSON doesn't technically support floating-point values.
+
+Timestamps are encoded as ISO 8601-formatted strings. All timestamps should be in UTC (timezone +00:00). In the structure descriptions below, they'll be indicated as `datetime`.
+
+Public IDs of studies, experiments, and projects, are also strings, but have a specific structure, a zero-padded number prefixed by "SMGDB", "EMGDB", and "PMGDB", respectively
+
+Technique units depend on what the specific technique is, but they will be one of:
+
+- Cell count units: Cells/mL, Cells/μL
+- CFU count units: CFUs/mL, CFUs/μL
+- Metabolite units of molar or mass concentration: mM, μM, nM, pM, g/L, mg/L
+
+Units within these three lists are convertible between each other in the application, though at the moment the API returns the data in the units that it was uploaded in. There are also other units that are not convertible with the others:
+
+- AUC: for metabolites, a relative measurement
+- g/L: for mass concentration of cells, same unit as with metabolites, but non-convertible (since we don't know the weights of individual cells)
+- reads: for relative cell abundances
+- an empty string, indicating a unitless value like OD or pH.
+
+Below, in the structure descriptions, these will be described as the type `Unit`.
+
 ## Search
 
-You can use the "search" endpoint to locate studies with specific properties. At this time, you can only look for studies that measure specific **microbial strains** or measure specific **metabolites**.
+You can use the "search" endpoint to locate studies with specific properties. At this time, you can only look for studies that measure specific **microbial strains** or measure specific **metabolites**. Output structure:
+
+```typescript
+{
+  studies: string[],
+  experiments: string[],
+  measurementTimeUnits: "h",
+  measurementContexts: [{
+    id: number,
+    experimentId: "EMGDBxxx",
+    studyId: "SMGDBxxx",
+    techniqueType: "fc"|"od"|"plates"|"16s"|"qpcr"|"ph"|"metabolite",
+    techniqueUnits: Unit,
+    subject: {
+      type: "bioreplicate"|"strain"|"metabolite",
+      name: string,
+      NCBId?: number,
+      chebiId?: number,
+    }
+  }]
+}
+```
 
 Example search query that looks for the strain with NCBI Taxonomy ID 411483, [Faecalibacterium duncaniae](https://www.ncbi.nlm.nih.gov/datasets/taxonomy/411483/):
 
@@ -144,6 +188,20 @@ There are three major entities with stable public ids: projects, studies, and ex
 
 ### Projects
 
+Output structure:
+
+```typescript
+{
+  id: "PMGDBxxx",
+  name: string,
+  description: string,
+  studies: [{
+    id: "SMGDBxxx",
+    name: string,
+  }]
+}
+```
+
 Example project: [PMGDB000001](https://mgrowthdb.gbiomed.kuleuven.be/project/PMGDB000001).
 
 ```bash
@@ -167,6 +225,24 @@ Output:
 ```
 
 ### Studies
+
+Output structure:
+
+```typescript
+{
+  id: "SMGDBxxx",
+  projectId: "PMGDBxxx",
+  name: string,
+  description: string,
+  url: string,
+  uploadedAt: datetime,
+  publishedAt: datetime,
+  experiments: [{
+    id: "EMGDBxxx",
+    name: string,
+  }]
+}
+```
 
 Example study: [SMGDB00000002](https://mgrowthdb.gbiomed.kuleuven.be/study/SMGDB00000002/).
 
@@ -200,6 +276,60 @@ Output:
 ```
 
 ### Experiments
+
+Output structure (note that compartment values encoded as decimal numbers are returned as strings):
+
+```typescript
+{
+  id: "EMGDBxxx",
+  name: string,
+  description: string,
+  studyId: "SMGDBxxx",
+  cultivationMode: "batch"|"fed-batch"|"chemostat"|"other",
+  communityStrains: [{
+    id: number,
+    NCBId: number,
+    custom: boolean,
+    name: string,
+  }],
+  compartments: [{
+    name: string,
+    volume?: string,
+    pressure?: string,
+    stirringSpeed?: string,
+    stirringMode?: "linear"|"orbital"|"vibrational",
+    O2?: string,
+    CO2: string,
+    H2?: string,
+    N2?: string,
+    inoculumConcentration?: string,
+    inoculumVolume?: string,
+    initialPh?: string,
+    dilutionRate?: string,
+    initialTemperature?: string,
+    mediumName?: string,
+    mediumUrl?: string,
+  }],
+  bioreplicates: [{
+    id: number,
+    name: string
+    biosampleUrl?: string,
+    measurementContexts: [{
+      id: number,
+      experimentId: "EMGDBxxx",
+      studyId: "SMGDBxxx",
+      techniqueType: "fc"|"od"|"plates"|"16s"|"qpcr"|"ph"|"metabolite",
+      techniqueUnits: Unit,
+      subject: {
+        type: "bioreplicate"|"strain"|"metabolite",
+        name: string,
+        NCBId?: number,
+        chebiId?: number,
+      }
+    }]
+  }]
+}
+```
 
 Example experiment: [EMGDB000000019](https://mgrowthdb.gbiomed.kuleuven.be/experiment/EMGDB000000019/)
 
@@ -300,7 +430,31 @@ Example output:
 
 ### For a single measurement context
 
-From one of the above measurement context records, we can find the id of a particular collection of measurements and fetch its metadata as JSON and its specific measurements in CSV format. To fetch the metadata via curl:
+From one of the above measurement context records, we can find the id of a particular collection of measurements and fetch its metadata as JSON and its specific measurements in CSV format.
+
+Metadata structure:
+
+```typescript
+{
+  id: number,
+  experimentId: "EMGDBxxx",
+  studyId: "SMGDBxxx",
+  bioreplicateId: number,
+  bioreplicateName: string,
+  techniqueType: "fc"|"od"|"plates"|"16s"|"qpcr"|"ph"|"metabolite",
+  techniqueUnits: Unit,
+  subject: {
+    type: "bioreplicate"|"strain"|"metabolite",
+    name: string,
+    NCBId?: number,
+    chebiId?: number,
+  },
+  measurementCount: number,
+  measurementTimeUnits: "h",
+}
+```
+
+To fetch the metadata via curl:
 
 ```bash
 curl -s "$ROOT_URL/api/v1/measurement-context/1440.json"
@@ -399,6 +553,30 @@ time,value,std
 ### For an entire biological replicate
 
 We can perform similar queries for biological replicates, getting the results for multiple measurement contexts in one CSV, grouped by measurement context id. We can get the bioreplicate IDs from the experiment metadata and use them to fetch either the bioreplicate-specific metadata or the measurements in CSV form.
+
+Output structure:
+
+```typescript
+{
+  id: 60332,
+  experimentId: "EMGDB000000023",
+  studyId: "SMGDB00000002",
+  name: "Average(BTRI_MUCIN)",
+  biosampleUrl: null,
+  measurementTimeUnits: "h",
+  measurementContexts: [{
+    id: number,
+    techniqueType: "fc"|"od"|"plates"|"16s"|"qpcr"|"ph"|"metabolite",
+    techniqueUnits: Unit,
+    subject: {
+      type: "bioreplicate"|"strain"|"metabolite",
+      name: string,
+      NCBId?: number,
+      chebiId?: number,
+    }
+  }]
+}
+```
 
 The CSV for a biological replicate includes additional context about the subject of each measurement: its type and name, and external database identifier, if applicable. This information can be seen in the JSON metadata, but it's included in the CSV for convenience.
 

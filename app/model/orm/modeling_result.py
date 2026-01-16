@@ -44,6 +44,10 @@ class ModelInfo:
         self.description = description
         self.params      = params
 
+    @property
+    def is_custom(self):
+        return self.type.startswith('custom_')
+
     def __eq__(self, other):
         return self.type == other.type
 

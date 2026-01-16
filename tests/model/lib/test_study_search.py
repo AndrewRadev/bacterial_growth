@@ -7,7 +7,7 @@ from app.model.lib.study_search import StudySearch
 from tests.database_test import DatabaseTest
 
 class TestStudySearch(DatabaseTest):
-    def test_no_query(self):
+    def test_user_permissions(self):
         user1 = self.create_user()
         user2 = self.create_user()
         admin = self.create_user(isAdmin=True)
@@ -53,6 +53,15 @@ class TestStudySearch(DatabaseTest):
 
         search = StudySearch(self.db_session, user=admin, query="foobar")
         self._assertEqualPublicIds(search.fetch_results(), [s3])
+
+        # Pagination
+        search = StudySearch(self.db_session, user=admin, query="bar", per_page=2)
+        self._assertEqualPublicIds(search.fetch_results(), [s4, s3])
+        self.assertTrue(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, query="bar", per_page=2, offset=1)
+        self._assertEqualPublicIds(search.fetch_results(), [s3, s2])
+        self.assertFalse(search.has_more)
 
     def test_public_id_query(self):
         admin = self.create_user(isAdmin=True)
@@ -102,6 +111,16 @@ class TestStudySearch(DatabaseTest):
         search = StudySearch(self.db_session, user=admin, ncbiIds=[roseburia.ncbiId, blautia.ncbiId])
         self._assertEqualPublicIds(search.fetch_results(), [s1, s3, s2])
 
+        # Pagination
+        search = StudySearch(self.db_session, user=admin, ncbiIds=[roseburia.ncbiId], per_page=1)
+        self._assertEqualPublicIds(search.fetch_results(), [s2])
+        self.assertTrue(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, ncbiIds=[roseburia.ncbiId], per_page=1, offset=1)
+        self._assertEqualPublicIds(search.fetch_results(), [s1])
+        self.assertFalse(search.has_more)
+
+
     def test_metabolite_query(self):
         admin = self.create_user(isAdmin=True)
 
@@ -130,6 +149,56 @@ class TestStudySearch(DatabaseTest):
         # Order by larger number of matches:
         search = StudySearch(self.db_session, user=admin, chebiIds=[glucose.chebiId, trehalose.chebiId])
         self._assertEqualPublicIds(search.fetch_results(), [s1, s3, s2])
+
+        # Pagination
+        search = StudySearch(self.db_session, user=admin, chebiIds=[trehalose.chebiId], per_page=1)
+        self._assertEqualPublicIds(search.fetch_results(), [s3])
+        self.assertTrue(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, chebiIds=[trehalose.chebiId], per_page=1, offset=1)
+        self._assertEqualPublicIds(search.fetch_results(), [s1])
+        self.assertFalse(search.has_more)
+
+    def test_pagination(self):
+        admin = self.create_user(isAdmin=True)
+
+        s1 = self.create_study(name="Foo")
+        s2 = self.create_study(name="Bar")
+        s3 = self.create_study(name="FooBar")
+        s4 = self.create_study(name="Test", description="Bar")
+
+        search = StudySearch(self.db_session, user=admin, per_page=2)
+        self._assertEqualPublicIds(search.fetch_results(), [s4, s3])
+        self.assertTrue(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, per_page=4)
+        self._assertEqualPublicIds(search.fetch_results(), [s4, s3, s2, s1])
+        self.assertFalse(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, per_page=5)
+        self._assertEqualPublicIds(search.fetch_results(), [s4, s3, s2, s1])
+        self.assertFalse(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, per_page=2, offset=1)
+        self._assertEqualPublicIds(search.fetch_results(), [s3, s2])
+        self.assertTrue(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, per_page=2, offset=2)
+        self._assertEqualPublicIds(search.fetch_results(), [s2, s1])
+        self.assertFalse(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, per_page=2, offset=2)
+        self._assertEqualPublicIds(search.fetch_results(), [s2, s1])
+        self.assertFalse(search.has_more)
+
+        # With strain query
+        search = StudySearch(self.db_session, user=admin, query="bar", per_page=2)
+        self._assertEqualPublicIds(search.fetch_results(), [s4, s3])
+        self.assertTrue(search.has_more)
+
+        search = StudySearch(self.db_session, user=admin, query="bar", per_page=2, offset=1)
+        self._assertEqualPublicIds(search.fetch_results(), [s3, s2])
+        self.assertFalse(search.has_more)
 
     def _assertEqualPublicIds(self, list1, list2):
         get_public_id = lambda s: s.publicId

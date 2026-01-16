@@ -28,7 +28,7 @@ lower <- c(y0 = 1e-9,   mumax = 0,         K = 0)
 # “Marq”, “Port”, “Newton”, “Nelder-Mead”, “BFGS”, “CG”, “L-BFGS-B”, “SANN”, “Pseudo”, “bobyqa”
 
 model_fit <- fit_growthmodel(FUN       = grow_logistic,
-                             method    = 'CG',
+                             method    = 'BFGS',
                              transform = 'log',
                              time      = data$time,
                              y         = data$value,

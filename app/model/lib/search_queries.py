@@ -41,11 +41,12 @@ def dynamical_query(all_advance_query):
             values.append(project_id)
         elif query_dict['option'] == 'Study Name':
             study_name = query_dict['value'].strip().lower()
-            where_clause = f"""
-                FROM Studies
-                WHERE LOWER(name) LIKE :value_{len(values)}
-            """
-            values.append(f"%{study_name}%")
+            if study_name != '':
+                where_clause = f"""
+                    FROM Studies
+                    WHERE LOWER(name) LIKE :value_{len(values)}
+                """
+                values.append(f"%{study_name}%")
         elif query_dict['option'] == 'Study ID':
             study_id = query_dict['value'].strip()
             where_clause = f"""

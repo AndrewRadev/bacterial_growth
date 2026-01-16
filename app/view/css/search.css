@@ -16,7 +16,7 @@
   }
 
   .results-list {
-    transition: all var(--transition-length);
+    transition: opacity var(--transition-length);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding-right: 40px;
@@ -28,6 +28,17 @@
 
     .highlight {
       background-color: var(--light-blue);
+    }
+  }
+
+  .load-more {
+    margin-top: 20px;
+    width: 100%;
+    text-align: center;
+
+    &.loading {
+      background: url(/static/images/loader.svg) no-repeat left 10px center;
+      pointer-events: none;
     }
   }
 }

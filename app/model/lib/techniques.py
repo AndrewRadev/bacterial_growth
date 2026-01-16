@@ -5,7 +5,7 @@ TECHNIQUE_SHORT_NAMES = {
     '16s':        '16S-rRNA reads',
     'qpcr':       'qPCR',
     'ph':         'pH',
-    'metabolite': 'Metabolite',
+    'metabolite': 'Metabolites',
 }
 "Human-readable short names of techniques"
 

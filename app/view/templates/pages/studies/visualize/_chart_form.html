@@ -20,9 +20,9 @@
 
   {% for experiment in study.experiments: %}
     <div
-        class="experiment-container hidden js-experiment-container"
+        class="experiment-container small hidden js-experiment-container"
         data-experiment-id="{{ experiment.publicId }}">
-      <p>{{ experiment.description }}</p>
+      {{ experiment.description|format_text }}
     </div>
   {% endfor %}
 

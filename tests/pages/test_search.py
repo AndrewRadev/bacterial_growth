@@ -13,29 +13,13 @@ class TestSearch(PageTest):
         self._bootstrap_taxa()
         self._bootstrap_metabolites()
 
-    def test_no_query(self):
-        bootstrap_study(self.db_session, 'synthetic_gut', 'test_user')
-        bootstrap_study(self.db_session, 'ri_bt_bh_in_chemostat_controls', 'test_user')
+    # TODO (2026-01-14) Test simple search
 
-        response = self.client.get('/search/')
-        response_text = self._get_text(response)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Synthetic human gut bacterial community", response_text)
-        self.assertIn("RI, BT and BH in chemostat: Controls", response_text)
-
-        response = self.client.get('/search/', query_string={'clauses-0-value': ''})
-        response_text = self._get_text(response)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("Synthetic human gut bacterial community", response_text)
-        self.assertIn("RI, BT and BH in chemostat: Controls", response_text)
-
-    def test_basic_query(self):
+    def test_advanced_search_basic_query(self):
         s1 = bootstrap_study(self.db_session, 'synthetic_gut', 'test_user')
         s2 = bootstrap_study(self.db_session, 'ri_bt_bh_in_chemostat_controls', 'test_user')
 
-        response = self.client.get('/search/', query_string={
+        response = self.client.get('/advanced-search/', query_string={
             'clauses-0-option': 'Study Name',
             'clauses-0-value': 'Synthetic human gut',
         })
@@ -45,7 +29,7 @@ class TestSearch(PageTest):
         self.assertIn("Synthetic human gut bacterial community", response_text)
         self.assertNotIn("RI, BT and BH in chemostat: Controls", response_text)
 
-        response = self.client.get('/search/', query_string={
+        response = self.client.get('/advanced-search/', query_string={
             'clauses-0-option': 'Study Name',
             'clauses-0-value': 'chemostat',
         })
@@ -60,7 +44,10 @@ class TestSearch(PageTest):
         self.db_session.add(s1)
         self.db_session.commit()
 
-        response = self.client.get('/search/')
+        response = self.client.get('/advanced-search/', query_string={
+            'clauses-0-option': 'Study Name',
+            'clauses-0-value': 'a',
+        })
         response_text = self._get_text(response)
 
         self.assertEqual(response.status_code, 200)

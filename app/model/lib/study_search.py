@@ -21,6 +21,7 @@ class StudySearch():
         ncbiIds=None,
         chebiIds=None,
         per_page=10,
+        offset=0,
     ):
         self.db_session = db_session
         self.user       = user
@@ -28,8 +29,10 @@ class StudySearch():
         self.per_page   = per_page
         self.ncbiIds    = [int(n) for n in (ncbiIds or [])]
         self.chebiIds   = chebiIds or []
+        self.offset     = offset
 
         self.query_words = []
+        self.has_more = False
 
     def fetch_results(self):
         publish_clause = self._build_publish_clause()
@@ -41,6 +44,12 @@ class StudySearch():
             .join(StudyUser, isouter=True)
             .where(publish_clause)
             .limit(self.per_page)
+            .offset(self.offset)
+        )
+        db_count_query = (
+            sql.select(sql.func.count(Study.publicId.distinct()))
+            .join(StudyUser, isouter=True)
+            .where(publish_clause)
         )
 
         if len(self.query):
@@ -49,27 +58,38 @@ class StudySearch():
 
             like_expr = '%' + '%'.join(self.query_words) + '%'
 
-            db_query = db_query.where(
-                sql.or_(
-                    Study.name.ilike(like_expr),
-                    Study.description.ilike(like_expr),
-                    Study.publicId.in_(self.query_words),
-                )
+            query_clause = sql.or_(
+                Study.name.ilike(like_expr),
+                Study.description.ilike(like_expr),
+                Study.publicId.in_(self.query_words),
             )
+
+            db_query       = db_query.where(query_clause)
+            db_count_query = db_count_query.where(query_clause)
         else:
             self.query_words = []
 
         if self.chebiIds:
-            db_query = db_query.join(StudyMetabolite).where(StudyMetabolite.chebiId.in_(self.chebiIds))
+            db_query       = db_query.join(StudyMetabolite).where(StudyMetabolite.chebiId.in_(self.chebiIds))
+            db_count_query = db_count_query.join(StudyMetabolite).where(StudyMetabolite.chebiId.in_(self.chebiIds))
+
             order_clauses = (sql.func.count(StudyMetabolite.id.distinct()).desc(), *order_clauses)
 
         if self.ncbiIds:
-            db_query = db_query.join(StudyStrain).where(StudyStrain.ncbiId.in_(self.ncbiIds))
+            db_query       = db_query.join(StudyStrain).where(StudyStrain.ncbiId.in_(self.ncbiIds))
+            db_count_query = db_count_query.join(StudyStrain).where(StudyStrain.ncbiId.in_(self.ncbiIds))
+
             order_clauses = (sql.func.count(StudyStrain.ncbiId.distinct()).desc(), *order_clauses)
 
         db_query = db_query.order_by(*order_clauses)
 
-        return self.db_session.scalars(db_query).all()
+        results = self.db_session.scalars(db_query).all()
+        count   = self.db_session.scalars(db_count_query).one()
+
+        if count > self.offset + len(results):
+            self.has_more = True
+
+        return results
 
     def fetch_taxa(self):
         return self.db_session.scalars(
