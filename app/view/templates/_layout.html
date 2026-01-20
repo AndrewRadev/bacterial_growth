@@ -41,7 +41,7 @@
           <li>
             <a href="{{ url_for('search_index_page') }}">
               <div class="emoji-icon">🔍</div>
-              Search
+              Search/Explore
             </a>
           </li>
           <li>
@@ -71,6 +71,9 @@
               </span>
             </a>
           </li>
+
+          <hr>
+
           <li>
             {% if g.current_user: %}
               <a href="{{ url_for('user_show_page') }}">
@@ -91,6 +94,24 @@
             </a>
           </li>
           <li>
+            <a href="{{ url_for('sandbox_index_page') }}">
+              <div class="emoji-icon">📈</div>
+              Sandbox
+            </a>
+          </li>
+
+          {% if g.current_user and g.current_user.isAdmin: %}
+            <li>
+              <a href="/admin/" style="border: 1px solid coral;">
+                <div class="emoji-icon">👷</div>
+                Admin
+              </a>
+            </li>
+          {% endif %}
+
+          <hr>
+
+          <li>
             <a href="{{ url_for('help_index_page') }}">
               <div class="emoji-icon">❓</div>
               Help
@@ -102,14 +123,6 @@
               About us
             </a>
           </li>
-          {% if g.current_user and g.current_user.isAdmin: %}
-            <li>
-              <a href="/admin/" style="border: 1px solid coral;">
-                <div class="emoji-icon">👷</div>
-                Admin
-              </a>
-            </li>
-          {% endif %}
         </ul>
       </nav>
     </aside>

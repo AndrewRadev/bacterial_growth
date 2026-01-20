@@ -41,6 +41,11 @@ a:hover {
 
   nav {
     margin: 0 auto;
+
+    hr {
+      margin: 8px 0;
+      opacity: 0.7;
+    }
   }
 
   a {
