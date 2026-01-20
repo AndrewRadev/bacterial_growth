@@ -100,15 +100,6 @@
             </a>
           </li>
 
-          {% if g.current_user and g.current_user.isAdmin: %}
-            <li>
-              <a href="/admin/" style="border: 1px solid coral;">
-                <div class="emoji-icon">👷</div>
-                Admin
-              </a>
-            </li>
-          {% endif %}
-
           <hr>
 
           <li>
@@ -123,6 +114,15 @@
               About us
             </a>
           </li>
+
+          {% if g.current_user and g.current_user.isAdmin: %}
+            <li>
+              <a href="/admin/" style="border: 1px solid coral;">
+                <div class="emoji-icon">👷</div>
+                Admin
+              </a>
+            </li>
+          {% endif %}
         </ul>
       </nav>
     </aside>
