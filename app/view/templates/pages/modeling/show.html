@@ -7,6 +7,12 @@
 
 {% block title %}: Models for study {{ study.publicId }}{% endblock %}
 
+{% block head %}
+  {% assets "plotly_js" %}
+  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
+  {% endassets %}
+{% endblock %}
+
 {% block content %}
   <div class="container study-page study-modeling-page" data-study-id="{{ study.publicId }}">
     {% include 'pages/studies/_header.html' %}
@@ -73,8 +79,4 @@
       </div>
     </article>
   </div>
-
-  {% assets "plotly_js" %}
-  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
-  {% endassets %}
 {% endblock %}
