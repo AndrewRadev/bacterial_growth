@@ -127,7 +127,7 @@ def comparison_chart_fragment():
         show_std=args.get('showStd', None) is not None,
         show_perturbations=args.get('showPerturbations', None) is not None,
     )
-    chart = chart_form.build_chart(args, width, legend_position='top', clamp_x_data=True)
+    chart = chart_form.build_chart(args, width, clamp_x_data=True)
 
     return render_template(
         'pages/comparison/_chart.html',

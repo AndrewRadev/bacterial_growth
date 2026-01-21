@@ -31,7 +31,6 @@ class Chart:
         log_left=False,
         log_right=False,
         width=None,
-        legend_position='top',
         clamp_x_data=False,
         show_std=True,
     ):
@@ -43,7 +42,6 @@ class Chart:
         self.cfu_count_units  = cfu_count_units
         self.metabolite_units = metabolite_units
         self.width            = width
-        self.legend_position  = legend_position
         self.clamp_x_data     = clamp_x_data
         self.show_std         = show_std
 
