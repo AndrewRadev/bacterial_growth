@@ -1,5 +1,4 @@
 {% macro render_form() %}
-
   <form
       action="{{ url_for('sandbox_index_page') }}"
       enctype="multipart/form-data"
@@ -84,5 +83,26 @@
       </div>
     </div>
   </form>
+
+  <div class="help small margin-top-10">
+    You can upload multiple files at a time, either by selecting them in the
+    file browser or by dragging them together onto the upload areas.
+
+    <ul>
+      <li>
+        <strong>Column 1</strong>
+        of the uploaded files will be interpreted as <strong>time in hours</strong>.
+      </li>
+      <li>
+        <strong>Column 2</strong>
+        will be interpreted as the observations to place on the y-axis. The
+        column name will be used for the label.
+      </li>
+      <li>
+        <strong>Column 3</strong>, if present,
+        will be used for error bars.
+      </li>
+    </ul>
+  </div>
 
 {% endmacro %}
