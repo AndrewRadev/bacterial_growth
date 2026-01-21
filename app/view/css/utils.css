@@ -270,6 +270,11 @@ form.simple-form {
     }
   }
 
+  input[type="reset"],
+  button[type="reset"] {
+    cursor: pointer;
+  }
+
   input[type="submit"],
   button[type="submit"] {
     cursor: pointer;
