@@ -31,7 +31,7 @@ def sandbox_index_page():
             label = f"{file.filename}: {c2}"
             units = request.form.get(f"units-{axis}")
 
-            df = df.rename(columns={c1: "time", c2: "value", c3: "std"})
+            df.rename(columns={c1: "time", c2: "value", c3: "std"}, inplace=True)
 
             chart.add_df(df, units=units, label=label, axis=axis)
 
