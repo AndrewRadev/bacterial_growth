@@ -317,6 +317,11 @@ form.simple-form {
     color: gray;
   }
 
+  input.green-button[disabled] {
+    color: lightgray;
+    opacity: 0.5;
+  }
+
   button[disabled] {
     background-color: gray;
     &:hover {
