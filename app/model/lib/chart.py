@@ -60,6 +60,9 @@ class Chart:
         self.regions = []
 
     def add_df(self, df, *, units, label=None, axis='left', metabolite_mass=None):
+        if 'std' not in df:
+            df['std'] = [float('nan') for _ in range(df['value'].size)]
+
         entry = (df, units, label, metabolite_mass)
 
         if axis == 'left':

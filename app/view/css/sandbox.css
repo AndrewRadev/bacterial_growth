@@ -1,0 +1,53 @@
+.sandbox-page {
+  .data-controls {
+    border-bottom: 2px solid var(--border-color);
+    padding: 4px 0;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .column {
+      display: flex;
+      flex-direction: row;
+    }
+
+    input[type="checkbox"] {
+      margin: 0;
+    }
+  }
+
+  .upload-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    background-color: var(--light-blue);
+    border-radius: var(--border-radius);
+    padding: 8px;
+    border: 2px solid var(--light-blue);
+
+    &.drop-hover {
+      border: 2px dashed var(--border-color);
+    }
+
+    img {
+      align-self: center;
+    }
+
+    .instructions {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hint {
+      opacity: 0.6;
+      font-size: 14px;
+    }
+
+    .upload-button {
+      cursor: pointer;
+      align-self: flex-start;
+    }
+  }
+}

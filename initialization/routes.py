@@ -151,7 +151,11 @@ def init_routes(app):
 
     app.add_url_rule("/excel_files/<id>.xlsx", view_func=excel_file_pages.download_excel_file)
 
-    app.add_url_rule("/sandbox/", view_func=sandbox_pages.sandbox_index_page)
+    app.add_url_rule(
+        "/sandbox/",
+        view_func=sandbox_pages.sandbox_index_page,
+        methods=["GET", "POST"],
+    )
 
     #
     # API routes

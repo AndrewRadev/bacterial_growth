@@ -1,6 +1,15 @@
+{% from 'pages/sandbox/_chart.html' import render_chart %}
+{% from 'pages/sandbox/_form.html' import render_form %}
+
 {% extends '_layout.html' %}
 
 {% block title %}: Data sandbox{% endblock %}
+
+{% block head %}
+  {% assets "plotly_js" %}
+  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
+  {% endassets %}
+{% endblock %}
 
 {% block content %}
   <div class="container sandbox-page">
@@ -16,5 +25,17 @@
         uploading it to any particular study.
       </p>
     </article>
+
+    {% if g.current_user: %}
+      {{ render_chart(chart) }}
+      {{ render_form() }}
+    {% else: %}
+      <p class="warning-message">
+        In order to upload and visualize data, please
+        <a href="{{ url_for("user_login_page") }}">log in</a>
+        to the application using your
+        {{ "https://orcid.org/"|external_link("ORCID") }}.
+      </p>
+    {% endif %}
   </div>
 {% endblock %}

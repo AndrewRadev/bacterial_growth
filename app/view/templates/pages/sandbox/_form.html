@@ -1,0 +1,77 @@
+{% macro render_form() %}
+
+  <form
+      action="{{ url_for('sandbox_index_page') }}"
+      enctype="multipart/form-data"
+      class="simple-form flex-column flex-gap-10"
+      method="POST">
+    <div class="form-row flex-row flex-gap-10">
+      <div class="flex-2">
+        Units left
+      </div>
+
+      <div class="flex-1 flex-row flex-center">
+        <input type="submit" class="green-button" value="Submit" />
+      </div>
+
+      <div class="flex-2">
+        Units right
+      </div>
+    </div>
+
+    <div class="form-row flex-row flex-gap-10">
+      <div class="flex-2 js-upload-container">
+        <div class="upload-container js-file-upload">
+          <div class="flex-row flex-gap-10">
+            <img
+                src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
+                height="40"
+                title="Upload" />
+            <div class="instructions">
+              <span>
+                Drag and drop data CSVs to show on the <strong>left axis</strong>
+              </span>
+              <span class="hint small">Limit 200MB per file</span>
+            </div>
+          </div>
+
+          <input
+              class="small"
+              multiple
+              name="data-left"
+              accept=".csv"
+              type="file" />
+        </div>
+      </div>
+
+      <div class="flex-1">
+        {# Empty column for spacing #}
+      </div>
+
+      <div class="flex-2 js-upload-container">
+        <div class="upload-container js-file-upload">
+          <div class="flex-row flex-gap-10">
+            <div class="instructions">
+              <span>
+                Drag and drop data CSVs to show on the <strong>right axis</strong>
+              </span>
+              <span class="hint">Limit 200MB per file</span>
+            </div>
+            <img
+                src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
+                height="40"
+                title="Upload" />
+          </div>
+
+          <input
+              class="small"
+              multiple
+              name="data-right"
+              accept=".csv"
+              type="file" />
+        </div>
+      </div>
+    </div>
+  </form>
+
+{% endmacro %}
