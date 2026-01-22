@@ -96,7 +96,7 @@ Page('.upload-page .step-content.step-3.active', function($step3) {
     let includeStd     = $container.find('.js-include-std').is(':checked');
     let includeUnknown = $container.find('.js-include-unknown').is(':checked');
 
-    let label = $.trim($container.find('.js-label').val())
+    let label = $container.find('.js-label').val().trim();
     if (label == '') {
       label = null;
     } else {
