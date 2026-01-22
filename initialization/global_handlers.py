@@ -13,7 +13,10 @@ import sqlalchemy as sql
 import sqlalchemy.exc as sql_exceptions
 
 from db import get_connection, FLASK_DB
-from app.model.orm import User
+from app.model.orm import (
+    User,
+    PageVisit
+)
 from app.model.lib.errors import LoginRequired
 
 
@@ -30,6 +33,7 @@ def init_global_handlers(app):
     app.before_request(_set_variables)
     app.before_request(_open_db_connection)
     app.before_request(_fetch_user)
+    app.before_request(_record_page_visit)
 
     app.after_request(_close_db_connection)
 
@@ -87,6 +91,34 @@ def _fetch_user():
             .where(User.uuid == user_uuid)
             .limit(1)
         ).one_or_none()
+
+
+def _record_page_visit():
+    if request.method != 'GET':
+        # We only track direct page visits
+        return
+    if request.endpoint in ('static', 'admin.static', None):
+        # Ignore static files
+        return
+    if request.path.startswith('/admin/'):
+        # Ignore admin page requests
+        return
+    if request.headers.get('X-Requested-With', '') == 'XMLHttpRequest':
+        # Ignore ajax requests
+        return
+
+    page_visit = PageVisit(
+        path=request.path,
+        query=request.query_string,
+        referrer=request.referrer,
+        ip=request.remote_addr,
+        userAgent=request.user_agent.string,
+        isUser=(True if g.current_user else False),
+        isAdmin=(True if g.current_user and g.current_user.isAdmin else False),
+    )
+
+    g.db_session.add(page_visit)
+    g.db_session.commit()
 
 
 def _close_db_connection(response):
