@@ -24,25 +24,30 @@ Page('.sandbox-page', function($page) {
   }
 
   function updateLogView() {
-    let leftType;
-    if ($page.find('.js-log-left').is(':checked')) {
-      leftType = 'log';
-    } else {
-      leftType = 'linear';
+    let updates = {}
+
+    let $logLeft = $page.find('.js-log-left');
+    if (!$logLeft.is(':disabled')) {
+      if ($logLeft.is(':checked')) {
+        updates['yaxis.type'] = 'log';
+      } else {
+        updates['yaxis.type'] = 'linear';
+      }
     }
 
-    let rightType;
-    if ($page.find('.js-log-right').is(':checked')) {
-      rightType = 'log';
-    } else {
-      rightType = 'linear';
+    let $logRight = $page.find('.js-log-right');
+    if (!$logRight.is(':disabled')) {
+      if ($logRight.is(':checked')) {
+        updates['yaxis2.type'] = 'log';
+      } else {
+        updates['yaxis2.type'] = 'linear';
+      }
     }
 
-    $page.find('.js-plotly-plot').each(function() {
-      Plotly.relayout(this, {
-        'yaxis.type': leftType,
-        'yaxis2.type': rightType,
+    if (Object.keys(updates).length > 0) {
+      $page.find('.js-plotly-plot').each(function() {
+        Plotly.relayout(this, updates);
       });
-    });
+    }
   }
 })
