@@ -13,12 +13,21 @@ from app.model.lib.errors import LoginRequired
 
 def sandbox_index_page():
     chart = Chart(time_units='h')
+    errors = {}
 
     for axis in ('left', 'right'):
         for file in request.files.getlist(f"data-{axis}"):
+            if file.filename == '':
+                continue
+
             try:
                 df = pd.read_csv(file)
             except pd.errors.EmptyDataError:
+                errors[file.filename] = "No columns found in file"
+                continue
+
+            if len(df.columns) < 2:
+                errors[file.filename] = f"Expected at least 2 columns, found {len(df.columns)}"
                 continue
 
             c1 = df.columns[0]
@@ -35,4 +44,8 @@ def sandbox_index_page():
 
             chart.add_df(df, units=units, label=label, axis=axis)
 
-    return render_template('pages/sandbox/index.html', chart=chart)
+    return render_template(
+        'pages/sandbox/index.html',
+        chart=chart,
+        errors=errors,
+    )

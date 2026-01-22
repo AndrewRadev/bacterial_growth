@@ -28,7 +28,7 @@
 
     {% if g.current_user: %}
       {{ render_chart(chart) }}
-      {{ render_form() }}
+      {{ render_form(errors) }}
     {% else: %}
       <p class="warning-message">
         In order to upload and visualize data, please
