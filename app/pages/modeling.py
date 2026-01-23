@@ -26,9 +26,9 @@ from app.model.orm import (
     StudyTechnique,
 )
 from app.model.lib.chart import Chart
-from app.model.lib.modeling_tasks import process_modeling_request
 from app.model.lib.model_export import export_model_csv
 from app.model.lib.modeling import COMMON_COEFFICIENTS
+from app.model.tasks.modeling import process_modeling_request
 
 
 def modeling_page(publicId):

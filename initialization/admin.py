@@ -34,6 +34,7 @@ from app.model.orm import (
     Metabolite,
     ModelingResult,
     PageVisit,
+    PageVisitCounter,
     Perturbation,
     Project,
     ProjectUser,
@@ -281,9 +282,10 @@ def init_admin(app):
             'projectUsers', 'studyUsers',
         ]
 
-    admin.add_view(UserView(User,       db_session, category="Users"))
-    admin.add_view(AppView(StudyUser,   db_session, category="Users"))
-    admin.add_view(AppView(ProjectUser, db_session, category="Users"))
-    admin.add_view(AppView(PageVisit,   db_session, category="Users"))
+    admin.add_view(UserView(User,            db_session, category="Users"))
+    admin.add_view(AppView(StudyUser,        db_session, category="Users"))
+    admin.add_view(AppView(ProjectUser,      db_session, category="Users"))
+    admin.add_view(AppView(PageVisit,        db_session, category="Users"))
+    admin.add_view(AppView(PageVisitCounter, db_session, category="Users"))
 
     return app

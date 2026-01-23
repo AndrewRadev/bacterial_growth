@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime
 
 import sqlalchemy as sql
 from sqlalchemy.orm import (

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+celery -A scripts.run_celery beat -s var/celerybeat-schedule

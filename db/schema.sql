@@ -363,6 +363,23 @@ CREATE TABLE ModelingResults (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `PageVisitCounters`
+--
+
+DROP TABLE IF EXISTS PageVisitCounters;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE PageVisitCounters (
+  id int NOT NULL AUTO_INCREMENT,
+  counts json NOT NULL DEFAULT (json_object()),
+  startTimestamp datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  endTimestamp datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `PageVisits`
 --
 
@@ -734,5 +751,6 @@ INSERT INTO MigrationVersions VALUES
 (84,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-17 15:59:33'),
 (85,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 15:59:33'),
 (86,'2026_01_05_113846_add-params-to-custom-models','2026-01-08 13:28:47'),
-(90,'2026_01_22_172601_create_page_visits','2026-01-23 10:35:44');
+(90,'2026_01_22_172601_create_page_visits','2026-01-23 10:35:44'),
+(93,'2026_01_23_120741_create_page_visit_counters','2026-01-23 13:45:15');
 

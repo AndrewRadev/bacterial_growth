@@ -19,6 +19,7 @@ from app.model.orm import (
     MeasurementTechnique,
     Metabolite,
     ModelingResult,
+    PageVisit,
     Perturbation,
     Project,
     Study,
@@ -350,6 +351,17 @@ class DatabaseTest(unittest.TestCase):
         }
 
         return self._create_orm_record(CustomModel, params)
+
+    def create_page_visit(self, **params):
+        params = {
+            'path': '/',
+            'ip': '127.0.0.1',
+            'userAgent': 'Mozilla/5.0 (X11; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0',
+            'uuid': str(uuid4()),
+            **params,
+        }
+
+        return self._create_orm_record(PageVisit, params)
 
     def _create_orm_record(self, model_class, params):
         instance = model_class(**params)
