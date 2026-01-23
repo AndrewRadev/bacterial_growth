@@ -15,7 +15,7 @@ export SERVER_PID=$!
 celery -A scripts.run_celery worker --concurrency=3 --loglevel INFO &
 export WORKER_PID=$!
 
-celery -A scripts.run_celery beat -s var/celerybeat-schedule &
+celery -A scripts.run_celery beat -s var/celerybeat-schedule --loglevel INFO &
 export SCHEDULER_PID=$!
 
 reload_processes() {
@@ -30,7 +30,7 @@ reload_processes() {
   export WORKER_PID=$!
 
   kill -TERM "$SCHEDULER_PID"
-  celery -A scripts.run_celery beat -s var/celerybeat-schedule &
+  celery -A scripts.run_celery beat -s var/celerybeat-schedule --loglevel INFO &
   export SCHEDULER_PID=$!
 }
 
