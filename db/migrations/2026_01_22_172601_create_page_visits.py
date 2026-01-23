@@ -7,6 +7,8 @@ def up(conn):
             id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
             isUser tinyint(1) NOT NULL DEFAULT '0',
             isAdmin tinyint(1) NOT NULL DEFAULT '0',
+            isBot tinyint(1) NOT NULL DEFAULT '0',
+            uuid VARCHAR(36) NOT NULL,
             path VARCHAR(255) NOT NULL,
             query VARCHAR(255) DEFAULT NULL,
             referrer VARCHAR(255) DEFAULT NULL,

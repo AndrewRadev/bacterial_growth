@@ -373,6 +373,8 @@ CREATE TABLE PageVisits (
   id int NOT NULL AUTO_INCREMENT,
   isUser tinyint(1) NOT NULL DEFAULT '0',
   isAdmin tinyint(1) NOT NULL DEFAULT '0',
+  isBot tinyint(1) NOT NULL DEFAULT '0',
+  uuid varchar(36) NOT NULL,
   `path` varchar(255) NOT NULL,
   `query` varchar(255) DEFAULT NULL,
   referrer varchar(255) DEFAULT NULL,
@@ -732,5 +734,5 @@ INSERT INTO MigrationVersions VALUES
 (84,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-17 15:59:33'),
 (85,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 15:59:33'),
 (86,'2026_01_05_113846_add-params-to-custom-models','2026-01-08 13:28:47'),
-(88,'2026_01_22_172601_create_page_visits','2026-01-22 16:30:27');
+(90,'2026_01_22_172601_create_page_visits','2026-01-23 10:35:44');
 

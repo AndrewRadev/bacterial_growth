@@ -1,9 +1,11 @@
-import sqlalchemy as sql
+from datetime import datetime, UTC
 
+import sqlalchemy as sql
 from sqlalchemy.orm import (
     Mapped,
     mapped_column,
 )
+from sqlalchemy_utc.sqltypes import UtcDateTime
 
 from app.model.orm.orm_base import OrmBase
 
@@ -22,6 +24,10 @@ class PageVisit(OrmBase):
     referrer:  Mapped[str] = mapped_column(sql.String(255))
     ip:        Mapped[str] = mapped_column(sql.String(100))
     userAgent: Mapped[str] = mapped_column(sql.String)
+    uuid:      Mapped[str] = mapped_column(sql.String(36))
 
     isUser:  Mapped[bool] = mapped_column(sql.Boolean, default=False)
     isAdmin: Mapped[bool] = mapped_column(sql.Boolean, default=False)
+    isBot:   Mapped[bool] = mapped_column(sql.Boolean, default=False)
+
+    createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())

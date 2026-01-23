@@ -11,6 +11,7 @@ from flask import (
 )
 import sqlalchemy as sql
 import sqlalchemy.exc as sql_exceptions
+from crawlerdetect import CrawlerDetect
 
 from db import get_connection, FLASK_DB
 from app.model.orm import (
@@ -63,7 +64,8 @@ def _set_variables():
 
 
 def _open_db_connection():
-    if request.endpoint == 'static':
+    if _is_static(request):
+        # Ignore static files
         return
 
     if 'db_conn' not in g:
@@ -74,7 +76,8 @@ def _open_db_connection():
 
 
 def _fetch_user():
-    if request.endpoint == 'static':
+    if _is_static(request):
+        # Ignore static files
         return
 
     if 'user' not in g:
@@ -97,13 +100,13 @@ def _record_page_visit():
     if request.method != 'GET':
         # We only track direct page visits
         return
-    if request.endpoint in ('static', 'admin.static', None):
-        # Ignore static files
+    if _is_static(request):
+        # Don't record static files
         return
     if request.path.startswith('/admin/'):
         # Ignore admin page requests
         return
-    if request.headers.get('X-Requested-With', '') == 'XMLHttpRequest':
+    if _is_ajax(request):
         # Ignore ajax requests
         return
 
@@ -113,8 +116,10 @@ def _record_page_visit():
         referrer=request.referrer,
         ip=request.remote_addr,
         userAgent=request.user_agent.string,
+        uuid=session['user_uuid'],
         isUser=(True if g.current_user else False),
         isAdmin=(True if g.current_user and g.current_user.isAdmin else False),
+        isBot=CrawlerDetect().isCrawler(request.user_agent.string),
     )
 
     g.db_session.add(page_visit)
@@ -122,7 +127,8 @@ def _record_page_visit():
 
 
 def _close_db_connection(response):
-    if request.endpoint == 'static':
+    if _is_static(request):
+        # Ignore static files
         return response
 
     db_conn = g.pop('db_conn', None)
@@ -139,7 +145,6 @@ def _render_not_found(_error):
         return '404 Not found', 404
     else:
         return render_template('errors/404.html'), 404
-
 
 
 def _render_forbidden(_error):
@@ -166,3 +171,11 @@ def _is_json(request):
 
 def _is_csv(request):
     return request.path.endswith('.csv')
+
+
+def _is_static(request):
+    return request.endpoint in ('static', 'admin.static', None)
+
+
+def _is_ajax(request):
+    return request.headers.get('X-Requested-With', '') == 'XMLHttpRequest'
