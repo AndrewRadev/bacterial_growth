@@ -9,38 +9,35 @@ fit_json          = 'fit.json'
 
 data <- read.table(input_csv, header=T, sep=',')
 
-## Initial parameter estimation from spline fit
-spline_fit <- fit_spline(data$time, data$value)
-summary(spline_fit)
-spline_coefficients <- coef(spline_fit)
+## Initial parameter estimation from easy linear fit
+model_fit <- fit_easylinear(data$time, data$value, h=min(5, length(data$time) - 1))
+el_coefficients = coef(model_fit)
 
-y0_est    = spline_coefficients['y0']
-mumax_est = spline_coefficients['mumax']
-names(y0_est)    <- NULL
-names(mumax_est) <- NULL
-
-# TODO: estimate lag time by intercepting max growth with x-axis
-# h0_est = mumax_est * lag_time
-# h0_est = mumax_est * 5.52495319837189
-h0_est = 0.05
+y0_est    = el_coefficients['y0']
+mumax_est = el_coefficients['mumax']
+lag_est   = el_coefficients['lag']
+h0_est    = mumax_est * lag_est
 
 max_value = max(data$value)
 
-p <- c(y0    = max(y0_est, 1e-9),
-       mumax = max(mumax_est, 1e-9),
-       K     = max(max_value, 1e-9),
-       h0    = max(h0_est, 1e-9))
+p <- c(y0    = max(y0_est,    10),
+       mumax = max(mumax_est, 1e-5),
+       K     = max(max_value, 1e+3),
+       h0    = max(h0_est,    1e-4))
 
-lower <- c(y0    = 1e-9,
-           mumax = 1e-9,
-           K     = 1e-9,
+print("Initial estimation:")
+print(p)
+
+lower <- c(y0    = 1,
+           mumax = 1e-6,
+           K     = 1e+2,
            h0    = 1e-9)
 
 # Fitting methods:
 # "Marq", "Port", "Newton", "Nelder-Mead", "BFGS", "CG", "L-BFGS-B", "SANN", "Pseudo", "bobyqa"
 
 model_fit <- fit_growthmodel(FUN       = grow_baranyi,
-                             method    = 'CG',
+                             method    = 'BFGS',
                              transform = 'log',
                              time      = data$time,
                              y         = data$value,

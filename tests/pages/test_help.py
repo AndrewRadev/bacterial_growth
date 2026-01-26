@@ -5,7 +5,7 @@ import unittest
 from werkzeug.exceptions import NotFound
 
 from tests.page_test import PageTest
-from app.pages.help import HelpPages
+from app.pages.help import HelpTopics
 
 
 class TestHelpPages(PageTest):
@@ -13,13 +13,13 @@ class TestHelpPages(PageTest):
         super().setUp()
 
         with self.app.app_context():
-            self.help_pages = HelpPages()
+            self.help_pages = HelpTopics()
             self.help_pages.process_once()
 
     def test_simple_page_rendering(self):
         self.assertIn(
             '<h2>Study navigation</h2>',
-            str(self.help_pages.render_html('data-analysis')),
+            str(self.help_pages.render_html('study-pages')),
         )
 
         self.assertIn(

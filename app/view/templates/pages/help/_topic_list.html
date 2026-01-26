@@ -1,0 +1,117 @@
+{% if topics is not none: %}
+  <ul>
+
+    {% for topic in topics: %}
+      <li>
+        <a href="{{ url_for('help_show_page', name=topic['name']) }}">
+          {{ topic['name']|replace('-', ' ')|title }}
+        </a>
+
+        <p>{{ topic['excerpt_html']|safe }}</p>
+      </li>
+    {% else: %}
+      <li class="warning-message">
+        No results match your query
+      </li>
+    {% endfor %}
+
+  </ul>
+{% else: %}
+
+  <div class="flex-row">
+    <div class="flex-1">
+      <h3>Biological</h3>
+      <p class="description">
+        How to understand microbial growth
+      </p>
+
+      <ul>
+        <li>
+          <a href="{{ url_for('help_show_page', name="main-concepts") }}">
+            Main concepts
+          </a>
+          <p class="description">
+            Terminology used across the application and in the help pages.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="microbial-growth-experiments") }}">
+            Microbial growth experiments
+          </a>
+          <p class="description">
+            Common concerns when growing microbial cultures.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="measurement-techniques") }}">
+            Measurement techniques
+          </a>
+          <p class="description">
+            Methods to measure cell abundances.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="modeling-techniques") }}">
+            Modeling techniques
+          </a>
+          <p class="description">
+            Explanations of the modeling methods supported by the application.
+          </p>
+        </li>
+      </ul>
+    </div>
+
+    <div class="flex-1">
+      <h3>Technical</h3>
+      <p class="description">
+        How to use the site
+      </p>
+
+      <ul>
+        <li>
+          <a href="{{ url_for('help_show_page', name="searching") }}">
+            Searching
+          </a>
+          <p class="description">
+            How to find studies on the site by their title, included strains, or
+            other properties.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="upload-process") }}">
+            Upload process
+          </a>
+          <p class="description">
+            Step-by-step instructions on uploading a new study.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="study-pages") }}">
+            Study pages
+          </a>
+          <p class="description">
+            Exploring a single study: Visualizing data traces, comparing experiments
+            between studies, exporting data.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="downloading-data") }}">
+            Downloading data
+          </a>
+          <p class="description">
+            Getting data out of the application, either in batches or in a fine-grained way.
+          </p>
+        </li>
+        <li>
+          <a href="{{ url_for('help_show_page', name="modeling-interface") }}">
+            Modeling interface
+          </a>
+          <p class="description">
+            Using the application to fit growth data or uploading your own models.
+          </p>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+{% endif %}

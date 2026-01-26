@@ -65,6 +65,11 @@
                   in {{ technique.units }}
                 {% endif %}
               </strong>
+              {% if technique.type in ('fc', 'od', 'plates', '16s', 'metabolite'): %}
+                <span class="smaller">
+                  {{ "measurement-techniques"|help_link(text="ℹ️ Info", section=technique.type, css_class="white-button small-button") }}
+                </span>
+              {% endif %}
               {% if technique.description != '': %}
                 <div class="small">
                   {{ technique.description }}
@@ -86,9 +91,13 @@
               <li>
                 <strong>{{ model_info.name }}</strong>
 
-                {% if model_info.url: %}
-                  ({{ model_info.url|external_link }})
-                {% endif %}
+                <span class="smaller">
+                  {% if not model_info.is_custom: %}
+                    {{ "modeling-techniques"|help_link(text="ℹ️ Info", section=model_info.type, css_class="white-button small-button") }}
+                  {% elif model_info.url: %}
+                    {{ model_info.url|external_link(text="ℹ️ Info", css_class="white-button small-button") }}
+                  {% endif %}
+                </span>
 
                 {% if model_info.description != '': %}
                   <div class="small">{{ model_info.description }}</div>
@@ -133,7 +142,7 @@
               {% endif %}
 
               {% if experiment.description: %}
-                <p>{{ experiment.description }}</p>
+                {{ experiment.description|format_text }}
               {% endif %}
 
               <br>

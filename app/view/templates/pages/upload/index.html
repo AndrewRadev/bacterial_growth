@@ -43,6 +43,10 @@
   {% set submission = submission_form.submission %}
 
   <div class="container upload-page">
+    <div style="font-size: 14px; float: right">
+      {{ "upload-process"|help_link("❓ Help", css_class="white-button small-button") }}
+    </div>
+
     <h1>
       <span class="icon icon-emoji">📤</span>
       Upload Growth Data

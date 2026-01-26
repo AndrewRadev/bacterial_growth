@@ -112,7 +112,7 @@
               <div class="section-experiment">
                 <h4>Experiment: {{ experiment.name }}</h4>
 
-                <p>{{ experiment.description }}</p>
+                {{ experiment.description|format_text }}
 
                 <div class="section-bioreplicates box">
                   {% for bioreplicate in experiment.bioreplicates: %}

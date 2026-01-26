@@ -17,98 +17,74 @@
     </h1>
 
     <article>
-      <p>
-        Discover microbial growth studies and datasets by selecting one or more of
-        the options. When conducting an advanced search, you can choose multiple
-        logical operators to refine your query and extract precise information from
-        the database.
-      </p>
+      <form
+          action="{{ url_for('search_index_page') }}"
+          class="simple-form margin-top-10 js-search-form">
+        <div class="form-row full">
+          <label class="full">
+            <span>By study title or description:</span>
+            <input
+                type="text"
+                name="q"
+                tabindex="1"
+                autocomplete="off"
+                value="{{ request.args.get('q') or '' }}"
+                placeholder="Text included in the study"
+                class="form-input-full form-input-blue" />
+          </label>
 
-      <p>
-        <form action="{{ url_for('search_index_page') }}" class="simple-form">
-          {% for clause in form.clauses: %}
+          <input class="flex-end" type="submit" value="🔍 Search" />
+          <a href="{{ url_for('search_index_page') }}" class="flex-end white-button">🧹 Clear</a>
 
-            <div class="form-row clause">
-              {{ clause.csrf_token }}
-
-              {% if loop.index > 1: %}
-                <label>
-                  <span>Select logic operator:</span>
-                  {{ clause.logic_operator(class="form-input-full form-input-blue") }}
-                </label>
-              {% endif %}
-
-              <label>
-                <span>Select an option:</span>
-                {{ clause.option(class="form-input-full form-input-blue") }}
-              </label>
-
-              <label class="flex-grow">
-                <span>Enter text here:</span>
-                {{ clause.value(class="form-input-full form-input-blue") }}
-              </label>
-            </div>
-
-            {% if loop.index == 1: %}
-              <div class="form-row">
-                <input type="checkbox" name="advanced-search" id="advanced-search-input" />
-                <label for="advanced-search-input">Advanced search</label>
-
-                <a class="flex-right small" href="{{ url_for('new_search_index_page') }}">
-                  New search (beta)
-                </a>
-              </div>
-            {% endif %}
-
-          {% endfor %}
-
-          {% if form.clauses|length > 1: %}
-            <div class="form-row">
-              <a href="#" class="green-button js-add-clause">Add clause</a>
-            </div>
-          {% endif %}
-
-          <div class="form-row">
-            <input type="submit" value="Search Data" />
-            <a href="{{ url_for('search_index_page') }}" class="white-button flex-right">Reset</a>
-          </div>
-        </form>
-
-        {% if results: %}
-          <ol class="results-list">
-            {{ render_results_list(results, offset) }}
-          </ol>
-        {% elif error: %}
-          <p>
-            <div class="error-message">{{ error }}</div>
-          </p>
-        {% endif %}
-      </p>
-    </article>
-
-    <template id="form-clause-template">
-      <div class="form-row clause">
-        {{ template_clause.csrf_token }}
-
-        <label>
-          <span>Select logic operator:</span>
-          {{ template_clause.logic_operator(class="form-input-full form-input-blue") }}
-        </label>
-
-        <label>
-          <span>Select an option:</span>
-          {{ template_clause.option(class="form-input-full form-input-blue") }}
-        </label>
-
-        <label class="flex-grow">
-          <span>Enter text here:</span>
-          {{ template_clause.value(class="form-input-full form-input-blue") }}
-        </label>
-
-        <div class="no-label">
-          <a href="#" class="green-button js-remove-clause">Remove</a>
+          <label>
+            <span>Items per page</span>
+            {% set selected = search.per_page|string %}
+            <select name="perPage" class="form-input-blue form-input-full js-per-page">
+              <option {{ "selected" if selected == '10' }}>10</option>
+              <option {{ "selected" if selected == '20' }}>20</option>
+              <option {{ "selected" if selected == '50' }}>50</option>
+            </select>
+          </label>
         </div>
-      </div>
-    </template>
+
+        <div class="form-row full">
+          <label class="flex-1">
+            <span>By microbial strain:</span>
+            <select
+                tabindex="2"
+                name="ncbiIds"
+                multiple="multiple"
+                class="strain-select js-strain-select">
+              {% for taxon in search.fetch_taxa(): %}
+                <option value="{{ taxon.ncbiId }}" selected="selected">{{ taxon.name }} (NCBI:{{ taxon.ncbiId }})</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="flex-1">
+            <span>By metabolite:</span>
+            <select
+                tabindex="3"
+                name="chebiIds"
+                multiple="multiple"
+                class="metabolite-select js-metabolite-select">
+              {% for metabolite in search.fetch_metabolites(): %}
+                <option value="{{ metabolite.chebiId }}" selected>{{ metabolite.name }} ({{ metabolite.chebiId }})</option>
+              {% endfor %}
+            </select>
+          </label>
+        </div>
+      </form>
+
+      <a class="float-right small" href="{{ url_for('advanced_search_index_page') }}">
+        Advanced search
+      </a>
+
+      <div class="clear"></div>
+
+      <ol class="results-list js-results-list">
+        {{ render_results_list(studies, search, offset) }}
+      </ol>
+    </article>
   </div>
 {% endblock %}

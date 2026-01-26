@@ -9,7 +9,7 @@ In this repo, you can find the code of the resource, known issues and discussion
 If you'd like to explore studies and their data, these two documentation resources explain how to do that:
 
 - Searching: <https://mgrowthdb.gbiomed.kuleuven.be/help/searching/>
-- Data analysis: <https://mgrowthdb.gbiomed.kuleuven.be/help/data-analysis/>
+- Study pages: <https://mgrowthdb.gbiomed.kuleuven.be/help/study-pages/>
 
 To upload your own data, you need to authenticate by using [ORCID](https://orcid.org/). Documentation on how to proceed can be found here:
 

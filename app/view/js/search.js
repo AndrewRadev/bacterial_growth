@@ -37,6 +37,7 @@ Page('.search-page', function($page) {
   // Trigger search automatically
   $page.on('keyup', 'input[name=q]', _.debounce(updateSearch, 200));
   $page.on('change', '.js-strain-select,.js-metabolite-select', updateSearch)
+  $page.on('change', '.js-per-page', updateSearch)
 
   // Make sure the "advanced search" checkbox reflects the current state of the
   // form:
@@ -48,14 +49,21 @@ Page('.search-page', function($page) {
     $checkbox.prop('checked', true);
   }
 
-  $page.on('change', '#advanced-search-input', function(e) {
-    let checkbox = $(e.currentTarget);
+  $page.on('click', '.js-load-more', function(e) {
+    e.preventDefault();
+    loadNextPage($(this));
+  });
 
-    if (checkbox.is(':checked')) {
-      add_advanced_search();
-    } else {
-      remove_advanced_search();
-    }
+  /*
+   * Advanced search:
+   */
+
+  $page.on('click', '.js-add-clause', function(e) {
+    e.preventDefault();
+
+    $button = $(e.currentTarget);
+    let new_clause = buildNewClause();
+    $button.parents('.form-row').before(new_clause);
   });
 
   $page.on('click', '.js-remove-clause', function(e) {
@@ -63,14 +71,6 @@ Page('.search-page', function($page) {
 
     $clause = $(e.currentTarget).parents('.form-row.clause');
     $clause.remove();
-  });
-
-  $page.on('click', '.js-add-clause', function(e) {
-    e.preventDefault();
-
-    $button = $(e.currentTarget);
-    let new_clause = build_new_clause();
-    $button.parents('.form-row').before(new_clause);
   });
 
   function updateSearch() {
@@ -87,31 +87,21 @@ Page('.search-page', function($page) {
     });
   }
 
-  function remove_advanced_search() {
-    // We find the checkbox and remove all form rows after it:
-    let $checkbox = $page.find('#advanced-search-input');
-    let $inputs = $checkbox.parents('.form-row').nextAll('.form-row.clause');
+  function loadNextPage($button) {
+    let offset = $page.find('.js-search-result').length;
+    let $searchForm  = $page.find('.js-search-form');
 
-    $inputs.remove();
+    $button.addClass('loading');
 
-    // We also remove the "Add new" button
-    $page.find('.add-clause').parents('.form-row').remove();
+    $searchForm.ajaxSubmit({
+      urlParams: { offset },
+      success: function(response) {
+        $button.replaceWith(response);
+      }
+    });
   }
 
-  function add_advanced_search() {
-    // We find the checkbox and add a single clause afterwards:
-    let $checkbox = $page.find('#advanced-search-input');
-    let new_clause = build_new_clause();
-
-    $checkbox.parents('.form-row').after(`
-      <div class="form-row">
-        <a href="#" class="green-button add-clause">Add clause</a>
-      </div>
-    `);
-    $checkbox.parents('.form-row').after(new_clause);
-  }
-
-  function build_new_clause() {
+  function buildNewClause() {
     let template_clause = $page.find('#form-clause-template').html();
 
     // We need to prepend all names and ids with "clause-N" for uniqueness:

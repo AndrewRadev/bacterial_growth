@@ -4,6 +4,7 @@ from pathlib import Path
 from flask import (
     request,
     render_template,
+    current_app,
 )
 from markdown_it import MarkdownIt
 from markupsafe import Markup
@@ -13,10 +14,10 @@ from werkzeug.exceptions import NotFound
 from app.model.lib.util import is_ajax
 
 
-class HelpPages:
+class HelpTopics:
     def __init__(self):
         self.templates_dir = Path('app/view/templates')
-        self.root_dir      = self.templates_dir / Path('pages/help/pages')
+        self.root_dir      = self.templates_dir / 'pages/help/topics'
 
         self.markdown = MarkdownIt().enable('table')
 
@@ -76,7 +77,7 @@ class HelpPages:
         return results
 
     def process_once(self):
-        if self._html_cache:
+        if self._html_cache and not current_app.config['DEBUG']:
             return
 
         for file in self.root_dir.iterdir():
@@ -99,37 +100,27 @@ class HelpPages:
                 self._text_cache[base_key] = ' '.join(soup.get_text(' ', strip=True).split())
 
 
-HELP_PAGES = HelpPages()
+HELP_TOPICS = HelpTopics()
 
 
 def help_index_page():
-    HELP_PAGES.process_once()
+    HELP_TOPICS.process_once()
 
     if len(request.args.get('query', '')) >= 3:
-        search_results = HELP_PAGES.search(request.args['query'])
+        topics = HELP_TOPICS.search(request.args['query'])
     else:
-        search_results = None
+        topics = None
 
     if is_ajax(request):
-        return render_template(
-            "pages/help/_page_list.html",
-            search_results=search_results,
-        )
+        return render_template("pages/help/_topic_list.html", topics=topics)
     else:
-        return render_template(
-            "pages/help/index.html",
-            search_results=search_results,
-        )
+        return render_template("pages/help/index.html", topics=topics)
 
 
 def help_show_page(name):
-    HELP_PAGES.process_once()
+    HELP_TOPICS.process_once()
 
     title = name.replace('-', ' ').title()
-    html_content = HELP_PAGES.render_html(name)
+    html_content = HELP_TOPICS.render_html(name)
 
-    return render_template(
-        "pages/help/show.html",
-        title=title,
-        content=html_content,
-    )
+    return render_template("pages/help/show.html", title=title, content=html_content)

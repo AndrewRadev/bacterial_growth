@@ -20,13 +20,7 @@ def metabolite_show_page(chebiId):
         .where(StudyMetabolite.chebiId == metabolite.chebiId)
     ).one()
 
-    search_url = url_for(
-        'search_index_page',
-        **{
-            'clauses-0-option': 'chEBI ID',
-            'clauses-0-value': metabolite.chebiId,
-        },
-    )
+    search_url = url_for('search_index_page', chebiIds=metabolite.chebiId)
 
     last_chebi_update = read_timestamp_date('var/external_data/last_chebi_update.txt')
 

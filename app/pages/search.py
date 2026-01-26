@@ -8,6 +8,7 @@ from flask import (
     g,
     render_template,
     request,
+    make_response,
 )
 import sqlalchemy as sql
 
@@ -20,94 +21,78 @@ from app.model.orm import (
 from app.model.lib.study_search import StudySearch
 from app.model.lib.util import is_ajax
 
-_PER_PAGE = 20
 
-
-def new_search_index_page():
+def search_index_page():
     search = StudySearch(
         g.db_session,
         user=g.current_user,
         query=request.args.get('q'),
         ncbiIds=request.args.getlist('ncbiIds'),
         chebiIds=request.args.getlist('chebiIds'),
-        per_page=_PER_PAGE,
+        per_page=int(request.args.get('perPage', g.items_per_page)),
+        offset=int(request.args.get('offset', '0')),
     )
 
     studies = search.fetch_results()
 
+    render_params = dict(
+        search=search,
+        studies=studies,
+        offset=0,
+    )
+
     if is_ajax(request):
-        return render_template(
-            "pages/search/_new_index_update.html",
-            search=search,
-            studies=studies,
-            offset=0,
-        )
+        html = render_template("pages/search/_index_update.html", **render_params)
     else:
-        return render_template(
-            "pages/search/new_index.html",
-            search=search,
-            studies=studies,
-            offset=0,
-        )
+        html = render_template("pages/search/index.html", **render_params)
+
+    response = make_response(html)
+    response.set_cookie('items-per-page', str(search.per_page))
+
+    return response
 
 
-def search_index_page():
+def advanced_search_index_page():
     form = SearchForm(request.args)
 
-    template_clause = SearchFormClause()
-    results = []
-
-    if g.current_user and g.current_user.isAdmin:
-        # Noop, show everything
-        publish_clause = Study.publicId.isnot(None)
-    elif g.current_user:
-        publish_clause = sql.or_(
-            Study.isPublished,
-            StudyUser.userUniqueID == g.current_user.uuid
-        )
-    else:
-        publish_clause = Study.isPublished
+    template_clause  = SearchFormClause()
+    search_submitted = False
+    study_ids        = []
+    results          = []
 
     if form.data['clauses'] and form.data['clauses'][0]['value']:
-        if not form.data['clauses'][0]['option']:
-            form.data
+        search_submitted = True
+
+        if g.current_user and g.current_user.isAdmin:
+            # Noop, show everything
+            publish_clause = Study.publicId.isnot(None)
+        elif g.current_user:
+            publish_clause = sql.or_(
+                Study.isPublished,
+                StudyUser.userUniqueID == g.current_user.uuid
+            )
+        else:
+            publish_clause = Study.isPublished
 
         query, values = dynamical_query(form.data['clauses'])
         value_dict = {f"value_{i}": v for i, v in enumerate(values)}
-        studyIds = [
+        study_ids = [
             studyId for (studyId,)
             in g.db_conn.execute(sql.text(query), value_dict)
         ]
-    else:
-        # TODO (2025-04-15) Extract, test with multiple users
-        studyIds = g.db_session.scalars(
-            sql.select(Study.publicId)
-            .join(StudyUser, isouter=True)
-            .where(publish_clause)
-            .group_by(Study)
-            .limit(_PER_PAGE)
-        ).all()
 
-    if studyIds:
         results = g.db_session.scalars(
             sql.select(Study)
             .distinct()
-            .where(Study.publicId.in_(studyIds))
+            .where(Study.publicId.in_(study_ids))
             .where(publish_clause)
             .order_by(Study.createdAt.desc())
         ).all()
 
-    if results:
-        return render_template(
-            "pages/search/index.html",
-            form=form,
-            template_clause=template_clause,
-            results=results,
-        )
-    else:
-        return render_template(
-            "pages/search/index.html",
-            form=form,
-            template_clause=template_clause,
-            error="Couldn't find a study with these parameters.",
-        )
+    return render_template(
+        "pages/search/advanced.html",
+        search_submitted=search_submitted,
+        form=form,
+        template_clause=template_clause,
+        results=results,
+    )

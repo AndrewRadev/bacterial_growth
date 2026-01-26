@@ -135,8 +135,8 @@ def init_routes(app):
         methods=["POST"],
     )
 
-    app.add_url_rule("/search/",     view_func=search_pages.search_index_page)
-    app.add_url_rule("/new-search/", view_func=search_pages.new_search_index_page)
+    app.add_url_rule("/search/",          view_func=search_pages.search_index_page)
+    app.add_url_rule("/advanced-search/", view_func=search_pages.advanced_search_index_page)
 
     app.add_url_rule("/profile/", view_func=user_pages.user_show_page)
     app.add_url_rule("/login/",   view_func=user_pages.user_login_page)

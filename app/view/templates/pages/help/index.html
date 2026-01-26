@@ -22,16 +22,14 @@
               class="form-input-blue full js-search-input" />
         </label>
 
-        <a href="{{ url_for('help_index_page') }}" class="white-button flex-right">Reset</a>
+        <a href="{{ url_for('help_index_page') }}" class="white-button flex-right">🧹 Clear</a>
       </div>
     </form>
 
     <br>
 
-    <article>
-      <ul class="page-list js-page-list">
-        {% include 'pages/help/_page_list.html' %}
-      </ul>
+    <article class="page-list-container js-page-list-container">
+      {% include 'pages/help/_topic_list.html' %}
     </article>
   </div>
 
