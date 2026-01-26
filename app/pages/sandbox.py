@@ -9,8 +9,6 @@ from flask import (
 from app.model.lib.chart import Chart
 from app.model.lib.errors import LoginRequired
 
-# TODO (2026-01-21) validate files, show errors
-
 def sandbox_index_page():
     chart = Chart(time_units='h')
     errors = {}
