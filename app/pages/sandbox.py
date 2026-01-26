@@ -37,7 +37,7 @@ def sandbox_index_page():
             else:
                 c3 = None
 
-            label = f"{file.filename}: {c2}"
+            label = f"<b>{file.filename}</b>: {c2}"
             units = request.form.get(f"units-{axis}")
 
             df.rename(columns={c1: "time", c2: "value", c3: "std"}, inplace=True)
