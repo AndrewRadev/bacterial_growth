@@ -44,7 +44,7 @@ def create_app():
     if env == 'production':
         # In prod, we run behind nginx, so take its X-Forwarded-For field as
         # the remote address:
-        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=2)
 
     return app
 
