@@ -55,6 +55,7 @@ def _set_variables():
     else:
         g.sidebar_open = False
 
+    g.items_per_page = request.cookies.get('items-per-page', '10')
     g.now = datetime.now(UTC)
 
 
