@@ -37,6 +37,7 @@ Page('.search-page', function($page) {
   // Trigger search automatically
   $page.on('keyup', 'input[name=q]', _.debounce(updateSearch, 200));
   $page.on('change', '.js-strain-select,.js-metabolite-select', updateSearch)
+  $page.on('change', '.js-per-page', updateSearch)
 
   // Make sure the "advanced search" checkbox reflects the current state of the
   // form:
