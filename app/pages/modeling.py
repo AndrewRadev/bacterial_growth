@@ -132,7 +132,6 @@ def modeling_chart_fragment(publicId, measurementContextId):
 
     chart = Chart(
         time_units=study.timeUnits,
-        legend_position='right',
         log_left=log_transform,
     )
     units = measurement_context.technique.units

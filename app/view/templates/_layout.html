@@ -16,6 +16,9 @@
     {% assets "app_js" %}
     <script src="{{ ASSET_URL }}" type="text/javascript"></script>
     {% endassets %}
+
+    {% block head %}
+    {% endblock %}
   </head>
 
   <body>
@@ -26,92 +29,7 @@
         </a>
       </div>
 
-      <header>
-        <img src="{{ url_for('static', filename='images/logo_sidebar3.png') }}" />
-      </header>
-
-      <nav>
-        <ul class="nav-links">
-          <li>
-            <a href="{{ url_for('static_home_page') }}" class="home-link">
-              <div class="emoji-icon">🏠</div>
-              Home
-            </a>
-          </li>
-          <li>
-            <a href="{{ url_for('search_index_page') }}">
-              <div class="emoji-icon">🔍</div>
-              Search
-            </a>
-          </li>
-          <li>
-            {% if 'compareData' in session and session['compareData'].get('contexts', [])|length > 0 %}
-              {% set compareContexts = session['compareData']['contexts'] %}
-            {% else: %}
-              {% set compareContexts = [] %}
-            {% endif %}
-
-            {% if 'compareData' in session and session['compareData'].get('models', [])|length > 0 %}
-              {% set compareModels = session['compareData']['models'] %}
-            {% else: %}
-              {% set compareModels = [] %}
-            {% endif %}
-
-            <a
-                href="{{ url_for('comparison_show_page') }}"
-                class="js-sidebar-compare"
-                data-compare-context-ids='{{ compareContexts|join(',') }}'
-                data-compare-model-ids='{{ compareModels|join(',') }}'>
-              <div class="emoji-icon">↔</div>
-              Compare
-              <span class="js-count count">
-                {% if compareContexts|length > 0 or compareModels|length > 0: %}
-                  ({{ compareContexts|length + compareModels|length }})
-                {% endif %}
-              </span>
-            </a>
-          </li>
-          <li>
-            {% if g.current_user: %}
-              <a href="{{ url_for('user_show_page') }}">
-                <div class="emoji-icon">🧑‍🔬</div>
-                Profile
-              </a>
-            {% else: %}
-              <a href="{{ url_for('user_login_page') }}">
-                <div class="emoji-icon">🔐</div>
-                Log in
-              </a>
-            {% endif %}
-          </li>
-          <li>
-            <a href="{{ url_for('upload_status_page') }}">
-              <div class="emoji-icon">📤</div>
-              Upload data
-            </a>
-          </li>
-          <li>
-            <a href="{{ url_for('help_index_page') }}">
-              <div class="emoji-icon">❓</div>
-              Help
-            </a>
-          </li>
-          <li>
-            <a href="{{ url_for('static_about_page') }}">
-              <div class="emoji-icon">🥼</div>
-              About us
-            </a>
-          </li>
-          {% if g.current_user and g.current_user.isAdmin: %}
-            <li>
-              <a href="/admin/" style="border: 1px solid coral;">
-                <div class="emoji-icon">👷</div>
-                Admin
-              </a>
-            </li>
-          {% endif %}
-        </ul>
-      </nav>
+      {% include '_sidebar.html' %}
     </aside>
 
     <main id="main" class="{{ 'with-open-sidebar' if g.sidebar_open }}">

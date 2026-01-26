@@ -15,6 +15,7 @@ import app.pages.modeling as modeling_pages
 import app.pages.submissions as submission_pages
 import app.pages.upload as upload_pages
 import app.pages.users as user_pages
+import app.pages.sandbox as sandbox_pages
 
 import app.pages.api as api_pages
 
@@ -149,6 +150,12 @@ def init_routes(app):
     app.add_url_rule("/claim-study/",   view_func=user_pages.user_claim_study_action,   methods=["POST"])
 
     app.add_url_rule("/excel_files/<id>.xlsx", view_func=excel_file_pages.download_excel_file)
+
+    app.add_url_rule(
+        "/sandbox/",
+        view_func=sandbox_pages.sandbox_index_page,
+        methods=["GET", "POST"],
+    )
 
     #
     # API routes

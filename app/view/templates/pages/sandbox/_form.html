@@ -1,0 +1,141 @@
+{% macro render_form(errors) %}
+
+  {% if errors: %}
+    <ul class="error-message-list">
+      {% for filename, error in errors.items(): %}
+        <li>{{ filename }}: {{ error }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <form
+      action="{{ url_for('sandbox_index_page') }}"
+      enctype="multipart/form-data"
+      class="simple-form flex-column flex-gap-10"
+      method="POST">
+    <div class="form-row flex-row flex-gap-10">
+      <div class="flex-2 js-upload-container-left">
+        <div class="upload-container js-file-upload">
+          <div class="flex-row flex-gap-10">
+            <img
+                src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
+                height="40"
+                title="Upload" />
+            <div class="instructions">
+              <span>
+                Drag and drop data CSVs to show on the <strong>left axis</strong>
+              </span>
+              <span class="hint small">Limit 200MB per file</span>
+            </div>
+          </div>
+
+          <input
+              class="small"
+              multiple
+              name="data-left"
+              accept=".csv"
+              type="file" />
+        </div>
+      </div>
+
+      <div class="flex-1 flex-column flex-center flex-gap-10">
+        <input type="submit" disabled class="green-button form-input-full" value="Submit" />
+        <input type="reset" class="white-button form-input-full" value="🧹 Clear" />
+      </div>
+
+      <div class="flex-2 js-upload-container-right">
+        <div class="upload-container js-file-upload">
+          <div class="flex-row flex-gap-10">
+            <div class="instructions">
+              <span>
+                Drag and drop data CSVs to show on the <strong>right axis</strong>
+              </span>
+              <span class="hint">Limit 200MB per file</span>
+            </div>
+            <img
+                src="{{ url_for('static', filename='images/icons/cloud-upload.svg') }}"
+                height="40"
+                title="Upload" />
+          </div>
+
+          <input
+              class="small"
+              multiple
+              name="data-right"
+              accept=".csv"
+              type="file" />
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row flex-row flex-gap-10">
+      <label class="flex-2">
+        <span>Left axis units</span>
+        <input
+            type="text"
+            name="units-left"
+            value="{{ request.form['units-left'] or '' }}"
+            class="form-input-blue form-input-full" />
+      </label>
+
+      <div class="flex-1">
+        {# Empty column for spacing #}
+      </div>
+
+      <label class="flex-2">
+        <span>Right axis units</span>
+        <input
+            type="text"
+            name="units-right"
+            value="{{ request.form['units-right'] or '' }}"
+            class="form-input-blue form-input-full" />
+      </label>
+    </div>
+  </form>
+
+  <div class="help small margin-top-10">
+    You can upload multiple files at a time, either by selecting them in the
+    file browser or by dragging them together onto the upload areas.
+
+    <ul>
+      <li>
+        <strong>Column 1</strong>
+        of the uploaded files will be interpreted as <strong>time in hours</strong>.
+      </li>
+      <li>
+        <strong>Column 2</strong>
+        will be interpreted as the observations to place on the y-axis. The
+        column name will be used for the chart label.
+      </li>
+      <li>
+        <strong>Column 3</strong>, if present,
+        will be used for error bars.
+      </li>
+    </ul>
+
+    If given, the units for the left and right axis will only be used as labels.
+  </div>
+
+  <hr>
+
+  <div class="help small margin-top-10">
+    Here are a few example data files you can try out, taken from
+    <a target="_blank" href="/study/SMGDB00000007/">SMGDB00000007</a>:
+
+    <ul>
+      <li>
+        Growth data with time and value columns:
+        <a download href="/static/data/s7_bh1_bt_A.csv">FC live of the bh1_A community</a>
+      </li>
+      <li>
+        Growth data with error bars:
+        <a download href="/static/data/s7_bhbtri_bt_average_fc.csv">FC of Bacteroides thetaiotaomicron VPI-5482 in Average(bhbtri)</a>
+      </li>
+      <li>
+        Baranyi-Roberts model of the above:
+        <a download href="/static/data/s7_bhbtri_bt_model.csv">Baranyi-Roberts predictions</a>
+      </li>
+    </ul>
+  </div>
+
+{% endmacro %}

@@ -33,7 +33,7 @@ class HelpTopics:
     def search(self, query):
         results = []
 
-        search_pattern = '(' + re.escape(query) + ')'
+        search_pattern = '(' + re.escape(query.strip()) + ')'
         regex = re.compile(search_pattern, re.IGNORECASE)
 
         for name, text in self._text_cache.items():

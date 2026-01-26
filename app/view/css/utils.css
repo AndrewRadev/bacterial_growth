@@ -23,6 +23,11 @@
   flex-direction: row;
 }
 
+.flex-center {
+  justify-content: center;
+  align-items: center;
+}
+
 .flex-column {
   display: flex;
   flex-direction: column;
@@ -265,6 +270,11 @@ form.simple-form {
     }
   }
 
+  input[type="reset"],
+  button[type="reset"] {
+    cursor: pointer;
+  }
+
   input[type="submit"],
   button[type="submit"] {
     cursor: pointer;
@@ -310,6 +320,11 @@ form.simple-form {
   textarea[disabled]
   {
     color: gray;
+  }
+
+  input.green-button[disabled] {
+    color: lightgray;
+    opacity: 0.5;
   }
 
   button[disabled] {

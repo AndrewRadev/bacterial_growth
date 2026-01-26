@@ -4,6 +4,12 @@
 
 {% block title %}: Comparison view{% endblock %}
 
+{% block head %}
+  {% assets "plotly_js" %}
+  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
+  {% endassets %}
+{% endblock %}
+
 {% block content %}
   <div class="container comparison-page">
     <h1>
@@ -155,8 +161,4 @@
       </form>
     </article>
   </div>
-
-  {% assets "plotly_js" %}
-  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
-  {% endassets %}
 {% endblock %}

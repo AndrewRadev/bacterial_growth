@@ -1,3 +1,5 @@
+import re
+
 from flask import (
     g,
     request,
@@ -162,6 +164,12 @@ def measurement_context_csv(id):
         raise NotFound
 
     df = measurement_context.get_df(g.db_session)
+
+    if request.args.get('withLabel'):
+        html_label = measurement_context.get_chart_label()
+        plain_label = re.sub(r'</?(b|sub)>', '', html_label)
+
+        df.rename(columns={'value': plain_label}, inplace=True)
 
     return df.to_csv(index=False)
 

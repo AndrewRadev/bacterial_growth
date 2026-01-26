@@ -2,7 +2,7 @@ Page('.help-page-index', function($page) {
   let $pageListContainer = $page.find('.js-page-list-container');
   let $searchInput = $('.js-search-input');
 
-  if ($.trim($searchInput.val()).length > 0) {
+  if ($searchInput.val().trim().length > 0) {
     updatePage($searchInput);
   }
 

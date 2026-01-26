@@ -48,7 +48,7 @@ class ComparativeChartForm:
         self.log_left  = False
         self.log_right = False
 
-    def build_chart(self, args=None, width=None, legend_position='top', clamp_x_data=False):
+    def build_chart(self, args=None, width=None, clamp_x_data=False):
         if args:
             self._extract_args(args)
 
@@ -60,7 +60,6 @@ class ComparativeChartForm:
             log_left=self.log_left,
             log_right=self.log_right,
             width=width,
-            legend_position=legend_position,
             clamp_x_data=clamp_x_data,
             show_std=self.show_std,
         )

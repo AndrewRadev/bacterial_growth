@@ -83,7 +83,7 @@
                   {{ measurement_context.get_chart_label() }}
 
                   <a
-                      href="{{ url_for('measurement_context_csv', id=measurement_context.id) }}"
+                      href="{{ url_for('measurement_context_csv', id=measurement_context.id, withLabel=1) }}"
                       class="white-button no-border small-button"
                       style="vertical-align: top"
                       download="measurement_context_{{ measurement_context.id }}.csv"

@@ -1,0 +1,35 @@
+{% macro render_chart(chart) %}
+
+  <div class="chart-container">
+    {{ chart.to_html()|safe }}
+
+    <div class="data-controls">
+      <div class="column left">
+        <span class="icon icon-left"></span>
+        <label>
+          <input
+              type="checkbox"
+              class="js-log js-log-left"
+              name="log-left"
+              {{ "disabled" if chart.data_left|length == 0 }}
+              {{ "checked" if chart.log_left }} />
+          <span>Log view</span>
+        </label>
+      </div>
+
+      <div class="column right">
+        <label>
+          <input
+              type="checkbox"
+              class="js-log js-log-right"
+              name="log-right"
+              {{ "disabled" if chart.data_right|length == 0 }}
+              {{ "checked" if chart.log_right }} />
+          <span>Log view</span>
+        </label>
+        <span class="icon icon-right"></span>
+      </div>
+    </div>
+  </div>
+
+{% endmacro %}

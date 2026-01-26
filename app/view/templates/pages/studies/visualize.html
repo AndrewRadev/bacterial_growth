@@ -4,6 +4,12 @@
 
 {% block title %}: Visualize Study{% endblock %}
 
+{% block head %}
+  {% assets "plotly_js" %}
+  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
+  {% endassets %}
+{% endblock %}
+
 {% block content %}
   <div class="container study-page study-visualize-page" data-study-id="{{ study.publicId }}">
     {% include 'pages/studies/_header.html' %}
@@ -95,8 +101,4 @@
       </form>
     </article>
   </div>
-
-  {% assets "plotly_js" %}
-  <script src="{{ ASSET_URL }}" type="text/javascript"></script>
-  {% endassets %}
 {% endblock %}
