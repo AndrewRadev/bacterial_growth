@@ -34,8 +34,17 @@
           </label>
 
           <input class="flex-end" type="submit" value="🔍 Search" />
-
           <a href="{{ url_for('search_index_page') }}" class="flex-end white-button">🧹 Clear</a>
+
+          <label>
+            <span>Items per page</span>
+            {% set selected = search.per_page|string %}
+            <select name="perPage" class="form-input-blue form-input-full js-per-page">
+              <option {{ "selected" if selected == '10' }}>10</option>
+              <option {{ "selected" if selected == '20' }}>20</option>
+              <option {{ "selected" if selected == '50' }}>50</option>
+            </select>
+          </label>
         </div>
 
         <div class="form-row full">

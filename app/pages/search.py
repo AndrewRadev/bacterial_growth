@@ -8,6 +8,7 @@ from flask import (
     g,
     render_template,
     request,
+    make_response,
 )
 import sqlalchemy as sql
 
@@ -20,8 +21,6 @@ from app.model.orm import (
 from app.model.lib.study_search import StudySearch
 from app.model.lib.util import is_ajax
 
-_PER_PAGE = 5
-
 
 def search_index_page():
     search = StudySearch(
@@ -30,7 +29,7 @@ def search_index_page():
         query=request.args.get('q'),
         ncbiIds=request.args.getlist('ncbiIds'),
         chebiIds=request.args.getlist('chebiIds'),
-        per_page=_PER_PAGE,
+        per_page=int(request.args.get('perPage', g.items_per_page)),
         offset=int(request.args.get('offset', '0')),
     )
 
@@ -43,9 +42,14 @@ def search_index_page():
     )
 
     if is_ajax(request):
-        return render_template("pages/search/_index_update.html", **render_params)
+        html = render_template("pages/search/_index_update.html", **render_params)
     else:
-        return render_template("pages/search/index.html", **render_params)
+        html = render_template("pages/search/index.html", **render_params)
+
+    response = make_response(html)
+    response.set_cookie('items-per-page', str(search.per_page))
+
+    return response
 
 
 def advanced_search_index_page():
