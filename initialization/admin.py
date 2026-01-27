@@ -297,6 +297,7 @@ def init_admin(app):
             'userAgent', 'ip', 'country',
             'uuid', 'isBot', 'isUser', 'isAdmin',
         ]
+        column_filters = ['isBot', 'isUser', 'isAdmin', 'country']
 
     admin.add_view(UserView(User,            db_session, category="Users"))
     admin.add_view(AppView(StudyUser,        db_session, category="Users"))
