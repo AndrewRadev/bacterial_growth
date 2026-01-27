@@ -1,5 +1,6 @@
 from uuid import uuid4
 from datetime import datetime, UTC
+from pathlib import Path
 
 from flask import (
     g,
@@ -8,6 +9,7 @@ from flask import (
     request,
     session,
     url_for,
+    current_app,
 )
 import sqlalchemy as sql
 import sqlalchemy.exc as sql_exceptions
@@ -21,7 +23,6 @@ from app.model.orm import (
 )
 from app.model.lib.errors import LoginRequired
 
-
 def init_global_handlers(app):
     """
     Main entry point of the module.
@@ -30,6 +31,17 @@ def init_global_handlers(app):
     storing a database connection in ``g.db_session`` and fetching the
     currently logged-in user in ``g.current_user``.
     """
+
+    maxminddb_path = Path('var/GeoLite2-Country.mmdb')
+    if maxminddb_path.exists():
+        try:
+            setattr(app, 'maxminddb', maxminddb.open_database(maxminddb_path))
+            # Note: this doesn't get a `close()` call, but we only read from
+            # it, so it should be fine if the process gets killed.
+        except maxminddb.InvalidDatabaseError:
+            app.logger.warn(f"Maxmind DB exists, but can't be opened: {maxminddb_path}")
+        except Exception as e:
+            app.logger.warn(f"Error initializing maxminddb: {e}")
 
     app.before_request(_make_session_permanent)
     app.before_request(_set_variables)
@@ -113,9 +125,10 @@ def _record_page_visit():
         return
 
     country = None
-    # if request.remote_addr:
-    #     if geoip_match := geolite2.lookup(request.remote_addr.encode('ascii')):
-    #         country = geoip_match.country
+    if request.remote_addr and hasattr(current_app, 'maxminddb'):
+        info = current_app.maxminddb.get(request.remote_addr)
+        if info:
+            country = info.get('country', {}).get('names', {}).get('en')
 
     page_visit = PageVisit(
         path=request.path,
