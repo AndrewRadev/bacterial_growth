@@ -12,6 +12,7 @@ from flask import (
 import sqlalchemy as sql
 import sqlalchemy.exc as sql_exceptions
 from crawlerdetect import CrawlerDetect
+import maxminddb
 
 from db import get_connection, FLASK_DB
 from app.model.orm import (
@@ -111,11 +112,17 @@ def _record_page_visit():
         # Ignore ajax requests
         return
 
+    country = None
+    # if request.remote_addr:
+    #     if geoip_match := geolite2.lookup(request.remote_addr.encode('ascii')):
+    #         country = geoip_match.country
+
     page_visit = PageVisit(
         path=request.path,
         query=request.query_string,
         referrer=request.referrer,
         ip=request.remote_addr,
+        country=country,
         userAgent=request.user_agent.string,
         uuid=session['user_uuid'],
         isUser=(True if g.current_user else False),

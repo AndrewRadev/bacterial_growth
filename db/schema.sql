@@ -398,6 +398,7 @@ CREATE TABLE PageVisits (
   ip varchar(100) DEFAULT NULL,
   userAgent text,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  country varchar(255) DEFAULT NULL,
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -752,5 +753,6 @@ INSERT INTO MigrationVersions VALUES
 (85,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 15:59:33'),
 (86,'2026_01_05_113846_add-params-to-custom-models','2026-01-08 13:28:47'),
 (90,'2026_01_22_172601_create_page_visits','2026-01-23 10:35:44'),
-(93,'2026_01_23_120741_create_page_visit_counters','2026-01-23 13:45:15');
+(93,'2026_01_23_120741_create_page_visit_counters','2026-01-23 13:45:15'),
+(95,'2026_01_26_172214_add_country_to_page_visits','2026-01-26 16:22:56');
 

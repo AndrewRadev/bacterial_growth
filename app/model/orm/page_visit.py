@@ -23,6 +23,7 @@ class PageVisit(OrmBase):
     query:     Mapped[str] = mapped_column(sql.String(255))
     referrer:  Mapped[str] = mapped_column(sql.String(255))
     ip:        Mapped[str] = mapped_column(sql.String(100))
+    country:   Mapped[str] = mapped_column(sql.String(255))
     userAgent: Mapped[str] = mapped_column(sql.String)
     uuid:      Mapped[str] = mapped_column(sql.String(36))
 
