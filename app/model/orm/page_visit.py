@@ -1,4 +1,5 @@
 from datetime import datetime
+from urllib.parse import parse_qs
 
 import sqlalchemy as sql
 from sqlalchemy.orm import (
@@ -32,3 +33,10 @@ class PageVisit(OrmBase):
     isBot:   Mapped[bool] = mapped_column(sql.Boolean, default=False)
 
     createdAt: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
+
+    @property
+    def parsedQuery(self):
+        if self.query is None:
+            return None
+
+        return parse_qs(self.query)
