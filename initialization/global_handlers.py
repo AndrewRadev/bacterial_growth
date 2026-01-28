@@ -126,7 +126,12 @@ def _record_page_visit():
 
     country = None
     if request.remote_addr and hasattr(current_app, 'maxminddb'):
-        info = current_app.maxminddb.get(request.remote_addr)
+        info = None
+        try:
+            info = current_app.maxminddb.get(request.remote_addr)
+        except Exception as e:
+            current_app.logger.warn(f"Maxmind Lookup failed: {e}")
+
         if info:
             country = info.get('country', {}).get('names', {}).get('en')
 
