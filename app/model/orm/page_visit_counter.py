@@ -19,7 +19,14 @@ class PageVisitCounter(OrmBase):
     __tablename__ = 'PageVisitCounters'
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    counts: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+
+    paths:     Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+    countries: Mapped[sql.JSON] = mapped_column(sql.JSON, nullable=False)
+
+    totalVisitCount:    Mapped[int] = mapped_column(sql.Integer, nullable=False)
+    totalBotVisitCount: Mapped[int] = mapped_column(sql.Integer, nullable=False)
+    totalVisitorCount:  Mapped[int] = mapped_column(sql.Integer, nullable=False)
+    totalUserCount:     Mapped[int] = mapped_column(sql.Integer, nullable=False)
 
     startTimestamp: Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())
     endTimestamp:   Mapped[datetime] = mapped_column(UtcDateTime, server_default=sql.FetchedValue())

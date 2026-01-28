@@ -35,14 +35,32 @@ def _aggregate_page_visits(db_session):
 
     _LOGGER.info(f"Recording page visits from {start_time} to {end_time}")
 
-    total_count = 0
-    counts = {}
+    total_count           = 0
+    total_visit_count     = 0
+    total_bot_visit_count = 0
+    total_visitors        = set()
+    total_users           = set()
+
+    paths     = {}
+    countries = {}
+
     page_visits = db_session.scalars(sql.select(PageVisit).where(PageVisit.id <= last_id))
 
     for pv in page_visits:
         total_count += 1
-        if pv.path not in counts:
-            counts[pv.path] = {
+
+        pv_path = pv.path
+        if pv_path not in paths:
+            paths[pv_path] = {
+                'visitCount': 0,
+                'botVisitCount': 0,
+                'visitors': set(),
+                'users': set(),
+            }
+
+        pv_country = pv.country or "Unknown"
+        if pv_country not in countries:
+            countries[pv_country] = {
                 'visitCount': 0,
                 'botVisitCount': 0,
                 'visitors': set(),
@@ -50,14 +68,24 @@ def _aggregate_page_visits(db_session):
             }
 
         if pv.isBot:
-            counts[pv.path]['botVisitCount'] += 1
+            paths[pv_path]['botVisitCount'] += 1
+            countries[pv_country]['botVisitCount'] += 1
+            total_bot_visit_count += 1
         else:
-            counts[pv.path]['visitCount'] += 1
-            counts[pv.path]['visitors'].add(pv.uuid)
-            if pv.isUser:
-                counts[pv.path]['users'].add(pv.uuid)
+            paths[pv_path]['visitCount'] += 1
+            countries[pv_country]['visitCount'] += 1
+            total_visit_count += 1
 
-    for entry in counts.values():
+            paths[pv_path]['visitors'].add(pv.uuid)
+            countries[pv_country]['visitors'].add(pv.uuid)
+            total_visitors.add(pv.uuid)
+
+            if pv.isUser:
+                paths[pv_path]['users'].add(pv.uuid)
+                countries[pv_country]['users'].add(pv.uuid)
+                total_users.add(pv.uuid)
+
+    for entry in [*paths.values(), *countries.values()]:
         entry['visitorCount'] = len(entry['visitors'])
         entry['userCount']    = len(entry['users'])
 
@@ -67,7 +95,12 @@ def _aggregate_page_visits(db_session):
     pvc = PageVisitCounter(
         startTimestamp=start_time,
         endTimestamp=end_time,
-        counts=counts,
+        paths=paths,
+        countries=countries,
+        totalVisitCount=total_visit_count,
+        totalBotVisitCount=total_bot_visit_count,
+        totalVisitorCount=len(total_visitors),
+        totalUserCount=len(total_users),
     )
     db_session.add(pvc)
     db_session.commit()

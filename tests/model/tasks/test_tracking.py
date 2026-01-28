@@ -32,17 +32,62 @@ class TestTracking(DatabaseTest):
         # We have created one aggregated counter:
         counter = self.db_session.scalars(sql.select(PageVisitCounter)).one()
 
-        self.assertEqual(counter.counts['/']['visitCount'], 1)
-        self.assertEqual(counter.counts['/search/']['visitCount'], 4)
-        self.assertEqual(counter.counts['/help/']['visitCount'], 2)
+        self.assertEqual(counter.totalVisitCount, 7)
+        self.assertEqual(counter.totalBotVisitCount, 0)
+        self.assertEqual(counter.totalVisitorCount, 3)
+        self.assertEqual(counter.totalUserCount, 1)
 
-        self.assertEqual(counter.counts['/']['visitorCount'], 1)
-        self.assertEqual(counter.counts['/search/']['visitorCount'], 2)
-        self.assertEqual(counter.counts['/help/']['visitorCount'], 2)
+        self.assertEqual(counter.paths['/']['visitCount'], 1)
+        self.assertEqual(counter.paths['/search/']['visitCount'], 4)
+        self.assertEqual(counter.paths['/help/']['visitCount'], 2)
 
-        self.assertEqual(counter.counts['/']['userCount'], 0)
-        self.assertEqual(counter.counts['/search/']['userCount'], 1)
-        self.assertEqual(counter.counts['/help/']['userCount'], 0)
+        self.assertEqual(counter.paths['/']['visitorCount'], 1)
+        self.assertEqual(counter.paths['/search/']['visitorCount'], 2)
+        self.assertEqual(counter.paths['/help/']['visitorCount'], 2)
+
+        self.assertEqual(counter.paths['/']['userCount'], 0)
+        self.assertEqual(counter.paths['/search/']['userCount'], 1)
+        self.assertEqual(counter.paths['/help/']['userCount'], 0)
+
+    def test_aggregating_countries(self):
+        self.create_page_visit(uuid='p1', path='/', country="Belgium")
+        self.create_page_visit(uuid='p1', path='/', country="Bulgaria")
+        self.create_page_visit(uuid='p1', path='/', country="United States")
+
+        self.create_page_visit(uuid='p2', path='/', isUser=True, country="Belgium")
+        self.create_page_visit(uuid='p2', path='/', isUser=True, country="Belgium")
+
+        self.create_page_visit(uuid='p3', path='/', country=None)
+
+        # Bot, not counted:
+        self.create_page_visit(uuid='p4', path='/', isBot=True, country="United States")
+        self.create_page_visit(uuid='p4', path='/', isBot=True, country="United States")
+
+        _aggregate_page_visits(self.db_session)
+
+        # We delete all page visits at the end:
+        pv_count = self.db_session.scalar(sql.func.count(PageVisit.id))
+        self.assertEqual(pv_count, 0)
+
+        # We have created one aggregated counter:
+        counter = self.db_session.scalars(sql.select(PageVisitCounter)).one()
+
+        self.assertEqual(counter.countries['Belgium']['visitCount'], 3)
+        self.assertEqual(counter.countries['Belgium']['visitorCount'], 2)
+        self.assertEqual(counter.countries['Belgium']['userCount'], 1)
+
+        self.assertEqual(counter.countries['Bulgaria']['visitCount'], 1)
+        self.assertEqual(counter.countries['Bulgaria']['visitorCount'], 1)
+        self.assertEqual(counter.countries['Bulgaria']['userCount'], 0)
+
+        self.assertEqual(counter.countries['United States']['visitCount'], 1)
+        self.assertEqual(counter.countries['United States']['visitorCount'], 1)
+        self.assertEqual(counter.countries['United States']['userCount'], 0)
+        self.assertEqual(counter.countries['United States']['botVisitCount'], 2)
+
+        self.assertEqual(counter.countries['Unknown']['visitCount'], 1)
+        self.assertEqual(counter.countries['Unknown']['visitorCount'], 1)
+        self.assertEqual(counter.countries['Unknown']['userCount'], 0)
 
     def test_counting_bots(self):
         self.create_page_visit(uuid='p1', path='/', isUser=True)
@@ -54,10 +99,10 @@ class TestTracking(DatabaseTest):
         _aggregate_page_visits(self.db_session)
         counter = self.db_session.scalars(sql.select(PageVisitCounter)).one()
 
-        self.assertEqual(counter.counts['/']['visitCount'], 2)
-        self.assertEqual(counter.counts['/']['botVisitCount'], 2)
-        self.assertEqual(counter.counts['/']['visitorCount'], 2)
-        self.assertEqual(counter.counts['/']['userCount'], 1)
+        self.assertEqual(counter.paths['/']['visitCount'], 2)
+        self.assertEqual(counter.paths['/']['botVisitCount'], 2)
+        self.assertEqual(counter.paths['/']['visitorCount'], 2)
+        self.assertEqual(counter.paths['/']['userCount'], 1)
 
     def test_recording_timestamps(self):
         with freeze_time(datetime.now(UTC)) as frozen_time:

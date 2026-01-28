@@ -371,10 +371,15 @@ DROP TABLE IF EXISTS PageVisitCounters;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE PageVisitCounters (
   id int NOT NULL AUTO_INCREMENT,
-  counts json NOT NULL DEFAULT (json_object()),
+  paths json NOT NULL DEFAULT (json_object()),
   startTimestamp datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   endTimestamp datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  countries json NOT NULL DEFAULT (json_object()),
+  totalVisitCount int NOT NULL DEFAULT '0',
+  totalBotVisitCount int NOT NULL DEFAULT '0',
+  totalVisitorCount int NOT NULL DEFAULT '0',
+  totalUserCount int NOT NULL DEFAULT '0',
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -754,5 +759,6 @@ INSERT INTO MigrationVersions VALUES
 (86,'2026_01_05_113846_add-params-to-custom-models','2026-01-08 13:28:47'),
 (90,'2026_01_22_172601_create_page_visits','2026-01-23 10:35:44'),
 (93,'2026_01_23_120741_create_page_visit_counters','2026-01-23 13:45:15'),
-(95,'2026_01_26_172214_add_country_to_page_visits','2026-01-26 16:22:56');
+(95,'2026_01_26_172214_add_country_to_page_visits','2026-01-26 16:22:56'),
+(99,'2026_01_28_155444_track_country_in_page_visit_counters','2026-01-28 14:59:27');
 
