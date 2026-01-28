@@ -128,7 +128,12 @@ def _record_page_visit():
     if request.remote_addr and hasattr(current_app, 'maxminddb'):
         info = None
         try:
-            info = current_app.maxminddb.get(request.remote_addr)
+            ip = request.remote_addr
+            if ip.startswith('[') and ip.endswith(']'):
+                # IPv6 addresses may be wrapped in brackets, so let's remove them
+                ip = ip[1:-1]
+
+            info = current_app.maxminddb.get(ip)
         except Exception as e:
             current_app.logger.warn(f"Maxmind Lookup failed: {e}")
 
