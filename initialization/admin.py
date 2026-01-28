@@ -33,6 +33,8 @@ from app.model.orm import (
     MeasurementTechnique,
     Metabolite,
     ModelingResult,
+    PageVisit,
+    PageVisitCounter,
     Perturbation,
     Project,
     ProjectUser,
@@ -147,6 +149,8 @@ class AppView(ModelView):
     can_export       = True
     can_view_details = True
 
+    column_default_sort = ('id', True)
+
     model_form_converter = AppModelConverter
     "Custom converter for JSON and datetime"
 
@@ -190,12 +194,16 @@ def init_admin(app):
     class StudyView(AppView):
         column_searchable_list = ['name']
         column_exclude_list = ['description']
+        column_default_sort = ('publicId', True)
         form_excluded_columns = [
             'measurements', 'measurementContexts', 'studyTechniques', 'measurementTechniques',
             'studyUsers', 'experiments', 'strains', 'communities', 'compartments',
             'modelingResults', 'bioreplicates',
             'studyMetabolites', 'metabolites',
         ]
+
+    class ProjectView(AppView):
+        column_default_sort = ('publicId', True)
 
     class SubmissionView(AppView):
         column_exclude_list = ['studyDesign', 'dataFile']
@@ -223,7 +231,7 @@ def init_admin(app):
                 download_name=file.filename
             )
 
-    admin.add_view(AppView(Project,                 db_session, category="Studies"))
+    admin.add_view(ProjectView(Project,             db_session, category="Studies"))
     admin.add_view(StudyView(Study,                 db_session, category="Studies"))
     admin.add_view(SubmissionView(Submission,       db_session, category="Studies"))
     admin.add_view(SubmissionView(SubmissionBackup, db_session, category="Studies"))
@@ -243,8 +251,10 @@ def init_admin(app):
             'measurementContexts',
             'measurements',
         ]
+    class ExperimentView(ExperimentEntityView):
+        column_default_sort = ('publicId', True)
 
-    admin.add_view(ExperimentEntityView(Experiment,            db_session, category="Experiments"))
+    admin.add_view(ExperimentView(Experiment,                  db_session, category="Experiments"))
     admin.add_view(ExperimentEntityView(ExperimentCompartment, db_session, category="Experiments"))
     admin.add_view(ExperimentEntityView(Compartment,           db_session, category="Experiments"))
     admin.add_view(ExperimentEntityView(Bioreplicate,          db_session, category="Experiments"))
@@ -280,8 +290,19 @@ def init_admin(app):
             'projectUsers', 'studyUsers',
         ]
 
-    admin.add_view(UserView(User,       db_session, category="Users"))
-    admin.add_view(AppView(StudyUser,   db_session, category="Users"))
-    admin.add_view(AppView(ProjectUser, db_session, category="Users"))
+    class PageVisitView(AppView):
+        column_list = [
+            'createdAt',
+            'path', 'parsedQuery',
+            'userAgent', 'ip', 'country',
+            'uuid', 'isBot', 'isUser', 'isAdmin',
+        ]
+        column_filters = ['isBot', 'isUser', 'isAdmin', 'country']
+
+    admin.add_view(UserView(User,            db_session, category="Users"))
+    admin.add_view(AppView(StudyUser,        db_session, category="Users"))
+    admin.add_view(AppView(ProjectUser,      db_session, category="Users"))
+    admin.add_view(PageVisitView(PageVisit,  db_session, category="Users"))
+    admin.add_view(AppView(PageVisitCounter, db_session, category="Users"))
 
     return app

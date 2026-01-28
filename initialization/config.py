@@ -68,4 +68,10 @@ def init_config(app):
     if timing:
         app.logger.getChild('timing').setLevel('INFO')
 
+    if ip_forwarding_levels := int(app.config.get('IP_FORWARDING', '0')):
+        # In prod, we'd expect to run behind proxies, so we need to set the
+        # number of these in the .env file.
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=ip_forwarding_levels)
+
     return app

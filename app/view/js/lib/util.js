@@ -42,7 +42,7 @@ function wrapSubstrings(text, words, prefix, suffix) {
 function select2Highlighter(state, textClasses='') {
   $searchField = $('.select2-container--open .select2-search__field');
 
-  let query = $searchField.val().trim();
+  let query = ($searchField.val() || '').trim();
   let text = wrapSubstrings(
     state.text,
     query.split(/\s+/),

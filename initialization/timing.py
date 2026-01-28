@@ -30,7 +30,7 @@ def _start_request_timing():
 
 
 def _log_request_timing(response):
-    if request.full_path.startswith('/static'):
+    if _is_static(request):
         return response
 
     duration_ns = time.monotonic_ns() - g.start_time
@@ -69,3 +69,7 @@ def _log_db_timing(conn, cursor, statement, parameters, context, executemany):
     if os.getenv('TIME'):
         logger = current_app.logger.getChild('timing')
         logger.info(f"[{duration_ms}ms] Query: {' '.join(statement.split('\n'))}")
+
+
+def _is_static(request):
+    return request.endpoint in ('static', 'admin.static', None)

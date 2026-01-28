@@ -15,6 +15,9 @@ export SERVER_PID=$!
 celery -A scripts.run_celery worker --concurrency=3 --loglevel INFO &
 export WORKER_PID=$!
 
+celery -A scripts.run_celery beat -s var/celerybeat-schedule --loglevel INFO &
+export SCHEDULER_PID=$!
+
 reload_processes() {
   echo "> Reloading processes"
 
@@ -25,6 +28,10 @@ reload_processes() {
   kill -TERM "$WORKER_PID"
   celery -A scripts.run_celery worker --concurrency=3 --loglevel INFO &
   export WORKER_PID=$!
+
+  kill -TERM "$SCHEDULER_PID"
+  celery -A scripts.run_celery beat -s var/celerybeat-schedule --loglevel INFO &
+  export SCHEDULER_PID=$!
 }
 
 trap 'reload_processes' SIGHUP

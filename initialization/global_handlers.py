@@ -1,5 +1,6 @@
 from uuid import uuid4
 from datetime import datetime, UTC
+from pathlib import Path
 
 from flask import (
     g,
@@ -8,14 +9,19 @@ from flask import (
     request,
     session,
     url_for,
+    current_app,
 )
 import sqlalchemy as sql
 import sqlalchemy.exc as sql_exceptions
+from crawlerdetect import CrawlerDetect
+import maxminddb
 
 from db import get_connection, FLASK_DB
-from app.model.orm import User
+from app.model.orm import (
+    User,
+    PageVisit
+)
 from app.model.lib.errors import LoginRequired
-
 
 def init_global_handlers(app):
     """
@@ -26,10 +32,22 @@ def init_global_handlers(app):
     currently logged-in user in ``g.current_user``.
     """
 
+    maxminddb_path = Path('var/GeoLite2-Country.mmdb')
+    if maxminddb_path.exists():
+        try:
+            setattr(app, 'maxminddb', maxminddb.open_database(maxminddb_path))
+            # Note: this doesn't get a `close()` call, but we only read from
+            # it, so it should be fine if the process gets killed.
+        except maxminddb.InvalidDatabaseError:
+            app.logger.warn(f"Maxmind DB exists, but can't be opened: {maxminddb_path}")
+        except Exception as e:
+            app.logger.warn(f"Error initializing maxminddb: {e}")
+
     app.before_request(_make_session_permanent)
     app.before_request(_set_variables)
     app.before_request(_open_db_connection)
     app.before_request(_fetch_user)
+    app.before_request(_record_page_visit)
 
     app.after_request(_close_db_connection)
 
@@ -60,7 +78,8 @@ def _set_variables():
 
 
 def _open_db_connection():
-    if request.endpoint == 'static':
+    if _is_static(request):
+        # Ignore static files
         return
 
     if 'db_conn' not in g:
@@ -71,7 +90,8 @@ def _open_db_connection():
 
 
 def _fetch_user():
-    if request.endpoint == 'static':
+    if _is_static(request):
+        # Ignore static files
         return
 
     if 'user' not in g:
@@ -90,8 +110,56 @@ def _fetch_user():
         ).one_or_none()
 
 
+def _record_page_visit():
+    if request.method != 'GET':
+        # We only track direct page visits
+        return
+    if _is_static(request):
+        # Don't record static files
+        return
+    if request.path.startswith('/admin/'):
+        # Ignore admin page requests
+        return
+    if _is_ajax(request):
+        # Ignore ajax requests
+        return
+
+    country = None
+    if request.remote_addr and hasattr(current_app, 'maxminddb'):
+        info = None
+        try:
+            ip = request.remote_addr
+            if ip.startswith('[') and ip.endswith(']'):
+                # IPv6 addresses may be wrapped in brackets, so let's remove them
+                ip = ip[1:-1]
+
+            info = current_app.maxminddb.get(ip)
+        except Exception as e:
+            current_app.logger.warn(f"Maxmind Lookup failed: {e}")
+
+        if info:
+            country = info.get('country', {}).get('names', {}).get('en')
+
+    page_visit = PageVisit(
+        path=request.path,
+        query=request.query_string,
+        referrer=request.referrer,
+        ip=request.remote_addr,
+        country=country,
+        userAgent=request.user_agent.string,
+        uuid=session['user_uuid'],
+        isUser=(True if g.current_user else False),
+        isAdmin=(True if g.current_user and g.current_user.isAdmin else False),
+        isBot=CrawlerDetect().isCrawler(request.user_agent.string),
+    )
+
+    g.db_session.add(page_visit)
+    g.db_session.commit()
+
+
 def _close_db_connection(response):
-    if request.endpoint == 'static':
+    if _is_static(request):
+        # Ignore static files
         return response
 
     db_conn = g.pop('db_conn', None)
@@ -108,7 +176,6 @@ def _render_not_found(_error):
         return '404 Not found', 404
     else:
         return render_template('errors/404.html'), 404
-
 
 
 def _render_forbidden(_error):
@@ -135,3 +202,11 @@ def _is_json(request):
 
 def _is_csv(request):
     return request.path.endswith('.csv')
+
+
+def _is_static(request):
+    return request.endpoint in ('static', 'admin.static', None)
+
+
+def _is_ajax(request):
+    return request.headers.get('X-Requested-With', '') == 'XMLHttpRequest'

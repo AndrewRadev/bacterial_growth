@@ -2,11 +2,11 @@ import tests.init  # noqa: F401
 
 import unittest
 
-from app.model.lib.modeling_tasks import _process_modeling_request
+from app.model.tasks.modeling import _process_modeling_request
 from tests.database_test import DatabaseTest
 
 
-class TestModelingTasks(DatabaseTest):
+class TestModeling(DatabaseTest):
     def test_baranyi_roberts_calculation(self):
         strain              = self.create_study_strain()
         measurement_context = self.create_measurement_context(subjectId=strain.id, subjectType='strain')

@@ -363,6 +363,52 @@ CREATE TABLE ModelingResults (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `PageVisitCounters`
+--
+
+DROP TABLE IF EXISTS PageVisitCounters;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE PageVisitCounters (
+  id int NOT NULL AUTO_INCREMENT,
+  paths json NOT NULL DEFAULT (json_object()),
+  startTimestamp datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  endTimestamp datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  countries json NOT NULL DEFAULT (json_object()),
+  totalVisitCount int NOT NULL DEFAULT '0',
+  totalBotVisitCount int NOT NULL DEFAULT '0',
+  totalVisitorCount int NOT NULL DEFAULT '0',
+  totalUserCount int NOT NULL DEFAULT '0',
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `PageVisits`
+--
+
+DROP TABLE IF EXISTS PageVisits;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE PageVisits (
+  id int NOT NULL AUTO_INCREMENT,
+  isUser tinyint(1) NOT NULL DEFAULT '0',
+  isAdmin tinyint(1) NOT NULL DEFAULT '0',
+  isBot tinyint(1) NOT NULL DEFAULT '0',
+  uuid varchar(36) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  `query` varchar(255) DEFAULT NULL,
+  referrer varchar(255) DEFAULT NULL,
+  ip varchar(100) DEFAULT NULL,
+  userAgent text,
+  createdAt datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  country varchar(255) DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `Perturbations`
 --
 
@@ -702,13 +748,17 @@ INSERT INTO MigrationVersions VALUES
 (75,'2025_11_03_164617_populate_study_techniques','2025-11-13 14:05:50'),
 (76,'2025_11_18_125634_add_more_fields_to_metabolites','2025-11-18 14:20:52'),
 (77,'2025_11_19_173702_add_include_unknown_flag_to_study_techniques','2025-11-20 14:00:51'),
-(79,'2025_11_26_151231_rename_ncbi_id_in_study_strains','2025-11-26 14:13:39'),
-(81,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-26 14:15:20'),
-(83,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-26 15:06:13'),
-(85,'2025_12_08_172450_remove_modeling_request_id_constraint','2025-12-08 16:26:02'),
-(101,'2025_12_14_121007_create_custom_models','2025-12-15 15:15:04'),
-(102,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-15 15:15:04'),
-(103,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-15 15:15:04'),
-(105,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 14:35:08'),
-(107,'2026_01_05_113846_add-params-to-custom-models','2026-01-05 09:41:49');
+(78,'2025_11_26_151231_rename_ncbi_id_in_study_strains','2025-11-27 11:51:23'),
+(79,'2025_11_26_151436_rename_strains_to_study_strains','2025-11-27 11:51:23'),
+(80,'2025_11_26_160528_rename_chebi_id_in_study_metabolites','2025-11-27 11:51:23'),
+(81,'2025_12_08_172450_remove_modeling_request_id_constraint','2025-12-17 15:59:32'),
+(82,'2025_12_14_121007_create_custom_models','2025-12-17 15:59:32'),
+(83,'2025_12_14_121008_add_custom_upload_modeling_result_fields','2025-12-17 15:59:32'),
+(84,'2025_12_14_173844_add_publish_state_to_modeling_result','2025-12-17 15:59:33'),
+(85,'2025_12_17_153401_add_short_model_name_to_custom_models','2025-12-17 15:59:33'),
+(86,'2026_01_05_113846_add-params-to-custom-models','2026-01-08 13:28:47'),
+(90,'2026_01_22_172601_create_page_visits','2026-01-23 10:35:44'),
+(93,'2026_01_23_120741_create_page_visit_counters','2026-01-23 13:45:15'),
+(95,'2026_01_26_172214_add_country_to_page_visits','2026-01-26 16:22:56'),
+(99,'2026_01_28_155444_track_country_in_page_visit_counters','2026-01-28 14:59:27');
 

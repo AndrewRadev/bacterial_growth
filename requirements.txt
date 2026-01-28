@@ -24,6 +24,8 @@ requests
 watchdog
 markdown-it-py
 beautifulsoup4
+crawlerdetect
+maxminddb
 
 # Database
 sqlalchemy

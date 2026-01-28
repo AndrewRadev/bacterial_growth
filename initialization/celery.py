@@ -1,6 +1,9 @@
 import os
 
 from celery import Celery, Task
+from celery.schedules import crontab
+
+from app.model.tasks.tracking import aggregate_page_visits
 
 
 def init_celery(app):
@@ -25,12 +28,24 @@ def init_celery(app):
     redis_url = f"redis://{redis_host}:{redis_port}/0"
 
     celery_app = Celery(app.name, task_cls=AppTask)
+
     celery_app.config_from_object({
         'broker_url':         redis_url,
         'result_backend':     redis_url,
         'task_ignore_result': True,
+        'timezone':           'UTC',
+
+        'beat_schedule': {
+            'aggregate-page-visits': {
+                'task': 'app.model.tasks.tracking.aggregate_page_visits',
+                # 1pm UTC on Sunday:
+                'schedule': crontab(hour=13, minute=0, day_of_week='sunday'),
+                'args': (),
+            }
+        }
     })
     celery_app.set_default()
+
     app.extensions["celery"] = celery_app
 
     return app

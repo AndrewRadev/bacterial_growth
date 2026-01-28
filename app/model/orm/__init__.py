@@ -11,6 +11,8 @@ from .measurement_context import MeasurementContext
 from .measurement_technique import MeasurementTechnique
 from .metabolite import Metabolite
 from .modeling_result import ModelingResult
+from .page_visit import PageVisit
+from .page_visit_counter import PageVisitCounter
 from .perturbation import Perturbation
 from .project import Project
 from .project_user import ProjectUser
