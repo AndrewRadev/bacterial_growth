@@ -193,7 +193,7 @@ def init_admin(app):
 
     class StudyView(AppView):
         column_searchable_list = ['name']
-        column_exclude_list = ['description']
+        column_exclude_list = ['description', 'authors']
         column_default_sort = ('publicId', True)
         form_excluded_columns = [
             'measurements', 'measurementContexts', 'studyTechniques', 'measurementTechniques',

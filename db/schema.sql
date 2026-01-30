@@ -494,6 +494,8 @@ CREATE TABLE Studies (
   publishedAt datetime DEFAULT NULL,
   embargoExpiresAt datetime DEFAULT NULL,
   ownerUuid varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
+  authors json NOT NULL DEFAULT (json_array()),
+  citation text COLLATE utf8mb4_bin,
   PRIMARY KEY (publicId),
   UNIQUE KEY studyUniqueID (uuid)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
@@ -760,5 +762,6 @@ INSERT INTO MigrationVersions VALUES
 (90,'2026_01_22_172601_create_page_visits','2026-01-23 10:35:44'),
 (93,'2026_01_23_120741_create_page_visit_counters','2026-01-23 13:45:15'),
 (95,'2026_01_26_172214_add_country_to_page_visits','2026-01-26 16:22:56'),
-(99,'2026_01_28_155444_track_country_in_page_visit_counters','2026-01-28 14:59:27');
+(99,'2026_01_28_155444_track_country_in_page_visit_counters','2026-01-28 14:59:27'),
+(107,'2026_01_29_165248_add_authorship_fields_to_studies','2026-01-30 16:22:01');
 
