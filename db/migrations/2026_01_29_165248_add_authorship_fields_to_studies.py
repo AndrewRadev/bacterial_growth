@@ -4,9 +4,8 @@ import sqlalchemy as sql
 def up(conn):
     query = """
         ALTER TABLE Studies
-        ADD citation VARCHAR(255) DEFAULT NULL,
-        ADD bibtexFile TEXT DEFAULT NULL,
-        ADD authors JSON NOT NULL DEFAULT (json_array())
+        ADD authors JSON NOT NULL DEFAULT (json_array()),
+        ADD citation TEXT DEFAULT NULL
     """
     conn.execute(sql.text(query))
 
@@ -14,9 +13,8 @@ def up(conn):
 def down(conn):
     query = """
         ALTER TABLE Studies
-        DROP citation,
-        DROP bibtexFile,
-        DROP authors;
+        DROP authors,
+        DROP citation
     """
     conn.execute(sql.text(query))
 
